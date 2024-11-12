@@ -4,5 +4,5 @@ module;
 export module Eigen;
 
 export namespace Eigen {
-    export using Eigen::Vector3d;
+    using Eigen::Vector3d;
 }
