@@ -1,0 +1,14 @@
+# Xmake cache
+.xmake/
+build/
+
+# MacOS cache
+.DS_Store
+
+# Only for IDE to use
+CMakeLists.txt
+CMakeLists-backup.txt
+compile_commands.json
+
+# Clion generated files
+cmake-build-debug/
