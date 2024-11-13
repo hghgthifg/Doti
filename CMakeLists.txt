@@ -8,7 +8,9 @@ set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 
 find_package(Eigen3 CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
-find_package(glad CONFIG REQUIRED)
+#find_package(glad CONFIG REQUIRED)
+find_package(glbinding CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 # 添加静态库目标
 add_library(Doti STATIC "")
@@ -18,7 +20,8 @@ set_target_properties(Doti PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_D
 target_include_directories(Doti SYSTEM PRIVATE
         ${EIGEN3_INCLUDE_DIR}
         ${GLFW3_INCLUDE_DIR}
-        ${GLAD_INCLUDE_DIR}
+        ${GLBINDING_INCLUDE_DIR}
+        ${SPDLOG_INCLUDE_DIR}
 )
 
 target_compile_definitions(Doti PRIVATE
@@ -59,11 +62,13 @@ target_sources(Doti
         wrapper/test.cppm
         wrapper/eigen.cppm
         wrapper/glfw.cppm
+        wrapper/gl.cppm
+        wrapper/spdlog.cppm
 )
 
 target_link_libraries(Doti PRIVATE
         glfw
-        glad::glad
+        glbinding::glbinding
         Eigen3::Eigen
         opengl32
         user32
