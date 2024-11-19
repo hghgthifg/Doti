@@ -1,3 +1,7 @@
+/*!
+ * @brief Color utilities
+ */
+
 export module Utils.Color;
 
 import Math;

@@ -10,7 +10,8 @@ find_package(Eigen3 CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 #find_package(glad CONFIG REQUIRED)
 find_package(glbinding CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
+find_package(quill CONFIG REQUIRED)
+#find_package(spdlog CONFIG REQUIRED)
 
 # 添加静态库目标
 add_library(Doti STATIC "")
@@ -21,36 +22,40 @@ target_include_directories(Doti SYSTEM PRIVATE
         ${EIGEN3_INCLUDE_DIR}
         ${GLFW3_INCLUDE_DIR}
         ${GLBINDING_INCLUDE_DIR}
-        ${SPDLOG_INCLUDE_DIR}
+        #        ${QUILL_INCLUDE_DIR}
+        #        ${SPDLOG_INCLUDE_DIR}
 )
 
 target_compile_definitions(Doti PRIVATE
         GLFW_INCLUDE_NONE
 )
 
-if(MSVC)
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
+if (MSVC)
     target_compile_options(Doti PRIVATE /EHsc)
-elseif(Clang)
+elseif (Clang)
     target_compile_options(Doti PRIVATE -fexceptions -fcxx-exceptions)
-elseif(Gcc)
+elseif (Gcc)
     target_compile_options(Doti PRIVATE -fexceptions)
-endif()
+endif ()
 
 set_target_properties(Doti PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(Doti PRIVATE cxx_std_23)
 
-if(MSVC)
+if (MSVC)
     target_compile_options(Doti PRIVATE $<$<CONFIG:Debug>:-Od> $<$<CONFIG:Release>:-O2>)
     target_compile_options(Doti PRIVATE $<$<CONFIG:Debug>:-Zi> $<$<CONFIG:Release>:-DNDEBUG>)
-else()
+else ()
     target_compile_options(Doti PRIVATE $<$<CONFIG:Debug>:-O0> $<$<CONFIG:Release>:-O3>)
     target_compile_options(Doti PRIVATE $<$<CONFIG:Debug>:-g> $<$<CONFIG:Release>:-DNDEBUG>)
-endif()
+endif ()
 
-if(MSVC)
+if (MSVC)
     set_property(TARGET Doti PROPERTY
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
+endif ()
 
 target_sources(Doti
         PUBLIC
@@ -59,15 +64,21 @@ target_sources(Doti
         doti/Utils/ray.cppm
         doti/Math/math.cppm
         doti/Utils/color.cppm
+        doti/Window/window.cppm
+        doti/Debug/logger.cppm
+        doti/Graphics/Shader/shader.cppm
         wrapper/test.cppm
         wrapper/eigen.cppm
         wrapper/glfw.cppm
         wrapper/gl.cppm
-        wrapper/spdlog.cppm
+        #        wrapper/quill.cppm
+        wrapper/std.mock.cppm
 )
 
 target_link_libraries(Doti PRIVATE
         glfw
+        #        quill::quill
+        #        spdlog::spdlog
         glbinding::glbinding
         Eigen3::Eigen
         opengl32
@@ -81,29 +92,29 @@ add_executable(Editor "")
 set_target_properties(Editor PROPERTIES OUTPUT_NAME "Editor")
 set_target_properties(Editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/windows/x64/$<CONFIG>")
 
-if(MSVC)
+if (MSVC)
     target_compile_options(Editor PRIVATE /EHsc)
-elseif(Clang)
+elseif (Clang)
     target_compile_options(Editor PRIVATE -fexceptions -fcxx-exceptions)
-elseif(Gcc)
+elseif (Gcc)
     target_compile_options(Editor PRIVATE -fexceptions)
-endif()
+endif ()
 
 set_target_properties(Editor PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(Editor PRIVATE cxx_std_23)
 
-if(MSVC)
+if (MSVC)
     target_compile_options(Editor PRIVATE $<$<CONFIG:Debug>:-Od> $<$<CONFIG:Release>:-O2>)
     target_compile_options(Editor PRIVATE $<$<CONFIG:Debug>:-Zi> $<$<CONFIG:Release>:-DNDEBUG>)
-else()
+else ()
     target_compile_options(Editor PRIVATE $<$<CONFIG:Debug>:-O0> $<$<CONFIG:Release>:-O3>)
     target_compile_options(Editor PRIVATE $<$<CONFIG:Debug>:-g> $<$<CONFIG:Release>:-DNDEBUG>)
-endif()
+endif ()
 
-if(MSVC)
+if (MSVC)
     set_property(TARGET Editor PROPERTY
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
+endif ()
 
 target_sources(Editor PRIVATE
         editor/main.cpp
