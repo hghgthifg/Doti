@@ -6,8 +6,6 @@ import std;
 import Debug.Logger;
 import Math;
 
-export class ShaderFactory {};
-
 export class Shader {
 public:
     Shader() = delete;
@@ -20,15 +18,29 @@ public:
 
     Shader(Shader&&) = delete;
 
+    auto operator =(const Shader&) -> Shader& = delete;
+
+    auto operator =(Shader&&) -> Shader& = default;
+
     Shader(const std::string& name, const std::string& vertexPath,
            const std::string& fragmentPath): _ID(0), _name(name) {
         Logger::info("Created shader: " + name);
-        Logger::info("Loaded vertex shader: " + vertexPath + "and fragment shader: " + fragmentPath);
+        Logger::info("Loaded vertex shader: " + vertexPath + " and fragment shader: " + fragmentPath);
         this->_vertexPath   = vertexPath;
         this->_fragmentPath = fragmentPath;
+        this->loadShader();
     }
 
-    auto LoadShader() -> void {
+    auto activate() const -> void {
+        glUseProgram(_ID);
+    }
+
+    auto deactivate() const -> void {
+        glUseProgram(0);
+    }
+
+    // ------------------------------------------------------------------------
+    auto loadShader() -> void {
         // 1. Load shader code from file
         if (_vertexPath == "" || _fragmentPath == "") {
             Logger::error("No shader paths provided.");
@@ -96,71 +108,72 @@ public:
         Logger::info("Successfully compiled and linked shader: " + _vertexPath + " and " + _fragmentPath);
     }
 
-    auto LoadShader(const std::string& vertexPath, const std::string& fragmentPath) -> void {
+    auto loadShader(const std::string& vertexPath, const std::string& fragmentPath) -> void {
         Logger::info("Loaded vertex shader: " + vertexPath + "and fragment shader: " + fragmentPath);
         this->_vertexPath   = vertexPath;
         this->_fragmentPath = fragmentPath;
-        LoadShader();
+        loadShader();
     }
 
-    auto setBool(const std::string& name, bool value) -> const void {
+    // ------------------------------------------------------------------------
+    auto setBool(const std::string& name, const bool value) const -> void {
         glUniform1i(glGetUniformLocation(_ID, name.c_str()), (int) value);
     }
 
     // ------------------------------------------------------------------------
-    void setInt(const std::string& name, int value) const {
+    auto setInt(const std::string& name, const int value) const -> void {
         glUniform1i(glGetUniformLocation(_ID, name.c_str()), value);
     }
 
     // ------------------------------------------------------------------------
-    void setFloat(const std::string& name, float value) const {
+    auto setFloat(const std::string& name, const float value) const -> void {
         glUniform1f(glGetUniformLocation(_ID, name.c_str()), value);
     }
 
     // ------------------------------------------------------------------------
-    void setVec2(const std::string& name, const Vec2 value) const {
+    auto setVec2(const std::string& name, const Vec2& value) const -> void {
         glUniform2fv(glGetUniformLocation(_ID, name.c_str()), 1, &value(0));
     }
 
-    void setVec2(const std::string& name, float x, float y) const {
+    auto setVec2(const std::string& name, const float x, const float y) const -> void {
         glUniform2f(glGetUniformLocation(_ID, name.c_str()), x, y);
     }
 
     // ------------------------------------------------------------------------
-    void setVec3(const std::string& name, const Vec3 value) const {
+    auto setVec3(const std::string& name, const Vec3& value) const -> void {
         glUniform3fv(glGetUniformLocation(_ID, name.c_str()), 1, &value(0));
     }
 
-    void setVec3(const std::string& name, float x, float y, float z) const {
+    auto setVec3(const std::string& name, const float x, const float y, const float z) const -> void {
         glUniform3f(glGetUniformLocation(_ID, name.c_str()), x, y, z);
     }
 
     // ------------------------------------------------------------------------
-    void setVec4(const std::string& name, const Vec4 value) const {
+    auto setVec4(const std::string& name, const Vec4& value) const -> void {
         glUniform4fv(glGetUniformLocation(_ID, name.c_str()), 1, &value(0));
     }
 
-    void setVec4(const std::string& name, float x, float y, float z, float w) const {
+    auto setVec4(const std::string& name, const float x, const float y, const float z, const float w) const -> void {
         glUniform4f(glGetUniformLocation(_ID, name.c_str()), x, y, z, w);
     }
 
     // ------------------------------------------------------------------------
-    void setMat2(const std::string& name, const Mat2 mat) const {
+    auto setMat2(const std::string& name, const Mat2& mat) const -> void {
         glUniformMatrix2fv(glGetUniformLocation(_ID, name.c_str()), 1, GL_FALSE, &mat(0, 0));
     }
 
     // ------------------------------------------------------------------------
-    void setMat3(const std::string& name, const Mat3 mat) const {
+    auto setMat3(const std::string& name, const Mat3& mat) const -> void {
         glUniformMatrix3fv(glGetUniformLocation(_ID, name.c_str()), 1, GL_FALSE, &mat(0, 0));
     }
 
     // ------------------------------------------------------------------------
-    void setMat4(const std::string& name, const Mat4 mat) const {
+    auto setMat4(const std::string& name, const Mat4& mat) const -> void {
         glUniformMatrix4fv(glGetUniformLocation(_ID, name.c_str()), 1, GL_FALSE, &mat(0, 0));
     }
 
 private:
-    static auto checkCompileErrors(uint32_t shader, std::string_view type) -> void {
+    static auto checkCompileErrors(const uint32_t shader, const std::string_view type) -> void {
         int  success;
         char infoLog[1024];
         if (type != "PROGRAM") {
@@ -184,3 +197,5 @@ private:
     std::string                            _fragmentPath;
     static std::map<std::string, Shader *> _shaders;
 };
+
+std::map<std::string, Shader *> Shader::_shaders;

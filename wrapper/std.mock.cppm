@@ -15,6 +15,7 @@ module;
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <filesystem>
 #include <format>
 #include <fstream>
 #include <functional>
@@ -33,6 +34,7 @@ module;
 #include <semaphore>
 #include <source_location>
 #include <stdexcept>
+#include <stdfloat>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -2200,6 +2202,19 @@ export namespace std
 export namespace std
 {
     using std::map;
+}
+
+export namespace std
+{
+    namespace filesystem
+    {
+        using std::filesystem::path;
+    }
+}
+
+export namespace std
+{
+    using std::same_as;
 }
 
 #if defined(__GLIBCXX__) || defined(__GLIBCPP__)

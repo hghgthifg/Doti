@@ -6,8 +6,9 @@ export module Window;
 
 import std;
 import glfw;
-import Debug.Logger;
 import OpenGL;
+import Debug.Logger;
+import Graphics.Shader;
 
 export class Window {
 public:
@@ -24,7 +25,7 @@ public:
         Logger::info("Successfully initialize OpenGL 4.6.");
 
         /* Create the window */
-        _window = std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow*)> >(
+        _window = std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow*)>>(
             glfwCreateWindow(width, height, title, nullptr, nullptr),
             [](GLFWwindow* ptr) {
                 glfwDestroyWindow(ptr);
@@ -37,26 +38,58 @@ public:
         }
 
         glfwMakeContextCurrent(_window.get());
+        glfwSetFramebufferSizeCallback(_window.get(), [](GLFWwindow* window, int width, int height) {
+            glViewport(0, 0, width, height);
+        });
 
         glbinding::initialize(glfwGetProcAddress);
 
         Logger::info("Successfully create OpenGL window.");
     }
 
-    auto processEvents() const -> void {
-        /* Loop until the user closes the window */
-        while (!glfwWindowShouldClose(_window.get())) {
-            /* Render here */
-            glClear(GL_COLOR_BUFFER_BIT);
+    // auto loop() const -> void {
+    //     /* Loop until the user closes the window */
+    //     while (!glfwWindowShouldClose(_window.get())) {
+    //         /* Render here */
+    //         glClear(GL_COLOR_BUFFER_BIT);
+    //
+    //         /* Process keyboard and mouse inputs */
+    //         processInput();
+    //
+    //         /* Swap front and back buffers */
+    //         glfwSwapBuffers(_window.get());
+    //
+    //         /* Poll for and process events */
+    //         glfwPollEvents();
+    //     }
+    // }
 
-            /* Swap front and back buffers */
-            glfwSwapBuffers(_window.get());
+    auto shouldClose() const -> bool {
+        return glfwWindowShouldClose(_window.get());
+    }
 
-            /* Poll for and process events */
-            glfwPollEvents();
-        }
+    auto beginDraw() const -> void {
+        /* Render here */
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        /* Process keyboard and mouse inputs */
+        processInput();
+    }
+
+    auto endDraw() const -> void {
+        /* Swap front and back buffers */
+        glfwSwapBuffers(_window.get());
+
+        /* Poll for and process events */
+        glfwPollEvents();
     }
 
 private:
-    std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow*)> > _window;
+    std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow*)>> _window;
+
+    auto processInput() const -> void {
+        if (glfwGetKey(_window.get(), GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+            glfwSetWindowShouldClose(_window.get(), true);
+        }
+    }
 };
