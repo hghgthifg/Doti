@@ -5,7 +5,7 @@ cmake_policy(SET CMP0091 NEW)
 #        "0e5b6991-d74f-4b3d-a41c-cf096e0b2508")
 #
 #if (Clang)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -fbuiltin-headers-in-system-modules -fmodules -fcxx-modules")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
 #endif ()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -22,6 +22,8 @@ find_package(glfw3 CONFIG REQUIRED)
 #find_package(glad CONFIG REQUIRED)
 find_package(glbinding CONFIG REQUIRED)
 find_package(quill CONFIG REQUIRED)
+find_package(PkgConfig)
+pkg_check_modules(Jxl REQUIRED IMPORTED_TARGET libjxl libjxl_cms libjxl_threads)
 #find_package(Boost REQUIRED COMPONENTS signals2)
 #find_package(spdlog CONFIG REQUIRED)
 
@@ -29,13 +31,6 @@ find_package(quill CONFIG REQUIRED)
 add_library(Doti STATIC "")
 set_target_properties(Doti PROPERTIES OUTPUT_NAME "Doti")
 set_target_properties(Doti PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/windows/x64/$<CONFIG>")
-
-#target_include_directories(Doti SYSTEM PRIVATE
-#        ${EIGEN3_INCLUDE_DIR}
-#        ${GLFW3_INCLUDE_DIR}
-#        ${GLBINDING_INCLUDE_DIR}
-#        ${BOOST_}
-#)
 
 target_compile_definitions(Doti PRIVATE
         GLFW_INCLUDE_NONE
@@ -45,10 +40,13 @@ add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 if (MSVC)
+    # Enable C++ exceptions in MSVC
     target_compile_options(Doti PRIVATE /EHsc)
-elseif (Clang)
-    target_compile_options(Doti PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic)
-elseif (Gcc)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # Enable C++ exceptions and common warnings in Clang
+    target_compile_options(Doti PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic -Xclang -fmodules)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # Enable C++ exceptions in GCC
     target_compile_options(Doti PRIVATE -fexceptions)
 endif ()
 
@@ -56,16 +54,28 @@ set_target_properties(Doti PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(Doti PRIVATE cxx_std_23)
 
 if (MSVC)
-    target_compile_options(Doti PRIVATE $<$<CONFIG:Debug>:-Od> $<$<CONFIG:Release>:-O2>)
-    target_compile_options(Doti PRIVATE $<$<CONFIG:Debug>:-Zi> $<$<CONFIG:Release>:-DNDEBUG>)
-else ()
-    target_compile_options(Doti PRIVATE $<$<CONFIG:Debug>:-O0> $<$<CONFIG:Release>:-O3>)
-    target_compile_options(Doti PRIVATE $<$<CONFIG:Debug>:-g> $<$<CONFIG:Release>:-DNDEBUG>)
-endif ()
-
-if (MSVC)
+    # MSVC
+    target_compile_options(Doti PRIVATE
+            $<$<CONFIG:Debug>:/Od>               # Disable optimizations in Debug
+            $<$<CONFIG:Release>:/O2>             # Optimize for speed in Release
+            $<$<CONFIG:Debug>:/Zi>               # Enable debugging information in Debug
+    )
+    target_compile_definitions(Doti PRIVATE
+            $<$<CONFIG:Release>:NDEBUG>          # Define NDEBUG in Release
+    )
     set_property(TARGET Doti PROPERTY
-            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+    )
+else ()
+    # GCC or Clang
+    target_compile_options(Doti PRIVATE
+            $<$<CONFIG:Debug>:-O0>               # No optimization in Debug
+            $<$<CONFIG:Release>:-O3>             # High optimization in Release
+            $<$<CONFIG:Debug>:-g>                # Generate debug symbols in Debug
+    )
+    target_compile_definitions(Doti PRIVATE
+            $<$<CONFIG:Release>:NDEBUG>          # Define NDEBUG in Release
+    )
 endif ()
 
 target_sources(Doti
@@ -83,18 +93,20 @@ target_sources(Doti
         doti/Graphics/Render/Drawable/mesh.cppm
         doti/Graphics/Render/Drawable/triangle.cppm
         doti/Graphics/Render/Model/model.cppm
+        doti/Graphics/Loader/jxl_loader.cppm
+        doti/Graphics/Loader/image_loader.cppm
         wrapper/test.cppm
         wrapper/eigen.cppm
         wrapper/glfw.cppm
         wrapper/gl.cppm
         wrapper/std.mock.cppm
         wrapper/assimp.cppm
-        #        wrapper/boost-signals2.cppm
+        wrapper/libjxl.cppm
 )
 
 target_link_libraries(Doti PRIVATE
         glfw
-        #        Boost::signals2
+        PkgConfig::Jxl
         glbinding::glbinding
         Eigen3::Eigen
         opengl32
@@ -109,10 +121,13 @@ set_target_properties(Editor PROPERTIES OUTPUT_NAME "Editor")
 set_target_properties(Editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/windows/x64/$<CONFIG>")
 
 if (MSVC)
+    # Enable C++ exceptions in MSVC
     target_compile_options(Editor PRIVATE /EHsc)
-elseif (Clang)
-    target_compile_options(Doti PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic)
-elseif (Gcc)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # Enable C++ exceptions and common warnings in Clang
+    target_compile_options(Editor PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # Enable C++ exceptions in GCC
     target_compile_options(Editor PRIVATE -fexceptions)
 endif ()
 
@@ -120,16 +135,28 @@ set_target_properties(Editor PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(Editor PRIVATE cxx_std_23)
 
 if (MSVC)
-    target_compile_options(Editor PRIVATE $<$<CONFIG:Debug>:-Od> $<$<CONFIG:Release>:-O2>)
-    target_compile_options(Editor PRIVATE $<$<CONFIG:Debug>:-Zi> $<$<CONFIG:Release>:-DNDEBUG>)
-else ()
-    target_compile_options(Editor PRIVATE $<$<CONFIG:Debug>:-O0> $<$<CONFIG:Release>:-O3>)
-    target_compile_options(Editor PRIVATE $<$<CONFIG:Debug>:-g> $<$<CONFIG:Release>:-DNDEBUG>)
-endif ()
-
-if (MSVC)
+    # MSVC
+    target_compile_options(Editor PRIVATE
+            $<$<CONFIG:Debug>:/Od>               # Disable optimizations in Debug
+            $<$<CONFIG:Release>:/O2>             # Optimize for speed in Release
+            $<$<CONFIG:Debug>:/Zi>               # Enable debugging information in Debug
+    )
+    target_compile_definitions(Editor PRIVATE
+            $<$<CONFIG:Release>:NDEBUG>          # Define NDEBUG in Release
+    )
     set_property(TARGET Editor PROPERTY
-            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+    )
+else ()
+    # GCC or Clang
+    target_compile_options(Editor PRIVATE
+            $<$<CONFIG:Debug>:-O0>               # No optimization in Debug
+            $<$<CONFIG:Release>:-O3>             # High optimization in Release
+            $<$<CONFIG:Debug>:-g>                # Generate debug symbols in Debug
+    )
+    target_compile_definitions(Editor PRIVATE
+            $<$<CONFIG:Release>:NDEBUG>          # Define NDEBUG in Release
+    )
 endif ()
 
 target_sources(Editor PRIVATE
@@ -144,10 +171,13 @@ set_target_properties(Demo PROPERTIES OUTPUT_NAME "Demo")
 set_target_properties(Demo PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/windows/x64/$<CONFIG>")
 
 if (MSVC)
+    # Enable C++ exceptions in MSVC
     target_compile_options(Demo PRIVATE /EHsc)
-elseif (Clang)
-    target_compile_options(Doti PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic)
-elseif (Gcc)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # Enable C++ exceptions and common warnings in Clang
+    target_compile_options(Demo PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # Enable C++ exceptions in GCC
     target_compile_options(Demo PRIVATE -fexceptions)
 endif ()
 
@@ -155,16 +185,28 @@ set_target_properties(Demo PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(Demo PRIVATE cxx_std_23)
 
 if (MSVC)
-    target_compile_options(Demo PRIVATE $<$<CONFIG:Debug>:-Od> $<$<CONFIG:Release>:-O2>)
-    target_compile_options(Demo PRIVATE $<$<CONFIG:Debug>:-Zi> $<$<CONFIG:Release>:-DNDEBUG>)
-else ()
-    target_compile_options(Demo PRIVATE $<$<CONFIG:Debug>:-O0> $<$<CONFIG:Release>:-O3>)
-    target_compile_options(Demo PRIVATE $<$<CONFIG:Debug>:-g> $<$<CONFIG:Release>:-DNDEBUG>)
-endif ()
-
-if (MSVC)
+    # MSVC
+    target_compile_options(Demo PRIVATE
+            $<$<CONFIG:Debug>:/Od>               # Disable optimizations in Debug
+            $<$<CONFIG:Release>:/O2>             # Optimize for speed in Release
+            $<$<CONFIG:Debug>:/Zi>               # Enable debugging information in Debug
+    )
+    target_compile_definitions(Demo PRIVATE
+            $<$<CONFIG:Release>:NDEBUG>          # Define NDEBUG in Release
+    )
     set_property(TARGET Demo PROPERTY
-            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+    )
+else ()
+    # GCC or Clang
+    target_compile_options(Demo PRIVATE
+            $<$<CONFIG:Debug>:-O0>               # No optimization in Debug
+            $<$<CONFIG:Release>:-O3>             # High optimization in Release
+            $<$<CONFIG:Debug>:-g>                # Generate debug symbols in Debug
+    )
+    target_compile_definitions(Demo PRIVATE
+            $<$<CONFIG:Release>:NDEBUG>          # Define NDEBUG in Release
+    )
 endif ()
 
 target_sources(Demo PRIVATE

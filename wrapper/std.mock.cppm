@@ -33,6 +33,7 @@ module;
 #include <ratio>
 #include <semaphore>
 #include <source_location>
+#include <span>
 #include <stdexcept>
 #include <stdfloat>
 #include <string>
@@ -505,6 +506,7 @@ export namespace std
 export namespace std
 {
     using std::ifstream;
+    using std::ios;
     using std::stringstream;
 }
 
@@ -2209,12 +2211,18 @@ export namespace std
     namespace filesystem
     {
         using std::filesystem::path;
+        using std::filesystem::file_size;
     }
 }
 
 export namespace std
 {
     using std::same_as;
+}
+
+export namespace std
+{
+    using std::span;
 }
 
 #if defined(__GLIBCXX__) || defined(__GLIBCPP__)

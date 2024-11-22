@@ -6,20 +6,26 @@ import OpenGL;
 import Graphics.Shader;
 import Debug.Logger;
 
+/*!
+ * @brief Structure representing a vertex with multiple attributes
+ */
 struct Vertex {
-    Point3  position;
-    Vec3    normal;
-    Vec2    texCoords;
-    Vec3    tangent;
-    Vec3    bitangent;
-    GLint   boneIds[4];
-    GLfloat weights[4];
+    Point3  position;   /*!< Position of the vertex in 3D space */
+    Vec3    normal;     /*!< Normal vector of the vertex */
+    Vec2    texCoords;  /*!< Texture coordinates */
+    Vec3    tangent;    /*!< Tangent vector for normal mapping */
+    Vec3    bitangent;  /*!< Bitangent vector for normal mapping */
+    GLint   boneIds[4]; /*!< Bone IDs for skeletal animation */
+    GLfloat weights[4]; /*!< Weights for skeletal animation */
 };
 
+/*!
+ * @brief Structure representing a texture with its properties
+ */
 struct Texture {
-    uint32_t    id;
-    std::string type;
-    std::string path;
+    uint32_t    id;   /*!< OpenGL texture ID */
+    std::string type; /*!< Type of the texture (e.g., diffuse, specular) */
+    std::string path; /*!< File path to the texture */
 };
 
 template<typename V>
@@ -49,6 +55,9 @@ concept TextureContainer = requires(T t)
     requires std::same_as<typename T::value_type, Texture>;
 };
 
+/*!
+ * @brief Class representing a drawable mesh in the graphics renderer
+ */
 export class Mesh {
 public:
     Mesh() : _vao(0), _vbo(0), _ebo(0), _isSetup(false) {}
@@ -82,7 +91,7 @@ public:
      * @note If you want to avoid copying, please use @code std::move@endcode when passing the arguments
      */
     template<VertexContainer V, IndexContainer I, TextureContainer T>
-    auto set(V&& vertices, I&& indices, T&& textures) -> void{
+    auto set(V&& vertices, I&& indices, T&& textures) -> void {
         _vertices = std::forward<V>(vertices);
         _indices  = std::forward<I>(indices);
         _textures = std::forward<T>(textures);
@@ -105,7 +114,11 @@ public:
     //     _textures.insert(_textures.end(), std::forward<T>(textures).begin(), std::forward<T>(textures).end());
     // }
 
-    auto draw(const Shader& shader) -> void {
+    /*!
+     * @brief Draws the mesh using the provided shader
+     * @param shader The shader to be used for rendering the mesh
+     */
+    auto draw(const Shader& shader) const -> void {
         if (!_isSetup) {
             Logger::warning("Mesh has not been setup.");
             return;
@@ -132,6 +145,9 @@ public:
     }
 
 private:
+    /*!
+     * @brief Sets up the OpenGL buffers and vertex attributes for the mesh
+     */
     auto setup() -> void {
         glGenVertexArrays(1, &_vao);
         glGenBuffers(1, &_vbo);
@@ -159,11 +175,11 @@ private:
         _isSetup = true;
     }
 
-    uint32_t              _vao;
-    uint32_t              _vbo;
-    uint32_t              _ebo;
-    bool                  _isSetup;
-    std::vector<Vertex>   _vertices;
-    std::vector<uint32_t> _indices;
-    std::vector<Texture>  _textures;
+    uint32_t              _vao;      /*!< OpenGL Vertex Array Object handle */
+    uint32_t              _vbo;      /*!< OpenGL Vertex Buffer Object handle */
+    uint32_t              _ebo;      /*!< OpenGL Element Buffer Object handle */
+    bool                  _isSetup;  /*!< Flag indicating whether the mesh has been set up */
+    std::vector<Vertex>   _vertices; /*!< Container holding the vertices of the mesh */
+    std::vector<uint32_t> _indices;  /*!< Container holding the indices of the mesh */
+    std::vector<Texture>  _textures; /*!< Container holding the textures of the mesh */
 };
