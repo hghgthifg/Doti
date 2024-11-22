@@ -17,6 +17,7 @@ project(Doti LANGUAGES CXX)
 
 # Make sure to add -DCMAKE_TOOLCHAIN_FILE=<path/to/vcpkg>/scripts/buildsystems/vcpkg.cmake when calling CMake.
 
+#find_package(OpenMP)
 find_package(Eigen3 CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 #find_package(glad CONFIG REQUIRED)
@@ -44,7 +45,8 @@ if (MSVC)
     target_compile_options(Doti PRIVATE /EHsc)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # Enable C++ exceptions and common warnings in Clang
-    target_compile_options(Doti PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic -Xclang -fmodules)
+    target_compile_options(Doti PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic -Xclang -fmodules -fopenmp)
+    target_link_options(Doti PUBLIC -fopenmp)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # Enable C++ exceptions in GCC
     target_compile_options(Doti PRIVATE -fexceptions)
@@ -103,6 +105,9 @@ target_sources(Doti
         wrapper/assimp.cppm
         wrapper/libjxl.cppm
 )
+#if (OpenMP_CXX_FOUND)
+#    target_link_libraries(Doti PUBLIC OpenMP::OpenMP_CXX)
+#endif ()
 
 target_link_libraries(Doti PRIVATE
         glfw
@@ -125,7 +130,7 @@ if (MSVC)
     target_compile_options(Editor PRIVATE /EHsc)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # Enable C++ exceptions and common warnings in Clang
-    target_compile_options(Editor PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic)
+    target_compile_options(Editor PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic -fopenmp)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # Enable C++ exceptions in GCC
     target_compile_options(Editor PRIVATE -fexceptions)
@@ -175,7 +180,7 @@ if (MSVC)
     target_compile_options(Demo PRIVATE /EHsc)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # Enable C++ exceptions and common warnings in Clang
-    target_compile_options(Demo PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic)
+    target_compile_options(Demo PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic -fopenmp)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # Enable C++ exceptions in GCC
     target_compile_options(Demo PRIVATE -fexceptions)

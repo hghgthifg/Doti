@@ -7,6 +7,11 @@ import Debug.Logger;
 import Event;
 
 auto main() -> int {
+    #pragma omp parallel
+    {
+        Logger::info("Hello world");
+    }
+
     try {
         const Window window(800, 600, "Hello World");
         Shader       shader("default", "shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
@@ -16,7 +21,7 @@ auto main() -> int {
             Point3{0.5f, -0.5f, 0.0f},
             Point3{0.0f, 0.5f, 0.0f}
         };
-        triangle.set(points);
+        triangle.setVertices(points);
         while (!window.shouldClose()) {
             window.beginDraw();
             triangle.draw(shader);

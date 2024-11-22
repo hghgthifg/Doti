@@ -53,7 +53,7 @@ public:
      * @param vertices A container of vertices that satisfies the TriangleVertex concept
      */
     template<TriangleVertex V>
-    auto set(V&& vertices) -> void {
+    auto setVertices(V&& vertices) -> void {
         _vertices = std::vector<Vertex>(std::make_move_iterator(vertices.begin()),
                                         std::make_move_iterator(vertices.end()));
         this->setup();

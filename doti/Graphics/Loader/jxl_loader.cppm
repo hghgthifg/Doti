@@ -2,6 +2,7 @@ export module Graphics.Loader.Image.Jxl;
 
 import libjxl;
 import std;
+import Debug.Logger;
 
 export class JXLImageLoader {
 public:
@@ -51,6 +52,7 @@ public:
             loadSingleImage(indices[i]);
         }
 
+        Logger::info(std::format("Loaded {} images.", indices.size()));
         return indices;
     }
 
@@ -61,7 +63,7 @@ public:
      */
     auto appendImage(const std::string& filename) -> size_t {
         _images.push_back({.filename = filename});
-        size_t index = _images.size() - 1;
+        const size_t index = _images.size() - 1;
         loadSingleImage(index);
         return index;
     }
@@ -71,7 +73,7 @@ public:
      * @param index The index of the image to retrieve
      * @return An optional reference to the image data if loaded, otherwise std::nullopt
      */
-    auto getImage(size_t index) const -> std::optional<std::reference_wrapper<const ImageData>> {
+    auto getImage(const size_t index) const -> std::optional<std::reference_wrapper<const ImageData>> {
         if (index >= _images.size() || !_images[index].loaded) {
             return std::nullopt;
         }
@@ -88,7 +90,7 @@ private:
         std::vector<uint8_t> file_data;
 
         try {
-            auto file_size = std::filesystem::file_size(image.filename);
+            const auto file_size = std::filesystem::file_size(image.filename);
             file_data.resize(file_size);
 
             std::ifstream file(image.filename, std::ios::binary);
@@ -117,7 +119,7 @@ private:
         JxlPixelFormat format = {4, JxlDataType::JXL_TYPE_UINT8, JxlEndianness::JXL_NATIVE_ENDIAN, 0};
 
         for (;;) {
-            JxlDecoderStatus status = JxlDecoderProcessInput(dec.get());
+            const JxlDecoderStatus status = JxlDecoderProcessInput(dec.get());
 
             if (status == JxlDecoderStatus::JXL_DEC_ERROR) {
                 return;
