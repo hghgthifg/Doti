@@ -22,7 +22,9 @@ find_package(Eigen3 CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 #find_package(glad CONFIG REQUIRED)
 find_package(glbinding CONFIG REQUIRED)
-find_package(quill CONFIG REQUIRED)
+#find_package(quill CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
+find_package(Freetype CONFIG REQUIRED)
 find_package(PkgConfig)
 pkg_check_modules(Jxl REQUIRED IMPORTED_TARGET libjxl libjxl_cms libjxl_threads)
 #find_package(Boost REQUIRED COMPONENTS signals2)
@@ -102,6 +104,7 @@ target_sources(Doti
         wrapper/glfw.cppm
         wrapper/gl.cppm
         wrapper/std.mock.cppm
+        wrapper/imgui.cppm
         wrapper/assimp.cppm
         wrapper/libjxl.cppm
 )
@@ -111,13 +114,15 @@ target_sources(Doti
 
 target_link_libraries(Doti PRIVATE
         glfw
+        Freetype::Freetype
         PkgConfig::Jxl
         glbinding::glbinding
         Eigen3::Eigen
-        opengl32
-        user32
-        shell32
-        gdi32
+        imgui::imgui
+        #        opengl32
+        #        user32
+        #        shell32
+        #        gdi32
 )
 
 # Build Editor
