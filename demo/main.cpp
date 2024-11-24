@@ -7,10 +7,10 @@ import Debug.Logger;
 import Event;
 
 auto main() -> int {
-    #pragma omp parallel
-    {
-        Logger::info("Hello world");
-    }
+    // #pragma omp parallel
+    // {
+    //     Logger::info("Hello world");
+    // }
 
     try {
         const Window window(800, 600, "Hello World");
