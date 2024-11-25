@@ -1,7 +1,7 @@
 module;
-#include <glbinding/glbinding.h>
 #include <glbinding/gl/functions.h>
 #include <glbinding/gl/gl.h>
+#include <glbinding/glbinding.h>
 
 export module OpenGL;
 
@@ -19,9 +19,11 @@ export using gl::GLchar;
 export using gl::GLenum;
 
 export using gl::ClearBufferMask;
+export using gl::glClearColor;
 
 export using gl::glViewport;
 
+export using gl::glValidateProgram;
 export using gl::glUseProgram;
 export using gl::glCreateShader;
 export using gl::glCompileShader;
@@ -35,6 +37,7 @@ export using gl::glAttachShader;
 export using gl::glLinkProgram;
 export using gl::glDeleteShader;
 export using gl::glClear;
+export using gl::glEnable;
 
 export using gl::glUniform1i;
 export using gl::glUniform1f;
@@ -55,8 +58,24 @@ export using gl::glBindVertexArray;
 export using gl::glBindBuffer;
 export using gl::glBufferData;
 
+export using gl::glGenTextures;
 export using gl::glBindTexture;
 export using gl::glActiveTexture;
+export using gl::glTexImage2D;
+export using gl::glTexParameteri;
+export using gl::glDeleteTextures;
+
+export using gl::glGenFramebuffers;
+export using gl::glBindFramebuffer;
+export using gl::glFramebufferTexture2D;
+export using gl::glCheckFramebufferStatus;
+export using gl::glDeleteFramebuffers;
+
+export using gl::glGenRenderbuffers;
+export using gl::glBindRenderbuffer;
+export using gl::glRenderbufferStorage;
+export using gl::glFramebufferRenderbuffer;
+export using gl::glDeleteRenderbuffers;
 
 export using gl::glDrawElements;
 export using gl::glDrawArrays;
@@ -91,12 +110,34 @@ export constexpr auto GL_FALSE = gl::GL_FALSE;
 export constexpr auto GL_TRUE  = gl::GL_TRUE;
 
 export constexpr auto GL_ARRAY_BUFFER         = gl::GL_ARRAY_BUFFER;
+export constexpr auto GL_FRAMEBUFFER          = gl::GL_FRAMEBUFFER;
 export constexpr auto GL_ELEMENT_ARRAY_BUFFER = gl::GL_ELEMENT_ARRAY_BUFFER;
+export constexpr auto GL_RENDERBUFFER         = gl::GL_RENDERBUFFER;
 
+export constexpr auto GL_DEPTH24_STENCIL8 = gl::GL_DEPTH24_STENCIL8;
+
+export constexpr auto GL_DEPTH_STENCIL_ATTACHMENT = gl::GL_DEPTH_STENCIL_ATTACHMENT;
+
+export constexpr auto GL_DEPTH_TEST  = gl::GL_DEPTH_TEST;
 export constexpr auto GL_STATIC_DRAW = gl::GL_STATIC_DRAW;
 
+export constexpr auto GL_COLOR_ATTACHMENT0 = gl::GL_COLOR_ATTACHMENT0;
+export constexpr auto GL_COLOR_ATTACHMENT1 = gl::GL_COLOR_ATTACHMENT1;
+export constexpr auto GL_COLOR_ATTACHMENT2 = gl::GL_COLOR_ATTACHMENT2;
+export constexpr auto GL_COLOR_ATTACHMENT3 = gl::GL_COLOR_ATTACHMENT3;
+export constexpr auto GL_COLOR_ATTACHMENT4 = gl::GL_COLOR_ATTACHMENT4;
+export constexpr auto GL_COLOR_ATTACHMENT5 = gl::GL_COLOR_ATTACHMENT5;
+export constexpr auto GL_COLOR_ATTACHMENT6 = gl::GL_COLOR_ATTACHMENT6;
+export constexpr auto GL_COLOR_ATTACHMENT7 = gl::GL_COLOR_ATTACHMENT7;
+export constexpr auto GL_COLOR_ATTACHMENT8 = gl::GL_COLOR_ATTACHMENT8;
+export constexpr auto GL_COLOR_ATTACHMENT9 = gl::GL_COLOR_ATTACHMENT9;
+
+export constexpr auto GL_FRAMEBUFFER_COMPLETE = gl::GL_FRAMEBUFFER_COMPLETE;
+
+export constexpr auto GL_VALIDATE_STATUS  = gl::GL_VALIDATE_STATUS;
 export constexpr auto GL_LINK_STATUS      = gl::GL_LINK_STATUS;
 export constexpr auto GL_COMPILE_STATUS   = gl::GL_COMPILE_STATUS;
 export constexpr auto GL_VERTEX_SHADER    = gl::GL_VERTEX_SHADER;
 export constexpr auto GL_FRAGMENT_SHADER  = gl::GL_FRAGMENT_SHADER;
 export constexpr auto GL_COLOR_BUFFER_BIT = gl::GL_COLOR_BUFFER_BIT;
+export constexpr auto GL_DEPTH_BUFFER_BIT = gl::GL_DEPTH_BUFFER_BIT;

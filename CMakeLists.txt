@@ -85,20 +85,22 @@ endif ()
 target_sources(Doti
         PUBLIC
         FILE_SET CXX_MODULES FILES
-        doti/Utils/utils.cppm
-        doti/Utils/ray.cppm
-        doti/Math/math.cppm
-        doti/Utils/color.cppm
-        doti/Utils/Event/event.cppm
-        doti/Window/window.cppm
-        doti/Debug/logger.cppm
-        doti/Graphics/Shader/shader.cppm
-        doti/Graphics/Render/Drawable/drawable.cppm
-        doti/Graphics/Render/Drawable/mesh.cppm
-        doti/Graphics/Render/Drawable/triangle.cppm
-        doti/Graphics/Render/Model/model.cppm
-        doti/Graphics/Loader/jxl_loader.cppm
-        doti/Graphics/Loader/image_loader.cppm
+        doti/Math/Math.cppm
+        doti/Utils/Event/Event.cppm
+        doti/Window/Window.cppm
+        doti/Window/UI/UIComponent.cppm
+        doti/Window/UI/Components/OpenGLView.cppm
+        doti/Debug/Logger.cppm
+        doti/Graphics/Shader/Shader.cppm
+        doti/Graphics/Color.cppm
+        doti/Graphics/Render/RenderTexture.cppm
+        doti/Graphics/Render/Illumination/Ray.cppm
+        doti/Graphics/Render/Drawable/Drawable.cppm
+        doti/Graphics/Render/Drawable/Mesh.cppm
+        doti/Graphics/Render/Drawable/Triangle.cppm
+        doti/Graphics/Render/Model/Model.cppm
+        doti/Graphics/Loader/JxlLoader.cppm
+        doti/Graphics/Loader/ImageLoader.cppm
         wrapper/test.cppm
         wrapper/eigen.cppm
         wrapper/glfw.cppm
