@@ -14,7 +14,7 @@ auto main() -> int {
     // }
 
     try {
-        Window      window(800, 600, "Hello World");
+        Window      window(1920, 1080, "Hello World");
         Shader      shader("default", "shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
         Triangle    triangle;
         std::vector points{

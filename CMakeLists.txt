@@ -94,7 +94,7 @@ target_sources(Doti
         doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Color.cppm
         doti/Graphics/Render/RenderTexture.cppm
-        doti/Graphics/Render/Illumination/Ray.cppm
+        doti/Graphics/Render/Illumination/ray.cppm
         doti/Graphics/Render/Drawable/Drawable.cppm
         doti/Graphics/Render/Drawable/Mesh.cppm
         doti/Graphics/Render/Drawable/Triangle.cppm

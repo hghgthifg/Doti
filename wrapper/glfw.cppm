@@ -49,3 +49,4 @@ export using ::glfwWindowHint;
 export using ::glfwDestroyWindow;
 export using ::glfwGetFramebufferSize;
 export using ::glfwGetCurrentContext;
+export using ::glfwSwapInterval;

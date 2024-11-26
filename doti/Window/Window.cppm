@@ -46,9 +46,10 @@ public:
         int bufferWidth, bufferHeight;
         glfwGetFramebufferSize(_window.get(), &bufferWidth, &bufferHeight);
         glfwMakeContextCurrent(_window.get());
+        glfwSwapInterval(1);
 
-        glfwSetFramebufferSizeCallback(
-            _window.get(), [](GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); });
+        // glfwSetFramebufferSizeCallback(
+        //     _window.get(), [](GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); });
 
         glbinding::initialize(glfwGetProcAddress);
 
@@ -65,19 +66,18 @@ public:
 
         Logger::info("Inited ImGui. ");
 
-        _renderTexture = std::make_shared<RenderTexture>(width / 2, height / 2);
         _rootComponent = std::make_shared<UIComponent>("root");
         _view          = std::make_shared<OpenGLView>("opengl_view");
+        _renderTexture = std::make_shared<RenderTexture>(width, height);
         _view->setTexture(_renderTexture);
         _rootComponent->addChild(_view);
 
         Logger::info("Created root component. ");
     }
 
-    auto beginDraw() -> void {
-        /* Poll for and process events */
-        glfwPollEvents();
+    auto addComponent(const std::shared_ptr<UIComponent>& component) -> void { _rootComponent->addChild(component); }
 
+    auto beginDraw() -> void {
         /* Render UI */
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -91,17 +91,7 @@ public:
         ImGui::NewFrame();
 
         _rootComponent->render();
-        //
-        // ImGui::Begin("view");
-        // ImVec2 size = ImGui::GetContentRegionAvail();
-        // _renderTexture.rescale_framebuffer(size.x, size.y);
-        // glViewport(0, 0, size.x, size.y);
-        //
-        // ImGui::GetWindowDrawList()->AddImage(
-        //     (ImGui)
-        // );
 
-        // _rootComponent->render();
         ImGui::Render();
 
         _renderTexture->bind();
@@ -112,13 +102,16 @@ public:
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        GLFWwindow* backup_current_context = glfwGetCurrentContext();
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
-        glfwMakeContextCurrent(backup_current_context);
+        // GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        // ImGui::UpdatePlatformWindows();
+        // ImGui::RenderPlatformWindowsDefault();
+        // glfwMakeContextCurrent(backup_current_context);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(_window.get());
+
+        /* Poll for and process events */
+        glfwPollEvents();
     }
 
     auto shouldClose() const -> bool { return glfwWindowShouldClose(_window.get()); }

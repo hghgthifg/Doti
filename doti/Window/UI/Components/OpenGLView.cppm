@@ -15,6 +15,10 @@ public:
 
 protected:
     void beginRender() override {
+        ImGui::SetNextWindowSizeConstraints(
+            ImVec2(320, 240),    // 最小尺寸
+            ImVec2(10000, 10000) // 最大尺寸（无限制）
+        );
         ImGui::Begin(getName().c_str());
     }
 
@@ -22,8 +26,8 @@ protected:
         ImVec2 pos  = ImGui::GetCursorScreenPos();
         ImVec2 size = ImGui::GetContentRegionAvail();
 
-        _texture->rescale_framebuffer(size.x, size.y);
-        glViewport(0, 0, size.x, size.y);
+        _texture->rescaleFramebuffer(size.x, size.y);
+        // glViewport(0, 0, size.x, size.y);
 
         ImGui::GetWindowDrawList()->AddImage(
             (ImTextureID) (intptr_t) (_texture->getTexture()),
@@ -40,4 +44,5 @@ protected:
 
 private:
     std::shared_ptr<RenderTexture> _texture;
+    // ImVec2                         _lastSize;
 };

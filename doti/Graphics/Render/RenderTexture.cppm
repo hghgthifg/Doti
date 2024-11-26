@@ -22,22 +22,22 @@ public:
     auto bind() -> void {
         glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
         glViewport(0, 0, _width, _height);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // glViewport(0, 0, _width, _height);
     }
 
     auto unbind() -> void {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        // int width, height;
-        // glfwGetFramebufferSize(glfwGetCurrentContext(), &width, &height);
-        // glViewport(0, 0, width, height);
-        // // glClear(GL_COLOR_BUFFER_BIT);
     }
 
     auto getTexture() const -> GLuint { return _texture; }
     auto getWidth() const -> int32_t { return _width; }
     auto getHeight() const -> int32_t { return _height; }
 
-    auto rescale_framebuffer(float width, float height) -> void {
+    auto rescaleFramebuffer(float width, float height) -> void {
+        glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
+
         glBindTexture(GL_TEXTURE_2D, _texture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -47,6 +47,15 @@ public:
         glBindRenderbuffer(GL_RENDERBUFFER, _rbo);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _rbo);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            Logger::error("Framebuffer is not complete after resize!");
+        }
+
+        /* Unbind the objects to get ready for rendering after this */
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
     }
 
 private:
@@ -76,6 +85,7 @@ private:
             Logger::error("Framebuffer is not complete!");
         }
 
+        /* Unbind the objects to get ready for rendering after this */
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

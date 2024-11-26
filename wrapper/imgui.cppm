@@ -52,6 +52,8 @@ export namespace ImGui
     using ImGui::ShowUserGuide;
     using ImGui::Text;
 
+    using ImGui::SetNextWindowSizeConstraints;
+
     using ImGui::UpdatePlatformWindows;
     using ImGui::RenderPlatformWindowsDefault;
 
