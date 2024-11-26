@@ -1,7 +1,3 @@
-/*!
- * @brief The module which provide windows creation and management functionality.
- */
-
 export module Window;
 
 import std;
@@ -11,8 +7,6 @@ import OpenGL;
 import Debug.Logger;
 import Graphics.Shader;
 import Graphics.Render.RenderTexture;
-import Window.UI.ComponentBase;
-import Window.UI.Components.OpenGLView;
 
 export class Window {
 public:
@@ -65,17 +59,7 @@ public:
         ImGui_ImplOpenGL3_Init("#version 460");
 
         Logger::info("Inited ImGui. ");
-
-        _rootComponent = std::make_shared<UIComponent>("root");
-        _view          = std::make_shared<OpenGLView>("opengl_view");
-        _renderTexture = std::make_shared<RenderTexture>(width, height);
-        _view->setTexture(_renderTexture);
-        _rootComponent->addChild(_view);
-
-        Logger::info("Created root component. ");
     }
-
-    auto addComponent(const std::shared_ptr<UIComponent>& component) -> void { _rootComponent->addChild(component); }
 
     auto beginDraw() -> void {
         /* Render UI */
@@ -87,19 +71,9 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
         /* Process keyboard and mouse inputs */
         processInput();
-
-        ImGui::NewFrame();
-
-        _rootComponent->render();
-
-        ImGui::Render();
-
-        _renderTexture->bind();
     }
 
     auto endDraw() -> void {
-        _renderTexture->unbind();
-
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // GLFWwindow* backup_current_context = glfwGetCurrentContext();
@@ -118,9 +92,7 @@ public:
 
 private:
     std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow*)>> _window;
-    std::shared_ptr<UIComponent>                                  _rootComponent;
-    std::shared_ptr<OpenGLView>                                   _view;
-    std::shared_ptr<RenderTexture>                                _renderTexture;
+
 
     auto processInput() const -> void {
         if (glfwGetKey(_window.get(), GLFW_KEY_ESCAPE) == GLFW_PRESS) { glfwSetWindowShouldClose(_window.get(), true); }

@@ -87,9 +87,6 @@ target_sources(Doti
         FILE_SET CXX_MODULES FILES
         doti/Math/Math.cppm
         doti/Utils/Event/Event.cppm
-        doti/Window/Window.cppm
-        doti/Window/UI/UIComponent.cppm
-        doti/Window/UI/Components/OpenGLView.cppm
         doti/Debug/Logger.cppm
         doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Color.cppm
@@ -171,8 +168,16 @@ else ()
     )
 endif ()
 
+target_sources(Editor
+        PUBLIC
+        FILE_SET CXX_MODULES FILES
+        editor/Window/Window.cppm
+        editor/Window/UI/UIComponent.cppm
+        editor/Window/UI/Components/OpenGLView.cppm
+)
+
 target_sources(Editor PRIVATE
-        editor/main.cpp
+        editor/App.cpp
 )
 
 target_link_libraries(Editor PRIVATE Doti)

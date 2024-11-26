@@ -138,7 +138,7 @@ protected:
 
     /*!
      * @brief Called after rendering is complete
-     * @details It usually contains @code ImGui::Begin(); @endcode.
+     * @details It usually contains @code ImGui::End(); @endcode.
      */
     virtual void endRender() {}
 
