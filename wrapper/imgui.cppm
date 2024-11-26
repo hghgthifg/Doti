@@ -19,10 +19,13 @@ export using ::ImGui_ImplGlfw_Shutdown;
 export using ::ImVec2;
 export using ::ImVec4;
 export using ::ImColor;
-export using ::ImTextureID;
-export using ::ImU64;
-
+export using ::ImGuiViewport;
 export using ::ImGuiIO;
+export using ::ImTextureID;
+export using ::ImGuiID;
+export using ::ImU64;
+export using ::ImGuiWindowFlags;
+export using ::ImGuiDockNodeFlags;
 
 export namespace ImGui
 {
@@ -32,9 +35,16 @@ export namespace ImGui
     using ImGui::DestroyContext;
     using ImGui::DestroyPlatformWindows;
     using ImGui::End;
+    using ImGui::GetMainViewport;
+    using ImGui::GetPlatformIO;
+    using ImGui::GetVersion;
+    using ImGui::GetWindowViewport;
+    using ImGui::BeginChild;
+    using ImGui::EndChild;
     using ImGui::GetContentRegionAvail;
     using ImGui::GetDrawData;
     using ImGui::GetIO;
+    using ImGui::GetID;
     using ImGui::Image;
     using ImGui::NewFrame;
     using ImGui::Render;
@@ -43,6 +53,7 @@ export namespace ImGui
     using ImGui::SetNextWindowBgAlpha;
     using ImGui::SetNextWindowPos;
     using ImGui::SetNextWindowSize;
+    using ImGui::SetNextWindowViewport;
     using ImGui::ShowAboutWindow;
     using ImGui::ShowDemoWindow;
     using ImGui::ShowFontSelector;
@@ -50,7 +61,11 @@ export namespace ImGui
     using ImGui::ShowStyleEditor;
     using ImGui::ShowStyleSelector;
     using ImGui::ShowUserGuide;
+    using ImGui::StyleColorsDark;
     using ImGui::Text;
+
+    using ImGui::PushStyleVar;
+    using ImGui::PopStyleVar;
 
     using ImGui::SetNextWindowSizeConstraints;
 
@@ -93,11 +108,124 @@ export namespace ImGuiFlags
         NavEnableSetMousePos   = 1 << 2,   // [moved/renamed in 1.91.4] -> use bool io.ConfigNavMoveSetMousePos
         NavNoCaptureKeyboard   = 1 << 3,   // [moved/renamed in 1.91.4] -> use bool io.ConfigNavCaptureKeyboard
     #endif
-    };;
+    };
+    enum class ImGuiStyleVar
+    {
+        // Enum name -------------------------- // Member in ImGuiStyle structure (see ImGuiStyle for descriptions)
+        Alpha,                    // float     Alpha
+        DisabledAlpha,            // float     DisabledAlpha
+        WindowPadding,            // ImVec2    WindowPadding
+        WindowRounding,           // float     WindowRounding
+        WindowBorderSize,         // float     WindowBorderSize
+        WindowMinSize,            // ImVec2    WindowMinSize
+        WindowTitleAlign,         // ImVec2    WindowTitleAlign
+        ChildRounding,            // float     ChildRounding
+        ChildBorderSize,          // float     ChildBorderSize
+        PopupRounding,            // float     PopupRounding
+        PopupBorderSize,          // float     PopupBorderSize
+        FramePadding,             // ImVec2    FramePadding
+        FrameRounding,            // float     FrameRounding
+        FrameBorderSize,          // float     FrameBorderSize
+        ItemSpacing,              // ImVec2    ItemSpacing
+        ItemInnerSpacing,         // ImVec2    ItemInnerSpacing
+        IndentSpacing,            // float     IndentSpacing
+        CellPadding,              // ImVec2    CellPadding
+        ScrollbarSize,            // float     ScrollbarSize
+        ScrollbarRounding,        // float     ScrollbarRounding
+        GrabMinSize,              // float     GrabMinSize
+        GrabRounding,             // float     GrabRounding
+        TabRounding,              // float     TabRounding
+        TabBorderSize,            // float     TabBorderSize
+        TabBarBorderSize,         // float     TabBarBorderSize
+        TabBarOverlineSize,       // float     TabBarOverlineSize
+        TableAngledHeadersAngle,  // float     TableAngledHeadersAngle
+        TableAngledHeadersTextAlign,// ImVec2  TableAngledHeadersTextAlign
+        ButtonTextAlign,          // ImVec2    ButtonTextAlign
+        SelectableTextAlign,      // ImVec2    SelectableTextAlign
+        SeparatorTextBorderSize,  // float     SeparatorTextBorderSize
+        SeparatorTextAlign,       // ImVec2    SeparatorTextAlign
+        SeparatorTextPadding,     // ImVec2    SeparatorTextPadding
+        DockingSeparatorSize,     // float     DockingSeparatorSize
+        COUNT
+    };
+    enum class ImGuiWindowFlags
+    {
+        None                   = 0,
+        NoTitleBar             = 1 << 0,   // Disable title-bar
+        NoResize               = 1 << 1,   // Disable user resizing with the lower-right grip
+        NoMove                 = 1 << 2,   // Disable user moving the window
+        NoScrollbar            = 1 << 3,   // Disable scrollbars (window can still scroll with mouse or programmatically)
+        NoScrollWithMouse      = 1 << 4,   // Disable user vertically scrolling with mouse wheel. On child window, mouse wheel will be forwarded to the parent unless NoScrollbar is also set.
+        NoCollapse             = 1 << 5,   // Disable user collapsing window by double-clicking on it. Also referred to as Window Menu Button (e.g. within a docking node).
+        AlwaysAutoResize       = 1 << 6,   // Resize every window to its content every frame
+        NoBackground           = 1 << 7,   // Disable drawing background color (WindowBg, etc.) and outside border. Similar as using SetNextWindowBgAlpha(0.0f).
+        NoSavedSettings        = 1 << 8,   // Never load/save settings in .ini file
+        NoMouseInputs          = 1 << 9,   // Disable catching mouse, hovering test with pass through.
+        MenuBar                = 1 << 10,  // Has a menu-bar
+        HorizontalScrollbar    = 1 << 11,  // Allow horizontal scrollbar to appear (off by default). You may use SetNextWindowContentSize(ImVec2(width,0.0f)); prior to calling Begin() to specify width. Read code in imgui_demo in the "Horizontal Scrolling" section.
+        NoFocusOnAppearing     = 1 << 12,  // Disable taking focus when transitioning from hidden to visible state
+        NoBringToFrontOnFocus  = 1 << 13,  // Disable bringing window to front when taking focus (e.g. clicking on it or programmatically giving it focus)
+        AlwaysVerticalScrollbar= 1 << 14,  // Always show vertical scrollbar (even if ContentSize.y < Size.y)
+        AlwaysHorizontalScrollbar=1<< 15,  // Always show horizontal scrollbar (even if ContentSize.x < Size.x)
+        NoNavInputs            = 1 << 16,  // No keyboard/gamepad navigation within the window
+        NoNavFocus             = 1 << 17,  // No focusing toward this window with keyboard/gamepad navigation (e.g. skipped by CTRL+TAB)
+        UnsavedDocument        = 1 << 18,  // Display a dot next to the title. When used in a tab/docking context, tab is selected when clicking the X + closure is not assumed (will wait for user to stop submitting the tab). Otherwise closure is assumed when pressing the X, so if you keep submitting the tab may reappear at end of tab bar.
+        NoDocking              = 1 << 19,  // Disable docking of this window
+        NoNav                  = NoNavInputs | NoNavFocus,
+        NoDecoration           = NoTitleBar | NoResize | NoScrollbar | NoCollapse,
+        NoInputs               = NoMouseInputs | NoNavInputs | NoNavFocus,
+
+        // [Internal]
+        ChildWindow            = 1 << 24,  // Don't use! For internal use by BeginChild()
+        Tooltip                = 1 << 25,  // Don't use! For internal use by BeginTooltip()
+        Popup                  = 1 << 26,  // Don't use! For internal use by BeginPopup()
+        Modal                  = 1 << 27,  // Don't use! For internal use by BeginPopupModal()
+        ChildMenu              = 1 << 28,  // Don't use! For internal use by BeginMenu()
+        DockNodeHost           = 1 << 29,  // Don't use! For internal use by Begin()/NewFrame()
+
+        // Obsolete names
+    #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
+        AlwaysUseWindowPadding = 1 << 30,  // Obsoleted in 1.90.0: Use ImGuiChildFlags_AlwaysUseWindowPadding in BeginChild() call.
+        NavFlattened           = 1 << 31,  // Obsoleted in 1.90.9: Use ImGuiChildFlags_NavFlattened in BeginChild() call.
+    #endif
+    };
+    enum class ImGuiDockNodeFlags
+    {
+        None                         = 0,
+        KeepAliveOnly                = 1 << 0,   //       // Don't display the dockspace node but keep it alive. Windows docked into this dockspace node won't be undocked.
+        //NoCentralNode              = 1 << 1,   //       // Disable Central Node (the node which can stay empty)
+        NoDockingOverCentralNode     = 1 << 2,   //       // Disable docking over the Central Node, which will be always kept empty.
+        PassthruCentralNode          = 1 << 3,   //       // Enable passthru dockspace: 1) DockSpace() will render a ImGuiCol_WindowBg background covering everything excepted the Central Node when empty. Meaning the host window should probably use SetNextWindowBgAlpha(0.0f) prior to Begin() when using this. 2) When Central Node is empty: let inputs pass-through + won't display a DockingEmptyBg background. See demo for details.
+        NoDockingSplit               = 1 << 4,   //       // Disable other windows/nodes from splitting this node.
+        NoResize                     = 1 << 5,   // Saved // Disable resizing node using the splitter/separators. Useful with programmatically setup dockspaces.
+        AutoHideTabBar               = 1 << 6,   //       // Tab bar will automatically hide when there is a single window in the dock node.
+        NoUndocking                  = 1 << 7,   //       // Disable undocking this node.
+
+    #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
+        NoSplit                      = NoDockingSplit, // Renamed in 1.90
+        NoDockingInCentralNode       = NoDockingOverCentralNode, // Renamed in 1.90
+    #endif
+    };
+
     // clang-format on
 } // namespace ImGuiFlags
 
-export using namespace ImGuiFlags;
+export namespace ImGui
+{
+    inline void PushStyleVar(ImGuiFlags::ImGuiStyleVar idx, float val) {
+        ImGui::PushStyleVar(static_cast<ImGuiStyleVar>(idx), val);
+    }
+
+    inline void PushStyleVar(ImGuiFlags::ImGuiStyleVar idx, ImVec2 val) {
+        ImGui::PushStyleVar(static_cast<ImGuiStyleVar>(idx), val);
+    }
+
+    inline ImGuiID DockSpace(ImGuiID label, ImVec2 size, ImGuiFlags::ImGuiDockNodeFlags flags) {
+        return ImGui::DockSpace(label, size, static_cast<ImGuiDockNodeFlags>(flags));
+    }
+}
+
+// export using namespace ImGuiFlags;
 
 // To enable bitwise operators for Flag enums in ImGui, use the following code for compatibility.
 // Since C++ cannot retrieve type names at compile time, you must manually define them using macros.
@@ -111,6 +239,12 @@ struct EnableBitMaskOperators : std::false_type {};
 
 ENABLE_BITMASK_OPERATORS(ImGuiFlags::ImGuiConfigFlags);
 
+ENABLE_BITMASK_OPERATORS(ImGuiFlags::ImGuiStyleVar);
+
+ENABLE_BITMASK_OPERATORS(ImGuiFlags::ImGuiWindowFlags);
+
+ENABLE_BITMASK_OPERATORS(ImGuiFlags::ImGuiDockNodeFlags);
+
 template<typename Enum>
 concept ImGuiFlagType = EnableBitMaskOperators<Enum>::value && std::is_enum_v<Enum>;
 
@@ -118,6 +252,12 @@ export template<ImGuiFlagType Enum>
 constexpr int operator|(Enum lhs, Enum rhs) {
     using Underlying = std::underlying_type_t<Enum>;
     return static_cast<int>(static_cast<Underlying>(lhs) | static_cast<Underlying>(rhs));
+}
+
+export template<ImGuiFlagType Enum>
+constexpr int operator|(int lhs, Enum rhs) {
+    using Underlying = std::underlying_type_t<Enum>;
+    return lhs | static_cast<Underlying>(rhs);
 }
 
 export template<ImGuiFlagType Enum>
@@ -133,13 +273,19 @@ constexpr int operator&(int lhs, Enum rhs) {
 }
 
 export template<ImGuiFlagType Enum>
-constexpr int operator|=(int lhs, Enum rhs) {
+constexpr int& operator|=(int& lhs, Enum rhs) {
     using Underlying = std::underlying_type_t<Enum>;
-    return lhs | static_cast<Underlying>(rhs);
+    return lhs = lhs | static_cast<Underlying>(rhs);
 }
 
 export template<ImGuiFlagType Enum>
-constexpr int operator&=(int lhs, Enum rhs) {
+constexpr int& operator&=(int& lhs, Enum rhs) {
     using Underlying = std::underlying_type_t<Enum>;
-    return lhs & static_cast<Underlying>(rhs);
+    return lhs = lhs & static_cast<Underlying>(rhs);
+}
+
+export template<ImGuiFlagType Enum>
+constexpr int operator~(Enum rhs) {
+    using Underlying = std::underlying_type_t<Enum>;
+    return ~static_cast<Underlying>(rhs);
 }

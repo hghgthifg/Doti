@@ -36,6 +36,8 @@ protected:
             ImVec2(0, 1),
             ImVec2(1, 0)
         );
+
+        // ImGui::ShowDemoWindow();
     }
 
     void endRender() override {

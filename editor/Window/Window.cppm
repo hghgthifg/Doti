@@ -50,10 +50,12 @@ public:
         Logger::info("Created Glfw window. ");
 
         ImGui::CreateContext();
-        const ImGuiIO& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags::NavEnableKeyboard;
-        io.ConfigFlags |= ImGuiConfigFlags::DockingEnable;
-        io.ConfigFlags |= ImGuiConfigFlags::ViewportsEnable;
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiFlags::ImGuiConfigFlags::NavEnableKeyboard;
+        io.ConfigFlags |= ImGuiFlags::ImGuiConfigFlags::DockingEnable;
+        io.ConfigFlags |= ImGuiFlags::ImGuiConfigFlags::ViewportsEnable;
+
+        ImGui::StyleColorsDark();
 
         ImGui_ImplGlfw_InitForOpenGL(_window.get(), true);
         ImGui_ImplOpenGL3_Init("#version 460");
@@ -76,10 +78,13 @@ public:
     auto endDraw() -> void {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        // GLFWwindow* backup_current_context = glfwGetCurrentContext();
-        // ImGui::UpdatePlatformWindows();
-        // ImGui::RenderPlatformWindowsDefault();
-        // glfwMakeContextCurrent(backup_current_context);
+        ImGuiIO& io = ImGui::GetIO();
+        if (io.ConfigFlags & ImGuiFlags::ImGuiConfigFlags::ViewportsEnable) {
+            GLFWwindow* backup_current_context = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup_current_context);
+        }
 
         /* Swap front and back buffers */
         glfwSwapBuffers(_window.get());

@@ -174,6 +174,7 @@ target_sources(Editor
         editor/Window/Window.cppm
         editor/Window/UI/UIComponent.cppm
         editor/Window/UI/Components/OpenGLView.cppm
+        editor/Window/UI/Components/DockSpace.cppm
 )
 
 target_sources(Editor PRIVATE
