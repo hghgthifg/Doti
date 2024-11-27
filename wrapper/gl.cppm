@@ -25,6 +25,7 @@ export using gl::glViewport;
 
 export using gl::glValidateProgram;
 export using gl::glUseProgram;
+export using gl::glDeleteProgram;
 export using gl::glCreateShader;
 export using gl::glCompileShader;
 export using gl::glShaderSource;

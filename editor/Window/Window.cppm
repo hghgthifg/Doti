@@ -6,7 +6,6 @@ import ImGui;
 import OpenGL;
 import Debug.Logger;
 import Graphics.Shader;
-import Graphics.Render.RenderTexture;
 
 export class Window {
 public:

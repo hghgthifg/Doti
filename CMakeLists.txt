@@ -48,7 +48,7 @@ if (MSVC)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # Enable C++ exceptions and common warnings in Clang
     target_compile_options(Doti PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic -Xclang -fmodules -fopenmp)
-    target_link_options(Doti PUBLIC -fopenmp)
+    target_link_options(Doti PUBLIC -fopenmp -fuse-ld=lld)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # Enable C++ exceptions in GCC
     target_compile_options(Doti PRIVATE -fexceptions)
@@ -90,7 +90,6 @@ target_sources(Doti
         doti/Debug/Logger.cppm
         doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Color.cppm
-        doti/Graphics/Render/RenderTexture.cppm
         doti/Graphics/Render/Illumination/ray.cppm
         doti/Graphics/Render/Drawable/Drawable.cppm
         doti/Graphics/Render/Drawable/Mesh.cppm
@@ -98,6 +97,8 @@ target_sources(Doti
         doti/Graphics/Render/Model/Model.cppm
         doti/Graphics/Loader/JxlLoader.cppm
         doti/Graphics/Loader/ImageLoader.cppm
+        doti/Scene/SceneBase.cppm
+        doti/Scene/SceneManager.cppm
         wrapper/test.cppm
         wrapper/eigen.cppm
         wrapper/glfw.cppm
@@ -135,6 +136,7 @@ if (MSVC)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # Enable C++ exceptions and common warnings in Clang
     target_compile_options(Editor PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic -fopenmp)
+    target_link_options(Doti PUBLIC -fopenmp -fuse-ld=lld)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # Enable C++ exceptions in GCC
     target_compile_options(Editor PRIVATE -fexceptions)
@@ -172,9 +174,19 @@ target_sources(Editor
         PUBLIC
         FILE_SET CXX_MODULES FILES
         editor/Window/Window.cppm
+        editor/Window/RenderTexture.cppm
         editor/Window/UI/UIComponent.cppm
         editor/Window/UI/Components/OpenGLView.cppm
         editor/Window/UI/Components/DockSpace.cppm
+        editor/Window/UI/Components/MenuBar.cppm
+)
+
+file(GLOB SCENE_MODULES "editor/Test/*.cppm")
+
+target_sources(Editor
+        PUBLIC
+        FILE_SET CXX_MODULES FILES
+        ${SCENE_MODULES}
 )
 
 target_sources(Editor PRIVATE
@@ -183,52 +195,8 @@ target_sources(Editor PRIVATE
 
 target_link_libraries(Editor PRIVATE Doti)
 
-# Build Demo
-add_executable(Demo "")
-set_target_properties(Demo PROPERTIES OUTPUT_NAME "Demo")
-set_target_properties(Demo PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/windows/x64/$<CONFIG>")
-
-if (MSVC)
-    # Enable C++ exceptions in MSVC
-    target_compile_options(Demo PRIVATE /EHsc)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    # Enable C++ exceptions and common warnings in Clang
-    target_compile_options(Demo PRIVATE -fexceptions -fcxx-exceptions -Wall -Wextra -Wpedantic -fopenmp)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    # Enable C++ exceptions in GCC
-    target_compile_options(Demo PRIVATE -fexceptions)
-endif ()
-
-set_target_properties(Demo PROPERTIES CXX_EXTENSIONS OFF)
-target_compile_features(Demo PRIVATE cxx_std_23)
-
-if (MSVC)
-    # MSVC
-    target_compile_options(Demo PRIVATE
-            $<$<CONFIG:Debug>:/Od>               # Disable optimizations in Debug
-            $<$<CONFIG:Release>:/O2>             # Optimize for speed in Release
-            $<$<CONFIG:Debug>:/Zi>               # Enable debugging information in Debug
-    )
-    target_compile_definitions(Demo PRIVATE
-            $<$<CONFIG:Release>:NDEBUG>          # Define NDEBUG in Release
-    )
-    set_property(TARGET Demo PROPERTY
-            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-    )
-else ()
-    # GCC or Clang
-    target_compile_options(Demo PRIVATE
-            $<$<CONFIG:Debug>:-O0>               # No optimization in Debug
-            $<$<CONFIG:Release>:-O3>             # High optimization in Release
-            $<$<CONFIG:Debug>:-g>                # Generate debug symbols in Debug
-    )
-    target_compile_definitions(Demo PRIVATE
-            $<$<CONFIG:Release>:NDEBUG>          # Define NDEBUG in Release
-    )
-endif ()
-
-target_sources(Demo PRIVATE
-        demo/main.cpp
+add_custom_command(TARGET Editor POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/resource"
+        "$<TARGET_FILE_DIR:Editor>/resource"
 )
-
-target_link_libraries(Demo PRIVATE Doti)

@@ -1,68 +1,131 @@
-export module Event;
+export module Utils.Event;
 
 import Debug.Logger;
 import std;
 
-/*!
- * @brief The event manager class which provides event registration, connection and emitting functionality. Here is an example:
- * @code
- * EventManager::registerEvent("Foo");
- * EventManager::connect("Foo", []() {
- *    Logger::info("Foo event emitted.");
- * });
- * EventManager::emit("Foo");
- * @endcode
- */
-export class EventManager {
-public:
-    /*!
-     * @brief Register the signal with the given name.
-     * @param name The name of the signal to be registered.
-     */
-    static auto registerEvent(const std::string& name) -> void {
-        _signals[name] = std::vector<std::function<void()>>();
-    }
+// Concept to ensure that the slot function is invocable with the specified arguments and returns void
+template<typename Slot, typename... Args>
+concept SlotCompatible = std::is_invocable_r_v<void, Slot, Args...>;
 
-    /*!
-     * @brief Connect the signal with the slot.
-     * @tparam Slot The function type of the slot.
-     * @param name The name of the signal.
-     * @param slot The function to handle the signal.
+// Signal class managing connected slots
+template<typename... Args>
+class Signal {
+public:
+    using SlotType = std::function<void(Args...)>;
+
+    /**
+     * @brief Connect a new slot to the signal.
+     * @param slot The slot function to be connected.
      */
-    template<typename Slot>
-    static auto connect(const std::string& name, Slot&& slot) -> void {
-        if (const auto signal = _signals.find(name); signal == _signals.end()) {
-            Logger::error("Signal " + name + " is not registered.");
-        } else {
-            signal->second.push_back(std::forward<Slot>(slot));
-        }
+    void connect(SlotType slot) {
+        _slots.emplace_back(std::move(slot));
     }
 
     /**
-     * @brief If the signal is registered, emit the signal with the given arguments.
-     * @tparam Args The types of specified arguments sent to the connected slots.
-     * @param name The name of the signal.
-     * @param args Specified arguments sent to the connected slots.
-     * @code
-     * // The signal must have been registered before emitting
-     * // You can pass any number of arguments, but the types must match the connected slots
-     * EventManager::registerEvent("Event1", "1");
-     * EventManager::registerEvent("Event2", 1, 2, 3);
-     * @endcode
+     * @brief Disconnect all slots from the signal.
      */
-    template<typename... Args>
-    static auto emit(const std::string& name, Args... args) -> void {
-        if (const auto signal = _signals.find(name); signal == _signals.end()) {
-            Logger::error("Signal " + name + " is not registered.");
-        } else {
-            for (const auto& slot: signal->second) {
-                slot(args...);
-            }
+    void disconnectAll() {
+        _slots.clear();
+    }
+
+    /**
+     * @brief Emit the signal, invoking all connected slots with the provided arguments.
+     * @param args Arguments to pass to the connected slots.
+     */
+    void emitSignal(Args... args) const {
+        for (const auto& slot: _slots) {
+            slot(args...);
         }
     }
 
 private:
-    static std::map<std::string, std::vector<std::function<void()>>> _signals;
+    std::vector<SlotType> _slots; /*!< Container for connected slots */
 };
 
-std::map<std::string, std::vector<std::function<void()>>> EventManager::_signals;
+// EventManager class handling event registration, connection, emission, and disconnection
+export class EventManager {
+public:
+    /**
+     * @brief Register a new event with specific argument types.
+     * @tparam Args The types of arguments that the event will use.
+     * @param name The name of the event to register.
+     */
+    template<typename... Args>
+    static void registerEvent(const std::string& name) {
+        if (!_signals.contains(name)) {
+            _signals[name] = std::make_shared<Signal<Args...>>();
+            Logger::info("Event '" + name + "' registered. ");
+        } else {
+            Logger::warning("Event '" + name + "' is already registered. ");
+        }
+    }
+
+    /**
+     * @brief Connect a slot to an event with matching argument types.
+     * @tparam Args The types of arguments for the event.
+     * @tparam Slot The type of the slot function.
+     * @param name The name of the event to connect to.
+     * @param slot The slot function to be connected.
+     */
+    template<typename... Args, typename Slot>
+        requires SlotCompatible<Slot, Args...>
+    static void connect(const std::string& name, Slot slot) {
+        const auto it = _signals.find(name);
+        if (it != _signals.end()) {
+            auto signal = std::static_pointer_cast<Signal<Args...>>(it->second);
+            signal->connect(std::function<void(Args...)>(slot));
+            Logger::info("Slot connected to event '" + name + "'. ");
+        } else {
+            Logger::error("Event '" + name + "' is not registered. ");
+        }
+    }
+
+    /**
+     * @brief Emit the specified event, invoking all connected slots with the provided arguments.
+     * @tparam Args The types of arguments to send to the connected slots.
+     * @param name The name of the event to emit.
+     * @param args The arguments to pass to the connected slots.
+     * @code
+     * // The event must have been registered before emitting
+     * // You can pass any number of arguments, but the types must match the connected slots
+     * EventManager::registerEvent<int, std::string>("Event1");
+     * EventManager::connect<int, std::string>("Event1", [](int a, const std::string& b) {
+     *     // Slot implementation
+     * });
+     * EventManager::emit("Event1", 1, "Test");
+     * @endcode
+     */
+    template<typename... Args>
+    static void emit(const std::string& name, Args... args) {
+        const auto it = _signals.find(name);
+        if (it != _signals.end()) {
+            auto signal = std::static_pointer_cast<Signal<Args...>>(it->second);
+            signal->emitSignal(args...);
+            Logger::info("Event '" + name + "' emitted. ");
+        } else {
+            Logger::warning("Event '" + name + "' is not registered. ");
+        }
+    }
+
+    /**
+     * @brief Disconnect all slots from the specified event.
+     * @param name The name of the event to disconnect all slots from.
+     */
+    static void disconnectAll(const std::string& name) {
+        auto it = _signals.find(name);
+        if (it != _signals.end()) {
+            /* Reset the shared_ptr and erase the event from the map */
+            it->second.reset();
+            _signals.erase(it);
+            Logger::info("All slots disconnected from event '" + name + "'. ");
+        } else {
+            Logger::warning("Event '" + name + "' is not registered. ");
+        }
+    }
+
+private:
+    static std::unordered_map<std::string, std::shared_ptr<void>> _signals;
+};
+
+/* Initialize the static member */
+std::unordered_map<std::string, std::shared_ptr<void>> EventManager::_signals;

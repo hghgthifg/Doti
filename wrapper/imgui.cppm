@@ -41,6 +41,11 @@ export namespace ImGui
     using ImGui::GetWindowViewport;
     using ImGui::BeginChild;
     using ImGui::EndChild;
+    using ImGui::BeginMenuBar;
+    using ImGui::EndMenuBar;
+    using ImGui::BeginMenu;
+    using ImGui::MenuItem;
+    using ImGui::EndMenu;
     using ImGui::GetContentRegionAvail;
     using ImGui::GetDrawData;
     using ImGui::GetIO;
@@ -160,7 +165,7 @@ export namespace ImGuiFlags
         AlwaysAutoResize       = 1 << 6,   // Resize every window to its content every frame
         NoBackground           = 1 << 7,   // Disable drawing background color (WindowBg, etc.) and outside border. Similar as using SetNextWindowBgAlpha(0.0f).
         NoSavedSettings        = 1 << 8,   // Never load/save settings in .ini file
-        NoMouseInputs          = 1 << 9,   // Disable catching mouse, hovering test with pass through.
+        NoMouseInputs          = 1 << 9,   // Disable catching mouse, hovering resource with pass through.
         MenuBar                = 1 << 10,  // Has a menu-bar
         HorizontalScrollbar    = 1 << 11,  // Allow horizontal scrollbar to appear (off by default). You may use SetNextWindowContentSize(ImVec2(width,0.0f)); prior to calling Begin() to specify width. Read code in imgui_demo in the "Horizontal Scrolling" section.
         NoFocusOnAppearing     = 1 << 12,  // Disable taking focus when transitioning from hidden to visible state

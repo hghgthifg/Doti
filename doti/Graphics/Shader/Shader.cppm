@@ -18,6 +18,10 @@ public:
 
     Shader(Shader&&) = delete;
 
+    ~Shader() {
+        glDeleteProgram(_ID);
+    }
+
     auto operator =(const Shader&) -> Shader& = delete;
 
     auto operator =(Shader&&) -> Shader& = default;

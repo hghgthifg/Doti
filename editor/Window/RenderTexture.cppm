@@ -1,4 +1,4 @@
-export module Graphics.Render.RenderTexture;
+export module Window.RenderTexture;
 
 import std;
 import OpenGL;

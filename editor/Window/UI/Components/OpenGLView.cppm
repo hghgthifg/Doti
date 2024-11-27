@@ -4,7 +4,7 @@ import ImGui;
 import OpenGL;
 import std;
 import Window.UI.ComponentBase;
-import Graphics.Render.RenderTexture;
+import Window.RenderTexture;
 import Debug.Logger;
 
 export class OpenGLView : public UIComponent {

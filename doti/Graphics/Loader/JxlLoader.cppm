@@ -10,7 +10,7 @@ public:
      * @brief Structure to hold image data
      */
     struct ImageData {
-        std::vector<uint8_t> pixels;
+        std::vector<uint8_t> pixels{};
         size_t               width{};
         size_t               height{};
         size_t               components{};

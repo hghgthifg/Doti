@@ -3,6 +3,7 @@
 // when that is available.
 module;
 #include <algorithm>
+#include <any>
 #include <array>
 #include <atomic>
 #include <chrono>
@@ -71,6 +72,10 @@ export namespace std
     }
 
     using std::hash;
+    using std::map;
+    using std::unordered_map;
+    using std::multimap;
+    using std::unordered_multimap;
 } // namespace std
 
 export namespace std
@@ -1247,6 +1252,7 @@ export
 export namespace std
 {
     using std::bad_exception;
+    using std::bad_any_cast;
     using std::current_exception;
     using std::exception;
     using std::exception_ptr;
@@ -2203,11 +2209,6 @@ export namespace std
 
 export namespace std
 {
-    using std::map;
-}
-
-export namespace std
-{
     namespace filesystem
     {
         using std::filesystem::path;
@@ -2223,6 +2224,13 @@ export namespace std
 export namespace std
 {
     using std::span;
+}
+
+export namespace std
+{
+    using std::any;
+    using std::make_any;
+    using std::any_cast;
 }
 
 #if defined(__GLIBCXX__) || defined(__GLIBCPP__)
