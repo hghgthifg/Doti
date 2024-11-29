@@ -18,7 +18,7 @@ public:
 
     auto direction() const -> const Vec3& { return dir; }
 
-    auto at(double t) const -> Point3 { return orig + t * dir; }
+    auto at(float t) const -> Point3 { return orig + t * dir; }
 
 private:
     Point3 orig;

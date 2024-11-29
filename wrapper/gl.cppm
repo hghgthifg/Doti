@@ -33,6 +33,7 @@ export using gl::glGetShaderiv;
 export using gl::glGetProgramiv;
 export using gl::glGetProgramInfoLog;
 export using gl::glGetShaderInfoLog;
+export using gl::glGenerateMipmap;
 export using gl::glCreateProgram;
 export using gl::glAttachShader;
 export using gl::glLinkProgram;
@@ -84,13 +85,16 @@ export using gl::glDrawArrays;
 export using gl::glVertexAttribPointer;
 export using gl::glEnableVertexAttribArray;
 
-export constexpr auto GL_BYTE               = gl::GL_BYTE;
-export constexpr auto GL_UNSIGNED_SHORT     = gl::GL_UNSIGNED_SHORT;
-export constexpr auto GL_FLOAT              = gl::GL_FLOAT;
-export constexpr auto GL_UNSIGNED_INT       = gl::GL_UNSIGNED_INT;
-export constexpr auto GL_UNSIGNED_BYTE      = gl::GL_UNSIGNED_BYTE;
-export constexpr auto GL_RGB                = gl::GL_RGB;
-export constexpr auto GL_RGBA               = gl::GL_RGBA;
+export constexpr auto GL_BYTE           = gl::GL_BYTE;
+export constexpr auto GL_UNSIGNED_SHORT = gl::GL_UNSIGNED_SHORT;
+export constexpr auto GL_FLOAT          = gl::GL_FLOAT;
+export constexpr auto GL_UNSIGNED_INT   = gl::GL_UNSIGNED_INT;
+export constexpr auto GL_UNSIGNED_BYTE  = gl::GL_UNSIGNED_BYTE;
+
+export constexpr auto GL_RED  = gl::GL_RED;
+export constexpr auto GL_RGB  = gl::GL_RGB;
+export constexpr auto GL_RGBA = gl::GL_RGBA;
+
 export constexpr auto GL_TRIANGLES          = gl::GL_TRIANGLES;
 export constexpr auto GL_TEXTURE_2D         = gl::GL_TEXTURE_2D;
 export constexpr auto GL_TEXTURE0           = gl::GL_TEXTURE0;
@@ -142,3 +146,5 @@ export constexpr auto GL_VERTEX_SHADER    = gl::GL_VERTEX_SHADER;
 export constexpr auto GL_FRAGMENT_SHADER  = gl::GL_FRAGMENT_SHADER;
 export constexpr auto GL_COLOR_BUFFER_BIT = gl::GL_COLOR_BUFFER_BIT;
 export constexpr auto GL_DEPTH_BUFFER_BIT = gl::GL_DEPTH_BUFFER_BIT;
+
+export constexpr auto GL_LINEAR_MIPMAP_LINEAR = gl::GL_LINEAR_MIPMAP_LINEAR;

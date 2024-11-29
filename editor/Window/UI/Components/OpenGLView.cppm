@@ -16,28 +16,48 @@ public:
 protected:
     void beginRender() override {
         ImGui::SetNextWindowSizeConstraints(
-            ImVec2(320, 240),    // 最小尺寸
-            ImVec2(10000, 10000) // 最大尺寸（无限制）
+            ImVec2(320, 240),
+            ImVec2(10000, 10000)
         );
         ImGui::Begin(getName().c_str());
     }
 
     void renderContent() override {
-        ImVec2 pos  = ImGui::GetCursorScreenPos();
-        ImVec2 size = ImGui::GetContentRegionAvail();
+        /* Get the current cursor position and available space in the window */
+        const ImVec2 pos           = ImGui::GetCursorScreenPos();
+        const ImVec2 availableSize = ImGui::GetContentRegionAvail();
 
-        _texture->rescaleFramebuffer(size.x, size.y);
-        // glViewport(0, 0, size.x, size.y);
+        /* Get the original texture dimensions */
+        const float textureWidth  = static_cast<float>(_texture->getWidth());
+        const float textureHeight = static_cast<float>(_texture->getHeight());
 
+        /* Calculate scaling factor while maintaining aspect ratio
+         * Choose the smaller scale to ensure texture fits in the window */
+        const float scaleX = availableSize.x / textureWidth;
+        const float scaleY = availableSize.y / textureHeight;
+        const float scale  = std::min(scaleX, scaleY);
+
+        /* Calculate the actual display dimensions after scaling */
+        const float displayWidth  = textureWidth * scale;
+        const float displayHeight = textureHeight * scale;
+
+        /* Calculate offsets to center the texture in available space */
+        const float offsetX = (availableSize.x - displayWidth) * 0.5f;
+        const float offsetY = (availableSize.y - displayHeight) * 0.5f;
+
+        /* Calculate final display coordinates with centering offsets */
+        const ImVec2 displayPos    = ImVec2(pos.x + offsetX, pos.y + offsetY);
+        const ImVec2 displayEndPos = ImVec2(displayPos.x + displayWidth, displayPos.y + displayHeight);
+
+        /* Draw the texture maintaining original aspect ratio and centered position
+         * UV coordinates are flipped vertically (0,1 to 1,0) to correct OpenGL texture orientation */
         ImGui::GetWindowDrawList()->AddImage(
             (ImTextureID) (intptr_t) (_texture->getTexture()),
-            ImVec2(pos.x, pos.y),
-            ImVec2(pos.x + size.x, pos.y + size.y),
-            ImVec2(0, 1),
-            ImVec2(1, 0)
+            displayPos,
+            displayEndPos,
+            ImVec2(0, 1), // UV start (bottom-left)
+            ImVec2(1, 0)  // UV end (top-right)
         );
-
-        // ImGui::ShowDemoWindow();
     }
 
     void endRender() override {

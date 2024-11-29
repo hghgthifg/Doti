@@ -25,6 +25,7 @@ find_package(glbinding CONFIG REQUIRED)
 #find_package(quill CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(Freetype CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 find_package(PkgConfig)
 pkg_check_modules(Jxl REQUIRED IMPORTED_TARGET libjxl libjxl_cms libjxl_threads)
 #find_package(Boost REQUIRED COMPONENTS signals2)
@@ -87,9 +88,11 @@ target_sources(Doti
         FILE_SET CXX_MODULES FILES
         doti/Math/Math.cppm
         doti/Utils/Event/Event.cppm
+        doti/Utils/Camera/Camera.cppm
         doti/Debug/Logger.cppm
         doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Color.cppm
+        doti/Graphics/Texture.cppm
         doti/Graphics/Render/Illumination/ray.cppm
         doti/Graphics/Render/Drawable/Drawable.cppm
         doti/Graphics/Render/Drawable/Mesh.cppm
@@ -103,6 +106,7 @@ target_sources(Doti
         wrapper/eigen.cppm
         wrapper/glfw.cppm
         wrapper/gl.cppm
+        wrapper/glm.cppm
         wrapper/std.mock.cppm
         wrapper/imgui.cppm
         wrapper/assimp.cppm
@@ -119,6 +123,7 @@ target_link_libraries(Doti PRIVATE
         glbinding::glbinding
         Eigen3::Eigen
         imgui::imgui
+        glm::glm
         #        opengl32
         #        user32
         #        shell32

@@ -9,7 +9,7 @@ import Debug.Logger;
 /*!
  * @brief Structure representing a vertex with multiple attributes
  */
-struct Vertex {
+export struct Vertex {
     Point3  position;   /*!< Position of the vertex in 3D space */
     Vec3    normal;     /*!< Normal vector of the vertex */
     Vec2    texCoords;  /*!< Texture coordinates */
@@ -22,8 +22,8 @@ struct Vertex {
 /*!
  * @brief Structure representing a texture with its properties
  */
-struct Texture {
-    uint32_t    id;   /*!< OpenGL texture ID */
+export struct Texture {
+    GLuint      id;   /*!< OpenGL texture ID */
     std::string type; /*!< Type of the texture (e.g., diffuse, specular) */
     std::string path; /*!< File path to the texture */
 };
@@ -33,8 +33,8 @@ concept VertexContainer = requires(V v)
 {
     { v.begin() } -> std::input_iterator;
     { v.end() } -> std::input_iterator;
-    typename V::value_type;
-    requires std::same_as<typename V::value_type, Vertex>;
+    typename std::remove_reference_t<V>::value_type;
+    requires std::same_as<typename std::remove_reference_t<V>::value_type, Vertex>;
 };
 
 template<typename I>
@@ -42,8 +42,8 @@ concept IndexContainer = requires(I i)
 {
     { i.begin() } -> std::input_iterator;
     { i.end() } -> std::input_iterator;
-    typename I::value_type;
-    requires std::same_as<typename I::value_type, uint32_t>;
+    typename std::remove_reference_t<I>::value_type;
+    requires std::same_as<typename std::remove_reference_t<I>::value_type, uint32_t>;
 };
 
 template<typename T>
@@ -51,8 +51,8 @@ concept TextureContainer = requires(T t)
 {
     { t.begin() } -> std::input_iterator;
     { t.end() } -> std::input_iterator;
-    typename T::value_type;
-    requires std::same_as<typename T::value_type, Texture>;
+    typename std::remove_reference_t<T>::value_type;
+    requires std::same_as<typename std::remove_reference_t<T>::value_type, Texture>;
 };
 
 /*!

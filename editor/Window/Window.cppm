@@ -60,6 +60,8 @@ public:
         ImGui_ImplOpenGL3_Init("#version 460");
 
         Logger::info("Inited ImGui. ");
+
+        glEnable(GL_DEPTH_TEST);
     }
 
     auto beginDraw() -> void {
@@ -67,9 +69,8 @@ public:
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
 
-        // glEnable(GL_DEPTH_TEST);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         /* Process keyboard and mouse inputs */
         processInput();
     }
