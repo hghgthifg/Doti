@@ -20,7 +20,7 @@ public:
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        Logger::info("Initialized OpenGL 4.6.");
+        Logger::info("Initialized OpenGL 4.6. ");
 
         /* Create the window */
         _window = std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow*)>>(

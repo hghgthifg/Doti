@@ -1,19 +1,19 @@
-export module Window.RenderTexture;
+export module Window.FrameCanvas;
 
 import std;
 import OpenGL;
 import glfw;
 import Debug.Logger;
 
-export class RenderTexture {
+export class FrameCanvas {
 public:
-    RenderTexture() = default;
+    FrameCanvas() = default;
 
-    RenderTexture(const int32_t width, const int32_t height) : _width(width), _height(height) {
+    FrameCanvas(const int32_t width, const int32_t height) : _width(width), _height(height) {
         initializeFramebuffer();
     }
 
-    ~RenderTexture() {
+    ~FrameCanvas() {
         if (_fbo) glDeleteFramebuffers(1, &_fbo);
         if (_texture) glDeleteTextures(1, &_texture);
         if (_rbo) glDeleteRenderbuffers(1, &_rbo);
@@ -35,7 +35,7 @@ public:
     auto getWidth() const -> int32_t { return _width; }
     auto getHeight() const -> int32_t { return _height; }
 
-    auto rescaleFramebuffer(float width, float height) -> void {
+    auto rescaleFramebuffer(const float width, const float height) -> void {
         glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
 
         glBindTexture(GL_TEXTURE_2D, _texture);

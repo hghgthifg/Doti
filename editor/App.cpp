@@ -4,7 +4,7 @@ import Debug.Logger;
 import Scene.SceneManager;
 import Scene.SceneBase;
 import Window;
-import Window.RenderTexture;
+import Window.FrameCanvas;
 import Window.UI.ComponentBase;
 import Window.UI.Components.OpenGLView;
 import Window.UI.Components.DockSpace;
@@ -13,8 +13,6 @@ import Window.UI.Components.MenuBar;
 import Test.TestScene;
 
 std::shared_ptr<DockSpace> RootComponent;
-// std::shared_ptr<OpenGLView>    View;
-// std::shared_ptr<RenderTexture> TargetTexture;
 
 auto main() -> int {
     try {
@@ -24,7 +22,7 @@ auto main() -> int {
         RootComponent = std::make_shared<DockSpace>("dock_space");
 
         auto view          = std::make_shared<OpenGLView>("opengl_view");
-        auto targetTexture = std::make_shared<RenderTexture>(width, height);
+        auto targetTexture = std::make_shared<FrameCanvas>(width, height);
         auto menu          = std::make_shared<MenuBar>("menu_bar");
         view->setTexture(targetTexture);
 
@@ -47,6 +45,9 @@ auto main() -> int {
             targetTexture->bind();
 
             auto currentScene = SceneManager::getCurrentScene();
+            if (currentScene.get() != nullptr) {
+                currentScene->setSize(1920, 1080);
+            }
             if (currentScene) {
                 currentScene->render();
             }

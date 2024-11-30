@@ -1,10 +1,11 @@
-export module Graphics.Render.Model;
+export module Graphics.Render.Drawable.Model;
 
 import assimp;
 import std;
 import Math;
 import OpenGL;
 import Debug.Logger;
+import Graphics.Render.RenderContext;
 import Graphics.Loader.Image;
 import Graphics.Render.Drawable.Mesh;
 import Graphics.Shader;
@@ -13,20 +14,22 @@ static JXLImageLoader ImageLoader;
 
 export class Model {
 public:
+    Model() {}
+
     Model(const std::string& path) : _directory(path) {
         this->loadModel(path);
     }
 
-    auto draw(const Shader& shader) const -> void {
+    auto draw(RenderContext& render_context) const -> void {
         for (auto mesh: _meshes) {
-            mesh.draw(shader);
+            mesh.draw(render_context);
         }
     }
 
 private:
-    std::vector<Mesh>     _meshes;
-    std::vector<Texture>  _textures;
-    std::filesystem::path _directory;
+    std::vector<Mesh>        _meshes;
+    std::vector<MeshTexture> _textures;
+    std::filesystem::path    _directory;
 
     auto loadModel(const std::string& path) -> void {
         Logger::info("Loading model: " + path);
@@ -59,13 +62,13 @@ private:
 
     auto processMesh(Assimp::aiMesh* mesh, const Assimp::aiScene* scene) -> Mesh {
         // data to fill
-        std::vector<Vertex>   vertices;
-        std::vector<uint32_t> indices;
-        std::vector<Texture>  textures;
+        std::vector<MeshVertex>  vertices;
+        std::vector<uint32_t>    indices;
+        std::vector<MeshTexture> textures;
 
         // walk through each of the mesh's vertices
         for (uint32_t i = 0; i < mesh->mNumVertices; i++) {
-            Vertex vertex;
+            MeshVertex vertex;
             /*
              * we declare a placeholder vector since assimp uses its own vector class that
              * doesn't directly convert to glm's vec3 class so we transfer the data to this
@@ -118,31 +121,37 @@ private:
         // specular: texture_specularN
         // normal: texture_normalN
         // 1. diffuse maps
-        std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+        std::vector<MeshTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE,
+                                                                    "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         // 2. specular maps
-        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+        std::vector<MeshTexture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR,
+                                                                     "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         // 3. normal maps
-        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+        std::vector<MeshTexture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT,
+                                                                   "texture_normal");
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
         // 4. height maps
-        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+        std::vector<MeshTexture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT,
+                                                                   "texture_height");
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
         // return a mesh object created from the extracted mesh data
-        return Mesh(vertices, indices, textures);
+        Mesh result;
+        result.set(vertices, indices, textures);
+        return result;
     }
 
     auto loadMaterialTextures(Assimp::aiMaterial* material, Assimp::aiTextureType type,
-                              const std::string&  typeName) -> std::vector<Texture> {
-        std::vector<Texture> textures;
+                              const std::string&  typeName) -> std::vector<MeshTexture> {
+        std::vector<MeshTexture> textures;
         for (uint32_t i = 0; i < material->GetTextureCount(type); i++) {
             Assimp::aiString str;
             material->GetTexture(type, i, &str);
             // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
             auto iter = std::find_if(_textures.begin(), _textures.end(),
-                                     [&str, &textures](const Texture& texture) {
+                                     [&str](const MeshTexture& texture) {
                                          return std::strcmp(texture.path.c_str(), str.C_Str()) == 0;
                                      });
 
@@ -151,8 +160,8 @@ private:
                 continue;
             }
 
-            Texture texture;
-            texture.id   = TextureFromFile(str.C_Str(), _directory);
+            MeshTexture texture;
+            texture.id   = loadTextureFromFile(str.C_Str(), _directory);
             texture.type = typeName;
             texture.path = str.C_Str();
             textures.push_back(texture);
@@ -161,7 +170,7 @@ private:
         return textures;
     }
 
-    auto TextureFromFile(const char* name, const std::filesystem::path& directory) -> GLuint {
+    auto loadTextureFromFile(const char* name, const std::filesystem::path& directory) -> GLuint {
         const std::filesystem::path texture_filename = directory / name;
 
         GLuint textureID;
@@ -203,11 +212,4 @@ private:
 
         return textureID;
     }
-
-    // auto processNode(aiNode* node, const aiScene* scene) -> void {}
-    //
-    // auto processMesh(aiMesh* mesh, const aiScene* scene) -> Mesh {}
-    //
-    // auto loadMaterialTextures(aiMaterial*        mat, aiTextureType type,
-    //                           const std::string& typeName) -> std::vector<Texture> {}
 };

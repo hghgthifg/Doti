@@ -46,8 +46,12 @@ export namespace ImGui
     using ImGui::BeginMenu;
     using ImGui::MenuItem;
     using ImGui::EndMenu;
+    using ImGui::IsItemActive;
+    using ImGui::IsItemClicked;
+    using ImGui::IsItemHovered;
     using ImGui::GetContentRegionAvail;
     using ImGui::GetDrawData;
+    using ImGui::GetMouseDragDelta;
     using ImGui::GetIO;
     using ImGui::GetID;
     using ImGui::Image;

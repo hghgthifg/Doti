@@ -1,6 +1,6 @@
 export module Graphics.Texture;
 
-export class Texture {
+export class MeshTexture {
 public:
 private:
 };

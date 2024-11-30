@@ -8,23 +8,40 @@ import Math;
 
 export class Shader {
 public:
-    Shader() = delete;
-
-    Shader(const Shader&) = delete;
+    Shader() = default;
 
     explicit Shader(const std::string& name) : _ID(0), _name(name) {
         Logger::info("Created shader: " + name);
     }
 
-    Shader(Shader&&) = delete;
+    Shader(Shader&& other) noexcept : _ID(other._ID), _name(other._name), _vertexPath(other._vertexPath),
+                                      _fragmentPath(other._fragmentPath) {
+        other._ID = 0;
+    };
 
     ~Shader() {
+        Logger::debug("Destroying shader: " + _name + ", ID: " + std::to_string(_ID));
         glDeleteProgram(_ID);
     }
 
     auto operator =(const Shader&) -> Shader& = delete;
 
-    auto operator =(Shader&&) -> Shader& = default;
+    auto operator=(Shader&& other) noexcept -> Shader& {
+        if (this != &other) {
+            if (_ID != 0) {
+                glDeleteProgram(_ID);
+            }
+
+            _ID           = other._ID;
+            _name         = std::move(other._name);
+            _vertexPath   = std::move(other._vertexPath);
+            _fragmentPath = std::move(other._fragmentPath);
+
+            other._ID   = 0;
+            other._name = "null";
+        }
+        return *this;
+    }
 
     Shader(const std::string& name, const std::string& vertexPath,
            const std::string& fragmentPath): _ID(0), _name(name) {
@@ -107,7 +124,7 @@ public:
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
-        _shaders.insert({_name, this});
+        // _shaders.insert({_name, this});
 
         Logger::info("Successfully compiled and linked shader: " + _vertexPath + " and " + _fragmentPath);
     }
@@ -195,11 +212,11 @@ private:
         }
     }
 
-    uint32_t                               _ID;
-    std::string                            _name;
-    std::string                            _vertexPath;
-    std::string                            _fragmentPath;
-    static std::map<std::string, Shader *> _shaders;
+    uint32_t    _ID;
+    std::string _name;
+    std::string _vertexPath;
+    std::string _fragmentPath;
+    // static std::unordered_map<std::string, Shader *> _shaders;
 };
 
-std::map<std::string, Shader *> Shader::_shaders;
+// std::unordered_map<std::string, Shader *> Shader::_shaders;

@@ -27,6 +27,9 @@ export namespace Math
     using glm::normalize;
     using glm::lookAt;
     using glm::rotate;
+    using glm::radians;
+    using glm::translate;
+    using glm::scale;
 }
 #elifdef USING_EIGEN
 import Eigen;

@@ -3,29 +3,30 @@ export module Graphics.Render.Drawable.Mesh;
 import std;
 import Math;
 import OpenGL;
-import Graphics.Shader;
 import Debug.Logger;
-
-/*!
- * @brief Structure representing a vertex with multiple attributes
- */
-export struct Vertex {
-    Point3  position;   /*!< Position of the vertex in 3D space */
-    Vec3    normal;     /*!< Normal vector of the vertex */
-    Vec2    texCoords;  /*!< Texture coordinates */
-    Vec3    tangent;    /*!< Tangent vector for normal mapping */
-    Vec3    bitangent;  /*!< Bitangent vector for normal mapping */
-    GLint   boneIds[4]; /*!< Bone IDs for skeletal animation */
-    GLfloat weights[4]; /*!< Weights for skeletal animation */
-};
+import Graphics.Shader;
+import Graphics.Render.RenderContext;
 
 /*!
  * @brief Structure representing a texture with its properties
  */
-export struct Texture {
+export struct MeshTexture {
     GLuint      id;   /*!< OpenGL texture ID */
     std::string type; /*!< Type of the texture (e.g., diffuse, specular) */
     std::string path; /*!< File path to the texture */
+};
+
+/*!
+ * @brief Structure representing a vertex with multiple attributes
+ */
+export struct MeshVertex {
+    Point3  position;   /*!< Position of the vertex in 3D space */
+    Vec3    normal;     /*!< Normal vector of the vertex */
+    Vec2    texCoords;  /*!< MeshTexture coordinates */
+    Vec3    tangent;    /*!< Tangent vector for normal mapping */
+    Vec3    bitangent;  /*!< Bitangent vector for normal mapping */
+    GLint   boneIds[4]; /*!< Bone IDs for skeletal animation */
+    GLfloat weights[4]; /*!< Weights for skeletal animation */
 };
 
 template<typename V>
@@ -34,7 +35,7 @@ concept VertexContainer = requires(V v)
     { v.begin() } -> std::input_iterator;
     { v.end() } -> std::input_iterator;
     typename std::remove_reference_t<V>::value_type;
-    requires std::same_as<typename std::remove_reference_t<V>::value_type, Vertex>;
+    requires std::same_as<typename std::remove_reference_t<V>::value_type, MeshVertex>;
 };
 
 template<typename I>
@@ -52,7 +53,7 @@ concept TextureContainer = requires(T t)
     { t.begin() } -> std::input_iterator;
     { t.end() } -> std::input_iterator;
     typename std::remove_reference_t<T>::value_type;
-    requires std::same_as<typename std::remove_reference_t<T>::value_type, Texture>;
+    requires std::same_as<typename std::remove_reference_t<T>::value_type, MeshTexture>;
 };
 
 /*!
@@ -98,42 +99,32 @@ public:
         this->setup();
     }
 
-    // /*!
-    //  * @brief Add more vertices, indices and textures to the mesh
-    // * @tparam V Container type of Vertex which can be iterated over to construct a vector
-    //  * @tparam I Container type of uint32_t which can be iterated over to construct a vector
-    //  * @tparam T Container type of Texture which can be iterated over to construct a vector
-    //  * @param Vertices you want to add to the mesh
-    //  * @param Indices of the vertices to form triangles you want to add to the mesh
-    //  * @param Textures you want to add to the mesh
-    //  */
-    // template<VertexContainer V, IndexContainer I, TextureContainer T>
-    // void add(V&& vertices, I&& indices, T&& textures) {
-    //     _vertices.insert(_vertices.end(), std::forward<V>(vertices).begin(), std::forward<V>(vertices).end());
-    //     _indices.insert(_indices.end(), std::forward<I>(indices).begin(), std::forward<I>(indices).end());
-    //     _textures.insert(_textures.end(), std::forward<T>(textures).begin(), std::forward<T>(textures).end());
-    // }
-
     /*!
      * @brief Draws the mesh using the provided shader
-     * @param shader The shader to be used for rendering the mesh
+     * @param render_context Render context to be used for rendering the mesh
      */
-    auto draw(const Shader& shader) const -> void {
+    auto draw(RenderContext& render_context) const -> void {
         if (!_isSetup) {
             Logger::warning("Mesh has not been setup.");
             return;
         }
+
+        const Shader& rawShader = render_context.directlyAccessShader(*this);
+        rawShader.activate();
+
+        render_context.apply();
+
         uint32_t diffuseNr  = 1;
         uint32_t specularNr = 1;
         for (uint32_t i = 0; i < _textures.size(); i++) {
-            glActiveTexture(static_cast<GLenum>(static_cast<uint32_t>(GL_TEXTURE0) + i)); // 在绑定之前激活相应的纹理单元
+            glActiveTexture(static_cast<GLenum>(static_cast<uint32_t>(GL_TEXTURE0) + i));
             /* Get texture id (N in diffuse_textureN)*/
             std::string number;
             std::string name = _textures[i].type;
             if (name == "texture_diffuse") number = std::to_string(diffuseNr++);
             else if (name == "texture_specular") number = std::to_string(specularNr++);
 
-            shader.setInt(("material." + name + number).c_str(), i);
+            rawShader.setInt(("material." + name + number).c_str(), i);
             glBindTexture(GL_TEXTURE_2D, _textures[i].id);
         }
         glActiveTexture(GL_TEXTURE0);
@@ -142,6 +133,8 @@ public:
         glBindVertexArray(_vao);
         glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+
+        rawShader.deactivate();
     }
 
 private:
@@ -156,30 +149,32 @@ private:
         glBindVertexArray(_vao);
         glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 
-        glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(Vertex), _vertices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(MeshVertex), _vertices.data(), GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(GLuint), _indices.data(), GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void *) 0);
 
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) __builtin_offsetof(Vertex, normal));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex),
+                              (void *) __builtin_offsetof(MeshVertex, normal));
 
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) __builtin_offsetof(Vertex, texCoords));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshVertex),
+                              (void *) __builtin_offsetof(MeshVertex, texCoords));
 
         glBindVertexArray(0);
 
         _isSetup = true;
     }
 
-    uint32_t              _vao;      /*!< OpenGL Vertex Array Object handle */
-    uint32_t              _vbo;      /*!< OpenGL Vertex Buffer Object handle */
-    uint32_t              _ebo;      /*!< OpenGL Element Buffer Object handle */
-    bool                  _isSetup;  /*!< Flag indicating whether the mesh has been set up */
-    std::vector<Vertex>   _vertices; /*!< Container holding the vertices of the mesh */
-    std::vector<uint32_t> _indices;  /*!< Container holding the indices of the mesh */
-    std::vector<Texture>  _textures; /*!< Container holding the textures of the mesh */
+    uint32_t                 _vao;      /*!< OpenGL MeshVertex Array Object handle */
+    uint32_t                 _vbo;      /*!< OpenGL MeshVertex Buffer Object handle */
+    uint32_t                 _ebo;      /*!< OpenGL Element Buffer Object handle */
+    bool                     _isSetup;  /*!< Flag indicating whether the mesh has been set up */
+    std::vector<MeshVertex>  _vertices; /*!< Container holding the vertices of the mesh */
+    std::vector<uint32_t>    _indices;  /*!< Container holding the indices of the mesh */
+    std::vector<MeshTexture> _textures; /*!< Container holding the textures of the mesh */
 };

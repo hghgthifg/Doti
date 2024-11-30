@@ -5,40 +5,54 @@ import Math;
 import Scene.SceneBase;
 import Utils.Camera;
 import Graphics.Shader;
+import Graphics.Render.RenderContext;
 import Graphics.Render.Drawable.Triangle;
+import Graphics.Render.Drawable.Model;
 
 export class TestScene : public SceneBase {
 public:
-    TestScene(): _shader("default", "resource/shaders/vertex_shader.glsl", "resource/shaders/fragment_shader.glsl") {
-        // Mat4 projection = Math::perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
-        // _shader.setMat4("projection", projection);
-        std::vector points{
-            Point3{-0.5f, -0.5f, 0.0f},
-            Point3{0.5f, -0.5f, 0.0f},
-            Point3{0.0f, 0.5f, 0.0f}
-        };
-        _triangle.setVertices(points);
+    TestScene() {
+        // std::vector points{
+        //     Point3{-0.5f, -0.5f, 0.0f},
+        //     Point3{0.5f, -0.5f, 0.0f},
+        //     Point3{0.0f, 0.5f, 0.0f}
+        // };
+        // _triangle.setVertices(points);
+    }
+
+    void load() override {
+        auto shader = Shader(
+            "default",
+            "resource/shaders/vertex_shader.glsl",
+            "resource/shaders/fragment_shader.glsl"
+        );
+        _renderContext.setShader(std::move(shader));
+        _bunnyModel = Model(
+            "resource/models/bunny.obj"
+        );
     }
 
     void render() override {
-        // auto view = _camera.getView();
-        // _shader.setMat4("view", view);
+        auto projection = Math::perspective(Math::radians(_camera.getFov()), _width / _height, 0.1f, 100.0f);
+        _renderContext.setProjectionMatrix(projection);
 
-        //get time
-        // auto time = std::chrono::duration_cast<std::chrono::milliseconds>(
-        // std::chrono::system_clock::now().time_since_epoch());
+        auto view = _camera.getView();
+        _renderContext.setViewMatrix(view);
 
-        // model      = Math::rotate(model, (float) time.count(), Vec3(0.0f, 0.0f, 1.0f));
-        Mat4 model = Mat4(1.0f);
-        _shader.setMat4("model", model);
+        auto viewPos = _camera.getPos();
+        _renderContext.setViewPos(viewPos);
 
-        _triangle.draw(_shader);
+        auto model = Mat4(1.0f);
+        model      = Math::translate(model, Vec3{0.0f, 0.0f, 0.0f});
+        model      = Math::scale(model, Vec3{1.0f, 1.0f, 1.0f});
+        _renderContext.setModelMatrix(model);
+
+        _bunnyModel.draw(_renderContext);
     }
 
     void exit() override {}
 
 private:
-    Camera   _camera;
-    Triangle _triangle;
-    Shader   _shader;
+    // Triangle _triangle;
+    Model _bunnyModel;
 };

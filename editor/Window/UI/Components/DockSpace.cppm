@@ -49,7 +49,7 @@ protected:
         // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
         // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
         if (!opt_padding) ImGui::PushStyleVar(ImGuiFlags::ImGuiStyleVar::WindowPadding, ImVec2(0.0f, 0.0f));
-        ImGui::Begin("DockSpace Demo", _open, window_flags);
+        ImGui::Begin("DockSpace", _open, window_flags);
         if (!opt_padding) ImGui::PopStyleVar();
 
         if (opt_fullscreen) ImGui::PopStyleVar(2);
@@ -57,7 +57,7 @@ protected:
         // Submit the DockSpace
         ImGuiIO& io = ImGui::GetIO();
         if (io.ConfigFlags & ImGuiFlags::ImGuiConfigFlags::DockingEnable) {
-            ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+            ImGuiID dockspace_id = ImGui::GetID("BaseDockSpace");
             ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
         }
     }

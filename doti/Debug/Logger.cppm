@@ -42,6 +42,9 @@ public:
                      filePath.filename().string(), location.line(), str);
     }
 
+    // TODO: Separate event emitting log.
+    static auto event(const std::string_view& str) -> void {}
+
 private:
     inline static auto getCurrentTime() -> std::string {
         std::chrono::zoned_time now{

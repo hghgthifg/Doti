@@ -98,8 +98,8 @@ private:
         _isSetup = true;
     }
 
-    uint32_t            _vao;      /*!< OpenGL Vertex Array Object handle */
-    uint32_t            _vbo;      /*!< OpenGL Vertex Buffer Object handle */
+    uint32_t            _vao;      /*!< OpenGL MeshVertex Array Object handle */
+    uint32_t            _vbo;      /*!< OpenGL MeshVertex Buffer Object handle */
     bool                _isSetup;  /*!< Flag indicating whether the triangle has been set up */
     std::vector<Vertex> _vertices; /*!< Container holding the vertices of the triangle */
 };

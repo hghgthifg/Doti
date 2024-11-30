@@ -33,6 +33,7 @@ public:
         const auto it = getScenes().find(name);
         if (it != getScenes().end()) {
             currentScene() = it->second;
+            currentScene()->load();
         } else {
             Logger::error("Scene " + name + " not found.");
         }

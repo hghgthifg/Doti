@@ -101,7 +101,7 @@ public:
         if (it != _signals.end()) {
             auto signal = std::static_pointer_cast<Signal<Args...>>(it->second);
             signal->emitSignal(args...);
-            Logger::info("Event '" + name + "' emitted. ");
+            // Logger::info("Event '" + name + "' emitted. ");
         } else {
             Logger::warning("Event '" + name + "' is not registered. ");
         }

@@ -18,6 +18,7 @@ project(Doti LANGUAGES CXX)
 # Make sure to add -DCMAKE_TOOLCHAIN_FILE=<path/to/vcpkg>/scripts/buildsystems/vcpkg.cmake when calling CMake.
 
 #find_package(OpenMP)
+find_package(assimp CONFIG REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 #find_package(glad CONFIG REQUIRED)
@@ -93,11 +94,12 @@ target_sources(Doti
         doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Color.cppm
         doti/Graphics/Texture.cppm
+        doti/Graphics/Render/RenderContext.cppm
         doti/Graphics/Render/Illumination/ray.cppm
         doti/Graphics/Render/Drawable/Drawable.cppm
         doti/Graphics/Render/Drawable/Mesh.cppm
         doti/Graphics/Render/Drawable/Triangle.cppm
-        doti/Graphics/Render/Model/Model.cppm
+        doti/Graphics/Render/Drawable/Model/Model.cppm
         doti/Graphics/Loader/JxlLoader.cppm
         doti/Graphics/Loader/ImageLoader.cppm
         doti/Scene/SceneBase.cppm
@@ -124,6 +126,7 @@ target_link_libraries(Doti PRIVATE
         Eigen3::Eigen
         imgui::imgui
         glm::glm
+        assimp::assimp
         #        opengl32
         #        user32
         #        shell32
@@ -179,7 +182,7 @@ target_sources(Editor
         PUBLIC
         FILE_SET CXX_MODULES FILES
         editor/Window/Window.cppm
-        editor/Window/RenderTexture.cppm
+        editor/Window/FrameCanvas.cppm
         editor/Window/UI/UIComponent.cppm
         editor/Window/UI/Components/OpenGLView.cppm
         editor/Window/UI/Components/DockSpace.cppm
