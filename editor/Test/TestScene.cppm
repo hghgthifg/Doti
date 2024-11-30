@@ -4,6 +4,7 @@ import std;
 import Math;
 import Scene.SceneBase;
 import Utils.Camera;
+import Utils.Event;
 import Graphics.Shader;
 import Graphics.Render.RenderContext;
 import Graphics.Render.Drawable.Triangle;
@@ -12,6 +13,13 @@ import Graphics.Render.Drawable.Model;
 export class TestScene : public SceneBase {
 public:
     TestScene() {
+        EventManager::connect<Vec2>("MouseDrag", [this](const Vec2& delta) {
+            _camera.updateOrientation(delta.x, delta.y);
+        });
+        EventManager::connect<float>("MouseScroll", [this](float delta) {
+            auto fov = _camera.getFov();
+            _camera.setFov(Math::clamp(fov - delta, 0.1f, 45.0f));
+        });
         // std::vector points{
         //     Point3{-0.5f, -0.5f, 0.0f},
         //     Point3{0.5f, -0.5f, 0.0f},

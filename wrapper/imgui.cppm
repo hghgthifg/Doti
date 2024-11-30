@@ -49,6 +49,10 @@ export namespace ImGui
     using ImGui::IsItemActive;
     using ImGui::IsItemClicked;
     using ImGui::IsItemHovered;
+    using ImGui::IsItemActivated;
+    using ImGui::IsItemDeactivated;
+    using ImGui::IsItemFocused;
+    using ImGui::IsWindowFocused;
     using ImGui::GetContentRegionAvail;
     using ImGui::GetDrawData;
     using ImGui::GetMouseDragDelta;

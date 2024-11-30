@@ -20,7 +20,7 @@ public:
     }
 
 protected:
-    Camera        _camera;
-    RenderContext _renderContext;
+    Camera        _camera{};
+    RenderContext _renderContext{};
     float         _width = 800, _height = 600;
 };

@@ -13,6 +13,7 @@ export class OpenGLView : public UIComponent {
 public:
     OpenGLView(const std::string& name) : UIComponent(name) {
         EventManager::registerEvent<Vec2>("MouseDrag");
+        EventManager::registerEvent<float>("MouseScroll");
     }
 
     auto setTexture(const std::shared_ptr<FrameCanvas>& canvas) -> void { _canvas = canvas; }
@@ -65,10 +66,17 @@ protected:
     }
 
     void endRender() override {
-        if (ImGui::IsItemActive()) {
+        ImGuiIO& io     = ImGui::GetIO();
+        float    scroll = io.MouseWheel;
+        if (scroll != 0.0f && ImGui::IsWindowFocused()) {
+            EventManager::emit("MouseScroll", scroll);
+        }
+        if (ImGui::IsWindowFocused() && !ImGui::IsItemHovered()) {
             ImVec2 mouseDelta = ImGui::GetMouseDragDelta();
             if (mouseDelta.x != 0 || mouseDelta.y != 0) {
-                Vec2 delta = {mouseDelta.x, mouseDelta.y};
+                float width  = _canvas->getWidth();
+                float height = _canvas->getHeight();
+                Vec2  delta  = {mouseDelta.x / width, mouseDelta.y / height};
                 EventManager::emit("MouseDrag", delta);
             }
         }

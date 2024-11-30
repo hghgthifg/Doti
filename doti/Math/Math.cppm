@@ -30,6 +30,9 @@ export namespace Math
     using glm::radians;
     using glm::translate;
     using glm::scale;
+    using glm::cos;
+    using glm::sin;
+    using glm::clamp;
 }
 #elifdef USING_EIGEN
 import Eigen;
