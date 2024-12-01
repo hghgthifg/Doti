@@ -31,6 +31,7 @@ private:
     std::vector<MeshTexture> _textures;
     std::filesystem::path    _directory;
 
+    // TODO: Asynchronous loading
     auto loadModel(const std::string& path) -> void {
         Logger::info("Loading model: " + path);
         Assimp::Importer       importer;

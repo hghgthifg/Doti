@@ -11,6 +11,7 @@ import Window.UI.Components.DockSpace;
 import Window.UI.Components.MenuBar;
 
 import Test.TestScene;
+import Test.Bunny;
 
 std::shared_ptr<DockSpace> RootComponent;
 
@@ -34,6 +35,7 @@ auto main() -> int {
         SceneManager::initialize();
 
         SceneManager::registerScene("TestScene", std::make_shared<TestScene>());
+        SceneManager::registerScene("BunnyScene", std::make_shared<BunnyScene>());
 
         while (!window.shouldClose()) {
             window.beginDraw();

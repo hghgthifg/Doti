@@ -99,6 +99,7 @@ target_sources(Doti
         doti/Graphics/Render/Drawable/Drawable.cppm
         doti/Graphics/Render/Drawable/Mesh.cppm
         doti/Graphics/Render/Drawable/Triangle.cppm
+        doti/Graphics/Render/Drawable/Canvas.cppm
         doti/Graphics/Render/Drawable/Model/Model.cppm
         doti/Graphics/Loader/JxlLoader.cppm
         doti/Graphics/Loader/ImageLoader.cppm

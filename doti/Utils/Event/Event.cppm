@@ -111,12 +111,15 @@ public:
      * @brief Disconnect all slots from the specified event.
      * @param name The name of the event to disconnect all slots from.
      */
+    template<typename... Args>
     static void disconnectAll(const std::string& name) {
         auto it = _signals.find(name);
         if (it != _signals.end()) {
             /* Reset the shared_ptr and erase the event from the map */
-            it->second.reset();
-            _signals.erase(it);
+            auto signal = std::static_pointer_cast<Signal<Args...>>(it->second);
+            signal->disconnectAll();
+            // it->second.reset();
+            // _signals.erase(it);
             Logger::info("All slots disconnected from event '" + name + "'. ");
         } else {
             Logger::warning("Event '" + name + "' is not registered. ");
