@@ -5,6 +5,7 @@ import Math;
 import Scene.SceneBase;
 import Utils.Camera;
 import Utils.Event;
+import Debug.Logger;
 import Graphics.Shader;
 import Graphics.Render.RenderContext;
 import Graphics.Render.Drawable.Canvas;
@@ -15,29 +16,30 @@ public:
     TestScene() = default;
 
     void load() override {
-        EventManager::connect<Vec2>("MouseDrag", [this](const Vec2& delta) {
+        EventManager::connect<Vec2>("Input::MouseDrag", [this](const Vec2& delta) {
             _camera.updateOrientation(delta.x, delta.y);
         });
-        EventManager::connect<float>("MouseScroll", [this](float delta) {
+        EventManager::connect<float>("Input::MouseScroll", [this](float delta) {
             auto fov = _camera.getFov();
-            _camera.setFov(Math::clamp(fov - delta, 0.1f, 45.0f));
+            _camera.setFov(Math::clamp(fov - delta, 0.1f, 80.0f));
         });
         auto shader = Shader(
-            "default",
+            "Default",
             "resource/shaders/TestScene/vertex_shader.glsl",
             "resource/shaders/TestScene/fragment_shader.glsl"
         );
+        _camera.updateScreenRatio(_width, _height);
         _renderContext.setShader(std::move(shader));
-        _camera.reset();
     }
 
     void render() override {
+        _renderContext.setCamera(_camera);
         _canvas.draw(_renderContext);
     }
 
     void exit() override {
-        EventManager::disconnectAll<Vec2>("MouseDrag");
-        EventManager::disconnectAll<float>("MouseScroll");
+        EventManager::disconnectAll<Vec2>("Input::MouseDrag");
+        EventManager::disconnectAll<float>("Input::MouseScroll");
     }
 
 private:

@@ -1,5 +1,6 @@
 export module Test.Bunny;
 
+/*
 import std;
 import Math;
 import Scene.SceneBase;
@@ -23,7 +24,7 @@ public:
             _camera.setFov(Math::clamp(fov - delta, 0.1f, 45.0f));
         });
         auto shader = Shader(
-            "default",
+            "BunnyShader (Phong)",
             "resource/shaders/BunnyScene/vertex_shader.glsl",
             "resource/shaders/BunnyScene/fragment_shader.glsl"
         );
@@ -38,7 +39,7 @@ public:
         auto projection = Math::perspective(Math::radians(_camera.getFov()), _width / _height, 0.1f, 100.0f);
         _renderContext.setProjectionMatrix(projection);
 
-        auto view = _camera.getView();
+        auto view = _camera.getViewMatrix();
         _renderContext.setViewMatrix(view);
 
         auto viewPos = _camera.getPos();
@@ -61,3 +62,4 @@ private:
     // Triangle _triangle;
     Model _bunnyModel;
 };
+*/

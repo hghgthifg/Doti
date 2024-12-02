@@ -19,6 +19,7 @@ public:
         this->setup();
     }
 
+    // TODO: Optimize Shader activation process
     auto draw(RenderContext& render_context) -> void {
         const Shader& rawShader = render_context.directlyAccessShader(*this);
         rawShader.activate();
