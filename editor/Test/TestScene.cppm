@@ -21,7 +21,7 @@ public:
             EventManager::emit("Render::RefreshHistoryFramedata");
         });
         EventManager::connect<float>("Input::MouseScroll", [this](float delta) {
-            auto fov = _camera.getFov();
+            const auto fov = _camera.getFov();
             _camera.setFov(Math::clamp(fov - delta, 0.1f, 80.0f));
             EventManager::emit("Render::RefreshHistoryFramedata");
         });

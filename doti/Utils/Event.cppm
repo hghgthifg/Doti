@@ -101,7 +101,6 @@ public:
         if (it != _signals.end()) {
             auto signal = std::static_pointer_cast<Signal<Args...>>(it->second);
             signal->emitSignal(args...);
-            // Logger::info("Event '" + name + "' emitted. ");
         } else {
             Logger::warning("Event \"" + name + "\" is not registered. ");
         }
@@ -118,8 +117,6 @@ public:
             /* Reset the shared_ptr and erase the event from the map */
             auto signal = std::static_pointer_cast<Signal<Args...>>(it->second);
             signal->disconnectAll();
-            // it->second.reset();
-            // _signals.erase(it);
             Logger::event("All slots disconnected from event \"" + name + "\". ");
         } else {
             Logger::warning("Event \"" + name + "\" is not registered. ");

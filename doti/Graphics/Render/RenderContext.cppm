@@ -37,6 +37,27 @@ public:
             _shader.setVec3("camera.leftBottom", camera.getLeftBottomCorner());
             _shader.setInt("frameCount", _frameCount);
             _shader.setFloat("randOrigin", 674764.0f * (Random::randFloat() + 1.0f));
+
+            // TODO: Custom scene content
+            _shader.setFloat("sphere[0].radius", 0.5);
+            _shader.setVec3("sphere[0].center", Vec3(0.0, 0.0, -1.0));
+            _shader.setInt("sphere[0].materialIndex", 0);
+            _shader.setVec3("sphere[0].albedo", Vec3(0.8, 0.7, 0.2));
+
+            _shader.setFloat("sphere[1].radius", 0.5);
+            _shader.setVec3("sphere[1].center", Vec3(1.0, 0.0, -1.0));
+            _shader.setInt("sphere[1].materialIndex", 1);
+            _shader.setVec3("sphere[1].albedo", Vec3(0.2, 0.7, 0.6));
+
+            _shader.setFloat("sphere[2].radius", 0.5);
+            _shader.setVec3("sphere[2].center", Vec3(-1.0, 0.0, -1.0));
+            _shader.setInt("sphere[2].materialIndex", 1);
+            _shader.setVec3("sphere[2].albedo", Vec3(0.7, 0.2, 0.2));
+
+            _shader.setFloat("sphere[3].radius", 100.0);
+            _shader.setVec3("sphere[3].center", Vec3(0.0, -100.5, -1.0));
+            _shader.setInt("sphere[3].materialIndex", 0);
+            _shader.setVec3("sphere[3].albedo", Vec3(0.9, 0.9, 0.9));
         }
     }
 

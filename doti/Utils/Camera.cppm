@@ -70,7 +70,6 @@ public:
         _halfWidth  = _halfHeight * _screenRatio;
 
         _leftBottomCorner = _cameraFront - _halfWidth * _cameraRight - _halfHeight * _cameraUp;
-        // Logger::info("halfHeight changed to " + std::to_string(_halfHeight));
     }
 
     auto getCameraPos() const -> Vec3 { return _cameraPos; }

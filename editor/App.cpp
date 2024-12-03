@@ -53,7 +53,6 @@ auto main() -> int {
             }
 
             targetTexture->unbind();
-            // triangle.draw(shader);
 
             ImGui::NewFrame();
             RootComponent->render();
