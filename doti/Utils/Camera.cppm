@@ -7,23 +7,38 @@ import Debug.Logger;
 
 export class Camera {
 public:
+    enum class MoveDirection {
+        Forward,
+        Backward,
+        Left,
+        Right,
+    };
+
     Camera(const float screen_width, const float screen_height) {
         this->reset(screen_width, screen_height);
         EventManager::registerEvent<>("Camera::MoveLeft");
         EventManager::registerEvent<>("Camera::MoveRight");
         EventManager::registerEvent<>("Camera::MoveForward");
         EventManager::registerEvent<>("Camera::MoveBackward");
+        EventManager::registerEvent<MoveDirection>("Camera::Move");
         EventManager::connect<>("Camera::MoveLeft", [this]() {
             _cameraPos -= _cameraRight * _cameraSpeed;
+            EventManager::emit("Camera::Move", MoveDirection::Left);
         });
         EventManager::connect<>("Camera::MoveRight", [this]() {
             _cameraPos += _cameraRight * _cameraSpeed;
+            EventManager::emit("Camera::Move", MoveDirection::Right);
         });
         EventManager::connect<>("Camera::MoveForward", [this]() {
             _cameraPos += _cameraFront * _cameraSpeed;
+            EventManager::emit("Camera::Move", MoveDirection::Forward);
         });
         EventManager::connect<>("Camera::MoveBackward", [this]() {
             _cameraPos -= _cameraFront * _cameraSpeed;
+            EventManager::emit("Camera::Move", MoveDirection::Backward);
+        });
+        EventManager::connect<MoveDirection>("Camera::Move", [this](MoveDirection) {
+            EventManager::emit("Render::RefreshHistoryFramedata");
         });
     }
 
@@ -55,7 +70,7 @@ public:
         _halfWidth  = _halfHeight * _screenRatio;
 
         _leftBottomCorner = _cameraFront - _halfWidth * _cameraRight - _halfHeight * _cameraUp;
-        Logger::info("halfHeight changed to " + std::to_string(_halfHeight));
+        // Logger::info("halfHeight changed to " + std::to_string(_halfHeight));
     }
 
     auto getCameraPos() const -> Vec3 { return _cameraPos; }

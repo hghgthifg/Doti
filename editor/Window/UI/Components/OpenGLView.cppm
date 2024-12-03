@@ -4,7 +4,7 @@ import ImGui;
 import OpenGL;
 import std;
 import Window.UI.ComponentBase;
-import Window.FrameCanvas;
+import Scene.FrameCanvas;
 import Debug.Logger;
 import Utils.Event;
 import Math;

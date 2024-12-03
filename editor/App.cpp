@@ -1,10 +1,11 @@
 import std;
 import ImGui;
+// import Utils.Event;
 import Debug.Logger;
 import Scene.SceneManager;
 import Scene.SceneBase;
+import Scene.FrameCanvas;
 import Window;
-import Window.FrameCanvas;
 import Window.UI.ComponentBase;
 import Window.UI.Components.OpenGLView;
 import Window.UI.Components.DockSpace;
@@ -40,10 +41,7 @@ auto main() -> int {
         while (!window.shouldClose()) {
             window.beginDraw();
 
-            ImGui::NewFrame();
-            RootComponent->render();
-            ImGui::Render();
-
+            // TODO: TargetTexture should be a component of RenderContext
             targetTexture->bind();
 
             auto currentScene = SceneManager::getCurrentScene();
@@ -56,6 +54,11 @@ auto main() -> int {
 
             targetTexture->unbind();
             // triangle.draw(shader);
+
+            ImGui::NewFrame();
+            RootComponent->render();
+            ImGui::Render();
+
             window.endDraw();
         }
     } catch (const std::exception& e) {

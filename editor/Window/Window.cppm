@@ -6,6 +6,7 @@ import ImGui;
 import OpenGL;
 import Debug.Logger;
 import Graphics.Shader;
+import Utils.Event;
 
 export class Window {
 public:
@@ -97,7 +98,6 @@ public:
 
 private:
     std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow*)>> _window;
-
 
     auto processInput() const -> void {
         if (glfwGetKey(_window.get(), GLFW_KEY_ESCAPE) == GLFW_PRESS) { glfwSetWindowShouldClose(_window.get(), true); }

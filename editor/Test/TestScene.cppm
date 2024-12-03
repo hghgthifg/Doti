@@ -18,10 +18,12 @@ public:
     void load() override {
         EventManager::connect<Vec2>("Input::MouseDrag", [this](const Vec2& delta) {
             _camera.updateOrientation(delta.x, delta.y);
+            EventManager::emit("Render::RefreshHistoryFramedata");
         });
         EventManager::connect<float>("Input::MouseScroll", [this](float delta) {
             auto fov = _camera.getFov();
             _camera.setFov(Math::clamp(fov - delta, 0.1f, 80.0f));
+            EventManager::emit("Render::RefreshHistoryFramedata");
         });
         auto shader = Shader(
             "Default",
@@ -33,7 +35,9 @@ public:
     }
 
     void render() override {
+        EventManager::emit("Scene::NewRenderLoop");
         _renderContext.setCamera(_camera);
+        _renderContext.setFrameCount(_renderLoopCount);
         _canvas.draw(_renderContext);
     }
 

@@ -54,9 +54,9 @@ public:
     static void registerEvent(const std::string& name) {
         if (!_signals.contains(name)) {
             _signals[name] = std::make_shared<Signal<Args...>>();
-            Logger::info("Event '" + name + "' registered. ");
+            Logger::event("Event \"" + name + "\" registered. ");
         } else {
-            Logger::warning("Event '" + name + "' is already registered. ");
+            Logger::warning("Event \"" + name + "\" is already registered. ");
         }
     }
 
@@ -74,9 +74,9 @@ public:
         if (it != _signals.end()) {
             auto signal = std::static_pointer_cast<Signal<Args...>>(it->second);
             signal->connect(std::function<void(Args...)>(slot));
-            Logger::info("Slot connected to event '" + name + "'. ");
+            Logger::event("Slot connected to event \"" + name + "\". ");
         } else {
-            Logger::error("Event '" + name + "' is not registered. ");
+            Logger::error("Event \"" + name + "\" is not registered. ");
         }
     }
 
@@ -103,7 +103,7 @@ public:
             signal->emitSignal(args...);
             // Logger::info("Event '" + name + "' emitted. ");
         } else {
-            Logger::warning("Event '" + name + "' is not registered. ");
+            Logger::warning("Event \"" + name + "\" is not registered. ");
         }
     }
 
@@ -120,9 +120,9 @@ public:
             signal->disconnectAll();
             // it->second.reset();
             // _signals.erase(it);
-            Logger::info("All slots disconnected from event '" + name + "'. ");
+            Logger::event("All slots disconnected from event \"" + name + "\". ");
         } else {
-            Logger::warning("Event '" + name + "' is not registered. ");
+            Logger::warning("Event \"" + name + "\" is not registered. ");
         }
     }
 

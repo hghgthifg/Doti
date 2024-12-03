@@ -88,14 +88,14 @@ target_sources(Doti
         PUBLIC
         FILE_SET CXX_MODULES FILES
         doti/Math/Math.cppm
-        doti/Utils/Event/Event.cppm
-        doti/Utils/Camera/Camera.cppm
+        doti/Utils/Event.cppm
+        doti/Utils/Camera.cppm
+        doti/Utils/Random.cppm
         doti/Debug/Logger.cppm
         doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Color.cppm
         doti/Graphics/Texture.cppm
         doti/Graphics/Render/RenderContext.cppm
-        doti/Graphics/Render/Illumination/ray.cppm
         doti/Graphics/Render/Drawable/Drawable.cppm
         doti/Graphics/Render/Drawable/Mesh.cppm
         doti/Graphics/Render/Drawable/Triangle.cppm
@@ -105,6 +105,7 @@ target_sources(Doti
         doti/Graphics/Loader/ImageLoader.cppm
         doti/Scene/SceneBase.cppm
         doti/Scene/SceneManager.cppm
+        doti/Scene/FrameCanvas.cppm
         wrapper/test.cppm
         wrapper/eigen.cppm
         wrapper/glfw.cppm
@@ -183,7 +184,6 @@ target_sources(Editor
         PUBLIC
         FILE_SET CXX_MODULES FILES
         editor/Window/Window.cppm
-        editor/Window/FrameCanvas.cppm
         editor/Window/UI/UIComponent.cppm
         editor/Window/UI/Components/OpenGLView.cppm
         editor/Window/UI/Components/DockSpace.cppm

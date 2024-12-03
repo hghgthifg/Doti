@@ -42,8 +42,12 @@ public:
                      filePath.filename().string(), location.line(), str);
     }
 
-    // TODO: Separate event emitting log.
-    static auto event(const std::string_view& str) -> void {}
+    static auto event(const std::string_view&     str,
+                      const std::source_location& location = std::source_location::current()) -> void {
+        const std::filesystem::path filePath = location.file_name();
+        std::println("{}{} {:<10} ({}:{}) {}", "\033[1;36m", getCurrentTime(), "[event]",
+                     filePath.filename().string(), location.line(), str);
+    }
 
 private:
     inline static auto getCurrentTime() -> std::string {

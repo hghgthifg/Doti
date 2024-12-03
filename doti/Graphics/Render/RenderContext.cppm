@@ -4,6 +4,8 @@ import std;
 import Math;
 import Graphics.Shader;
 import Utils.Camera;
+import Utils.Event;
+import Utils.Random;
 import Debug.Logger;
 
 export class RenderContext;
@@ -25,19 +27,17 @@ public:
             Logger::warning("Camera not set! ");
         } else {
             const auto& camera = _camera->get();
+            _shader.setInt("historyTexture", 0);
             _shader.setVec3("camera.position", camera.getCameraPos());
             _shader.setVec3("camera.front", camera.getCameraFront());
             _shader.setVec3("camera.right", camera.getCameraRight());
             _shader.setVec3("camera.up", camera.getCameraUp());
             _shader.setFloat("camera.halfHeight", camera.getHalfHeight());
-            // Logger::info("camera.halfHeight: " + std::to_string(camera.getHalfHeight()));
             _shader.setFloat("camera.halfWidth", camera.getHalfWidth());
             _shader.setVec3("camera.leftBottom", camera.getLeftBottomCorner());
+            _shader.setInt("frameCount", _frameCount);
+            _shader.setFloat("randOrigin", 674764.0f * (Random::randFloat() + 1.0f));
         }
-        // _shader.setMat4("projection", _projection);
-        // _shader.setMat4("view", _view);
-        // _shader.setMat4("model", _model);
-        // _shader.setVec3("viewPos", _viewPos);
     }
 
     auto setShader(Shader&& shader) -> void {
@@ -46,6 +46,10 @@ public:
 
     auto setCamera(const Camera& camera) -> void {
         _camera = camera;
+    }
+
+    auto setFrameCount(int32_t count) -> void {
+        _frameCount = count;
     }
 
     // auto setViewMatrix(const Mat4& view) -> void {
@@ -71,8 +75,9 @@ public:
     }
 
 private:
-    Shader                                              _shader;
-    std::optional<std::reference_wrapper<const Camera>> _camera;
+    Shader                                              _shader{};
+    std::optional<std::reference_wrapper<const Camera>> _camera{};
+    int32_t                                             _frameCount = 0;
     // Mat4 _projection;
     // Mat4 _view;
     // Mat4 _model;
