@@ -25,6 +25,12 @@ struct Sphere {
     int materialIndex;
 };
 
+struct Triangle {
+    vec3 v0, v1, v2;
+    vec3 n0, n1, n2;
+    vec2 u0, u1, u2;
+};
+
 struct hitRecord {
     vec3 normal;
     vec3 position;
@@ -40,13 +46,21 @@ uniform float randOrigin;
 
 uniform Camera camera;
 uniform Sphere sphere[4];
+uniform Triangle tri[2];
+
+uniform sampler2D texMeshVertex;
+uniform int meshVertexNum;
+uniform sampler2D texMeshFaceIndex;
+uniform int meshIndexNum;
 
 hitRecord rec;
 uint wseed;
 
 float randcore(uint seed);
 float rand(void);
+float at(sampler2D dataTex, float index);
 float hitSphere(Sphere s, Ray r);
+float hitTriangle(Triangle tri, Ray r);
 bool hitWorld(Ray r);
 
 float randcore(uint seed) {
@@ -72,33 +86,124 @@ float hitSphere(Sphere s, Ray r) {
     float discriminant = b * b - 4 * a * c;
     if (discriminant > 0.0) {
         float dis = (-b - sqrt(discriminant)) / (2.0 * a);
-        if (dis > 0.0) return dis;
+        if (dis > 0.0) return dis - 0.00001;
         else return -1.0;
     } else {
         return -1.0;
     }
 }
 
+// Get the distance between a triangle and a ray's origin
+float hitTriangle(Triangle tri, Ray r) {
+    vec3 vv = vec3(0.0, 0.0, 0.0);
+    if (tri.v0 == vv && tri.v1 == vv && tri.v2 == vv) return 0.2;
+
+    vec3 A = tri.v1 - tri.v0;
+    vec3 B = tri.v2 - tri.v0;
+    vec3 N = normalize(cross(A, B));
+
+    if (dot(N, r.direction) == 0) return -1.0;
+    float D = -dot(N, tri.v0);
+    float t = -(dot(N, r.origin) + D) / dot(N, r.direction);
+    if (t < 0) return -1.0;
+
+    vec3 pHit = r.origin + t * r.direction;
+    vec3 edge0 = tri.v1 - tri.v0;
+    vec3 C0 = pHit - tri.v0;
+    if (dot(N, cross(edge0, C0)) < 0) return -1.0;
+    vec3 edge1 = tri.v2 - tri.v1;
+    vec3 C1 = pHit - tri.v1;
+    if (dot(N, cross(edge1, C1)) < 0) return -1.0;
+    vec3 edge2 = tri.v0 - tri.v2;
+    vec3 C2 = pHit - tri.v2;
+    if (dot(N, cross(edge2, C2)) < 0) return -1.0;
+
+    return t - 0.00001;
+}
+
+float at(sampler2D dataTex, float index) {
+    float row = (index + 0.5) / textureSize(dataTex, 0).x;
+    float y = (int(row) + 0.5) / textureSize(dataTex, 0).y;
+    float x = (index + 0.5 - int(row) * textureSize(dataTex, 0).x) / textureSize(dataTex, 0).x;
+
+    vec2 texCoord = vec2(x, y);
+    return texture2D(dataTex, texCoord).x;
+}
+
+Triangle getTriangle(int index) {
+    Triangle tri_t;
+    float face0Index = at(texMeshFaceIndex, float(index * 3));
+    float face1Index = at(texMeshFaceIndex, float(index * 3 + 1));
+    float face2Index = at(texMeshFaceIndex, float(index * 3 + 2));
+
+    tri_t.v0.x = at(texMeshVertex, face0Index * 8.0);
+    tri_t.v0.y = at(texMeshVertex, face0Index * 8.0 + 1.0);
+    tri_t.v0.z = at(texMeshVertex, face0Index * 8.0 + 2.0);
+
+    tri_t.v1.x = at(texMeshVertex, face1Index * 8.0);
+    tri_t.v1.y = at(texMeshVertex, face1Index * 8.0 + 1.0);
+    tri_t.v1.z = at(texMeshVertex, face1Index * 8.0 + 2.0);
+
+    tri_t.v2.x = at(texMeshVertex, face2Index * 8.0);
+    tri_t.v2.y = at(texMeshVertex, face2Index * 8.0 + 1.0);
+    tri_t.v2.z = at(texMeshVertex, face2Index * 8.0 + 2.0);
+
+    return tri_t;
+}
+
+vec3 getTriangleNormal(Triangle tri) {
+    return normalize(cross(tri.v2 - tri.v0, tri.v1 - tri.v0));
+}
+
 // Check if the ray hit anything
 bool hitWorld(Ray r) {
     float dis = 100000;
-    bool hitAnything = false;
+    bool ifHitSphere = false;
+    bool ifHitTriangle = false;
     int hitSphereIndex;
-    for (int i = 0; i < 4; i++) {
-        float tempDis = hitSphere(sphere[i], r);
-        if (tempDis > 0.0 && tempDis < dis) {
+    int hitTriangleIndex;
+
+    // for (int i = 0; i < 4; i++) {
+    //     float tempDis = hitSphere(sphere[i], r);
+    //     if (tempDis > 0.0 && tempDis < dis) {
+    //         dis = tempDis;
+    //         ifHitSphere = true;
+    //         hitSphereIndex = i;
+    //     }
+    // }
+
+    // for (int i = 0; i < 2; i++) {
+    //     float tempDis = hitTriangle(tri[i], r);
+    //     if (tempDis > 0.0 && tempDis < dis) {
+    //         dis = tempDis;
+    //         ifHitTriangle = true;
+    //         hitTriangleIndex = i;
+    //     }
+    // }
+
+    for (int i = 0; i < meshIndexNum / 3; i++) {
+        float tempDis = hitTriangle(getTriangle(i), r);
+        if (tempDis > 0 && tempDis < dis) {
             dis = tempDis;
-            hitAnything = true;
-            hitSphereIndex = i;
+            hitTriangleIndex = i;
+            ifHitTriangle = true;
         }
     }
-    if (hitAnything) {
+
+    if (ifHitTriangle) {
+        rec.position = r.origin + dis * r.direction;
+        rec.normal = getTriangleNormal(getTriangle(hitTriangleIndex));
+        rec.albedo = vec3(0.87, 0.77, 0.12);
+        rec.materialIndex = 1;
+        return true;
+    } else if (ifHitSphere) {
         rec.position = r.origin + dis * r.direction;
         rec.normal = normalize(r.origin + dis * r.direction - sphere[hitSphereIndex].center);
         rec.albedo = sphere[hitSphereIndex].albedo;
         rec.materialIndex = sphere[hitSphereIndex].materialIndex;
         return true;
     }
+
     return false;
 }
 
@@ -121,21 +226,40 @@ vec3 metalReflection(vec3 normal, vec3 rayIn) {
 
 vec3 shading(Ray r) {
     vec3 color = vec3(1.0, 1.0, 1.0);
-    bool hitAnything = false;
+    // bool hitAnything = false;
     for (int i = 0; i < 20; i++) {
         if (hitWorld(r)) {
             r.origin = rec.position;
-            if (rec.materialIndex == 0)
-            r.direction = diffuseReflection(rec.normal);
-            else if (rec.materialIndex == 1)
-            r.direction = metalReflection(rec.normal, r.direction);
-            color *= rec.albedo;
-            hitAnything = true;
+
+            vec3 lightColor = vec3(1.0, 1.0, 1.0);
+            vec3 lightPos = vec3(-4.0, 4.0, -4.0);
+
+            float ambientStrength = 0.1;
+            vec3 ambient = ambientStrength * lightColor;
+
+            // diffuse
+            vec3 norm = rec.normal;
+            vec3 lightDir = normalize(lightPos - rec.position);
+            float diff = max(dot(norm, lightDir), 0.0);
+            vec3 diffuse = diff * lightColor;
+            float specularStrength = 0.5;
+
+            // specular
+            vec3 viewDir = normalize(r.direction - rec.position);
+            vec3 reflectDir = reflect(-lightDir, norm);
+            float spec = pow(max(dot(r.direction, reflectDir), 0.0), 32);
+            vec3 specular = specularStrength * spec * lightColor;
+
+            vec3 result = (ambient + diffuse + specular) * vec3(0.3, 0.7, 0.2);
+
+            color = result;
+            break;
         } else {
+            float t = 0.5 * (r.direction.y + 1.0);
+            color *= (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
             break;
         }
     }
-    if (!hitAnything) color = vec3(0.0, 0.0, 0.0);
     return color;
 }
 

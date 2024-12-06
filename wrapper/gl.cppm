@@ -82,6 +82,8 @@ export using gl::glDeleteRenderbuffers;
 export using gl::glDrawElements;
 export using gl::glDrawArrays;
 
+export using gl::glFlush;
+
 export using gl::glVertexAttribPointer;
 export using gl::glEnableVertexAttribArray;
 
@@ -92,6 +94,7 @@ export constexpr auto GL_UNSIGNED_INT   = gl::GL_UNSIGNED_INT;
 export constexpr auto GL_UNSIGNED_BYTE  = gl::GL_UNSIGNED_BYTE;
 
 export constexpr auto GL_RED  = gl::GL_RED;
+export constexpr auto GL_R32F = gl::GL_R32F;
 export constexpr auto GL_RGB  = gl::GL_RGB;
 export constexpr auto GL_RGBA = gl::GL_RGBA;
 

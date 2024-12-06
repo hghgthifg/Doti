@@ -89,16 +89,18 @@ target_sources(Doti
         FILE_SET CXX_MODULES FILES
         doti/Math/Math.cppm
         doti/Utils/Event.cppm
-        doti/Utils/Camera.cppm
         doti/Utils/Random.cppm
         doti/Debug/Logger.cppm
+        doti/Graphics/Camera/Camera.cppm
         doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Color.cppm
         doti/Graphics/Texture.cppm
+        doti/Graphics/Acceleration/BoundingBox.cppm
+        doti/Graphics/Acceleration/BVHTree.cppm
         doti/Graphics/Render/RenderContext.cppm
         doti/Graphics/Render/Drawable/Drawable.cppm
         doti/Graphics/Render/Drawable/Mesh.cppm
-        doti/Graphics/Render/Drawable/Triangle.cppm
+        #        doti/Graphics/Render/Drawable/Triangle.cppm
         doti/Graphics/Render/Drawable/Canvas.cppm
         doti/Graphics/Render/Drawable/Model/Model.cppm
         doti/Graphics/Loader/JxlLoader.cppm

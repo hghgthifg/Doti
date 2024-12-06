@@ -23,6 +23,9 @@ export using Point3 = Vec3;
 
 export namespace Math
 {
+    using glm::sqrt;
+    using glm::ceil;
+    using glm::floor;
     using glm::perspective;
     using glm::normalize;
     using glm::lookAt;
@@ -36,6 +39,8 @@ export namespace Math
     using glm::dot;
     using glm::cross;
     using glm::clamp;
+    using glm::min;
+    using glm::max;
 }
 #elifdef USING_EIGEN
 import Eigen;

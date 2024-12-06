@@ -3,7 +3,7 @@ export module Graphics.Render.RenderContext;
 import std;
 import Math;
 import Graphics.Shader;
-import Utils.Camera;
+import Graphics.Camera;
 import Utils.Event;
 import Utils.Random;
 import Debug.Logger;
@@ -39,6 +39,7 @@ public:
             _shader.setFloat("randOrigin", 674764.0f * (Random::randFloat() + 1.0f));
 
             // TODO: Custom scene content
+
             _shader.setFloat("sphere[0].radius", 0.5);
             _shader.setVec3("sphere[0].center", Vec3(0.0, 0.0, -1.0));
             _shader.setInt("sphere[0].materialIndex", 0);
@@ -52,12 +53,20 @@ public:
             _shader.setFloat("sphere[2].radius", 0.5);
             _shader.setVec3("sphere[2].center", Vec3(-1.0, 0.0, -1.0));
             _shader.setInt("sphere[2].materialIndex", 1);
-            _shader.setVec3("sphere[2].albedo", Vec3(0.7, 0.2, 0.2));
+            _shader.setVec3("sphere[2].albedo", Vec3(0.1, 0.3, 0.7));
 
-            _shader.setFloat("sphere[3].radius", 100.0);
-            _shader.setVec3("sphere[3].center", Vec3(0.0, -100.5, -1.0));
+            _shader.setFloat("sphere[3].radius", 0.5);
+            _shader.setVec3("sphere[3].center", Vec3(0.0, 0.0, 0.0));
             _shader.setInt("sphere[3].materialIndex", 0);
             _shader.setVec3("sphere[3].albedo", Vec3(0.9, 0.9, 0.9));
+
+            // _shader.setVec3("tri[0].v0", Vec3(2.0, -0.5, 2.0));
+            // _shader.setVec3("tri[0].v1", Vec3(-2.0, -0.5, -2.0));
+            // _shader.setVec3("tri[0].v2", Vec3(-2.0, -0.5, 2.0));
+            //
+            // _shader.setVec3("tri[1].v0", Vec3(2.0, -0.5, 2.0));
+            // _shader.setVec3("tri[1].v1", Vec3(-2.0, -0.5, -2.0));
+            // _shader.setVec3("tri[1].v2", Vec3(2.0, -0.5, -2.0));
         }
     }
 
@@ -69,7 +78,7 @@ public:
         _camera = camera;
     }
 
-    auto setFrameCount(int32_t count) -> void {
+    auto setFrameCount(const int32_t count) -> void {
         _frameCount = count;
     }
 

@@ -18,7 +18,7 @@ std::shared_ptr<DockSpace> RootComponent;
 
 auto main() -> int {
     try {
-        int    width = 1920, height = 1080;
+        int    width = 1200, height = 800;
         Window window(width, height, "Doti Engine");
 
         RootComponent = std::make_shared<DockSpace>("dock_space");
@@ -36,7 +36,6 @@ auto main() -> int {
         SceneManager::initialize();
 
         SceneManager::registerScene("TestScene", std::make_shared<TestScene>());
-        // SceneManager::registerScene("BunnyScene", std::make_shared<BunnyScene>());
 
         while (!window.shouldClose()) {
             window.beginDraw();
@@ -46,7 +45,7 @@ auto main() -> int {
 
             auto currentScene = SceneManager::getCurrentScene();
             if (currentScene.get() != nullptr) {
-                currentScene->setSize(1920, 1080);
+                currentScene->setSize(1200, 800);
             }
             if (currentScene) {
                 currentScene->render();

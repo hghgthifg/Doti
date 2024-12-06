@@ -4,7 +4,7 @@ export module Test.Bunny;
 import std;
 import Math;
 import Scene.SceneBase;
-import Utils.Camera;
+import Graphics.Camera;
 import Utils.Event;
 import Graphics.Shader;
 import Graphics.Render.RenderContext;

@@ -40,7 +40,7 @@ public:
         int bufferWidth, bufferHeight;
         glfwGetFramebufferSize(_window.get(), &bufferWidth, &bufferHeight);
         glfwMakeContextCurrent(_window.get());
-        glfwSwapInterval(1);
+        // glfwSwapInterval(1);
 
         // glfwSetFramebufferSizeCallback(
         //     _window.get(), [](GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); });

@@ -2,7 +2,7 @@ export module Scene.SceneBase;
 
 import std;
 import Utils.Event;
-import Utils.Camera;
+import Graphics.Camera;
 import Debug.Logger;
 import Graphics.Render.RenderContext;
 

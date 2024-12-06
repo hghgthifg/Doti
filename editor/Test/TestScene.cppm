@@ -3,7 +3,7 @@ export module Test.TestScene;
 import std;
 import Math;
 import Scene.SceneBase;
-import Utils.Camera;
+import Graphics.Camera;
 import Utils.Event;
 import Debug.Logger;
 import Graphics.Shader;
@@ -30,6 +30,7 @@ public:
             "resource/shaders/TestScene/vertex_shader.glsl",
             "resource/shaders/TestScene/fragment_shader.glsl"
         );
+        _model = Model("resource/models/bunny.obj");
         _camera.updateScreenRatio(_width, _height);
         _renderContext.setShader(std::move(shader));
     }
@@ -38,6 +39,7 @@ public:
         EventManager::emit("Scene::NewRenderLoop");
         _renderContext.setCamera(_camera);
         _renderContext.setFrameCount(_renderLoopCount);
+        _model.draw(_renderContext);
         _canvas.draw(_renderContext);
     }
 
@@ -47,5 +49,6 @@ public:
     }
 
 private:
+    Model  _model;
     Canvas _canvas;
 };
