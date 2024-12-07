@@ -12,7 +12,6 @@ import Window.UI.Components.DockSpace;
 import Window.UI.Components.MenuBar;
 
 import Test.TestScene;
-import Test.Bunny;
 
 std::shared_ptr<DockSpace> RootComponent;
 

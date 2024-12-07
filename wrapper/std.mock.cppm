@@ -137,6 +137,11 @@ export namespace std
         using std::ranges::distance;
         using std::ranges::next;
         using std::ranges::prev;
+
+        namespace views
+        {
+            using std::ranges::views::zip;
+        }
     } // namespace ranges
     using std::reverse_iterator;
     using std::operator==;
@@ -148,6 +153,7 @@ export namespace std
     using std::operator<=>;
     using std::operator-;
     using std::operator+;
+    using std::operator|;
     using std::back_insert_iterator;
     using std::back_inserter;
     using std::begin;

@@ -27,20 +27,24 @@ public:
         });
         auto shader = Shader(
             "Default",
-            "resource/shaders/TestScene/vertex_shader.glsl",
-            "resource/shaders/TestScene/fragment_shader.glsl"
+            "resource/shaders/PhongShadingScene/vertex_shader.glsl",
+            "resource/shaders/PhongShadingScene/fragment_shader.glsl"
         );
-        _model = Model("resource/models/bunny.obj");
+        auto model = Model("resource/models/cornell-box.obj");
         _camera.updateScreenRatio(_width, _height);
-        _renderContext.setShader(std::move(shader));
+        // _renderContext.setShader(std::move(shader));
+        // _renderContext.addModel(model);
     }
 
     void render() override {
         EventManager::emit("Scene::NewRenderLoop");
         _renderContext.setCamera(_camera);
         _renderContext.setFrameCount(_renderLoopCount);
+
+        /* 1. Rasterization */
         _model.draw(_renderContext);
-        _canvas.draw(_renderContext);
+
+        // _canvas.draw(_renderContext);
     }
 
     void exit() override {

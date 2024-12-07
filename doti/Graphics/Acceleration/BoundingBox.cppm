@@ -1,9 +1,12 @@
-export module Graphics.Render.BoundingBox;
+export module Graphics.Accleration.BoundingBox;
 
+import std;
 import Math;
 
 export class BoundingBox {
 public:
+    BoundingBox() : _min(0, 0, 0), _max(0, 0, 0) {};
+
     explicit BoundingBox(const Vec3& p1, const Vec3& p2) : _min(Math::min(p1, p2)), _max(Math::max(p1, p2)) {}
 
     auto getDiagonal() const -> Vec3 { return _max - _min; }
@@ -19,6 +22,13 @@ public:
     auto getSurfaceArea() const -> float {
         const Vec3 d = getDiagonal();
         return 2 * (d.x * d.y + d.x * d.z + d.y * d.z);
+    }
+
+    auto getMaximumExtent() const -> uint8_t {
+        Vec3 d = getDiagonal();
+        if (d.x > d.y && d.x > d.z) return 0;
+        if (d.y > d.z) return 1;
+        return 2;
     }
 
     auto getMin() const -> Vec3 { return _min; }

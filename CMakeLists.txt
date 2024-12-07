@@ -91,6 +91,7 @@ target_sources(Doti
         doti/Utils/Event.cppm
         doti/Utils/Random.cppm
         doti/Debug/Logger.cppm
+        doti/Geometry/Triangle.cppm
         doti/Graphics/Camera/Camera.cppm
         doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Color.cppm

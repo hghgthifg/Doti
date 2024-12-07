@@ -48,6 +48,8 @@ private:
             return;
         }
         processNode(scene->mRootNode, scene);
+        Logger::info("_meshes size: " + std::to_string(_meshes.size()));
+        Logger::info("_textures size: " + std::to_string(_textures.size()));
     }
 
     auto processNode(Assimp::aiNode* node, const Assimp::aiScene* scene) -> void {

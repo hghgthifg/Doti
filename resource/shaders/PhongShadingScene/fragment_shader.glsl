@@ -1,68 +1,37 @@
 #version 460 core
 out vec4 FragColor;
 
-in vec2 TexCoords;
+in vec3 FragPos;
+in vec3 Normal;
+in vec2 TexCoord;
 
-uniform int screenWidth;
-uniform int screenHeight;
+uniform vec3 viewPos;
 
-uniform vec3 lookat;
-struct Camera {
-    vec3 position;
-    vec3 front;
-    vec3 right;
-    vec3 up;
-    float halfHeight;
-    float halfWidth;
-    vec3 leftBottom;
-};
-uniform Camera camera;
+//uniform sampler2D texture_diffuse1;
 
-uint wseed;
-float randcore(uint seed) {
-    seed = (seed ^ uint(61)) ^ (seed >> uint(16));
-    seed *= uint(9);
-    seed = seed ^ (seed >> uint(4));
-    seed *= uint(0x27d4eb2d);
-    wseed = seed ^ (seed >> uint(15));
-    return float(wseed) * (1.0 / 4294967296.0);
+void main()
+{
+    vec3 lightPos = vec3(5.0, 5.0, 5.0);
+    vec3 lightColor = vec3(1.0, 1.0, 1.0);
+
+    // ambient
+    float ambientStrength = 0.1;
+    vec3 ambient = ambientStrength * lightColor;
+
+    // diffuse
+    vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(lightPos - FragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * lightColor;
+
+    // specular
+    float specularStrength = 0.5;
+    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    vec3 specular = specularStrength * spec * lightColor;
+
+    vec3 result = (ambient + diffuse + specular);
+    FragColor = vec4(result, 1.0);
 }
-float rand() {
-    return randcore(wseed);
-}
 
-void main() {
-    wseed = uint(float(69557857) * (TexCoords.x * TexCoords.y));
-    //if (distance(TexCoords, vec2(0.5, 0.5)) < 0.4)
-    //	FragColor = vec4(rand(), rand(), rand(), 1.0);
-    //else
-    //	FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-
-    vec3 rayDir = normalize(camera.leftBottom + (TexCoords.x * 2.0 * camera.halfWidth) * camera.right + (TexCoords.y * 2.0 * camera.halfHeight) * camera.up);
-
-    float radius = 1.2;
-    vec3 sphereCenter = vec3(0.0, 0.0, 0.0);
-    vec3 oc = camera.position - sphereCenter;
-    float a = dot(rayDir, rayDir);
-    float b = 2.0 * dot(oc, rayDir);
-    float c = dot(oc, oc) - radius * radius;
-    float discriminant = b * b - 4 * a * c;
-
-    if (discriminant > 0.0) {
-        float dis = (-b - sqrt(discriminant)) / (2.0 * a);
-        if (dis > 0.0) {
-            vec3 N = normalize(camera.position + dis * rayDir - sphereCenter);
-            vec3 LightDir = normalize(vec3(1.0, 1.0, 4.0));
-            float dif = max(dot(N, LightDir), 0.0);
-            float spec = pow(max(dot(N, LightDir), 0.0), 64);
-            float lu = 0.1 + 0.5 * dif + 0.4 * spec;
-            FragColor = vec4(lu, lu, lu, 1.0);
-        }
-        else {
-            FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        }
-    }
-    else {
-        FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-    }
-}

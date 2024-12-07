@@ -26,17 +26,17 @@ public:
         if (!_camera.has_value()) {
             Logger::warning("Camera not set! ");
         } else {
-            const auto& camera = _camera->get();
-            _shader.setInt("historyTexture", 0);
-            _shader.setVec3("camera.position", camera.getCameraPos());
-            _shader.setVec3("camera.front", camera.getCameraFront());
-            _shader.setVec3("camera.right", camera.getCameraRight());
-            _shader.setVec3("camera.up", camera.getCameraUp());
-            _shader.setFloat("camera.halfHeight", camera.getHalfHeight());
-            _shader.setFloat("camera.halfWidth", camera.getHalfWidth());
-            _shader.setVec3("camera.leftBottom", camera.getLeftBottomCorner());
-            _shader.setInt("frameCount", _frameCount);
-            _shader.setFloat("randOrigin", 674764.0f * (Random::randFloat() + 1.0f));
+            // const auto& camera = _camera->get();
+            // _shader.setInt("historyTexture", 0);
+            // _shader.setVec3("camera.position", camera.getCameraPos());
+            // _shader.setVec3("camera.front", camera.getCameraFront());
+            // _shader.setVec3("camera.right", camera.getCameraRight());
+            // _shader.setVec3("camera.up", camera.getCameraUp());
+            // _shader.setFloat("camera.halfHeight", camera.getHalfHeight());
+            // _shader.setFloat("camera.halfWidth", camera.getHalfWidth());
+            // _shader.setVec3("camera.leftBottom", camera.getLeftBottomCorner());
+            // _shader.setInt("frameCount", _frameCount);
+            // _shader.setFloat("randOrigin", 674764.0f * (Random::randFloat() + 1.0f));
 
             // TODO: Custom scene content
 
@@ -82,21 +82,21 @@ public:
         _frameCount = count;
     }
 
-    // auto setViewMatrix(const Mat4& view) -> void {
-    //     _view = view;
-    // }
-    //
-    // auto setProjectionMatrix(const Mat4& projection) -> void {
-    //     _projection = projection;
-    // }
-    //
-    // auto setModelMatrix(const Mat4& model) -> void {
-    //     _model = model;
-    // }
-    //
-    // auto setViewPos(const Vec3& pos) -> void {
-    //     _viewPos = pos;
-    // }
+    auto setViewMatrix(const Mat4& view) -> void {
+        _view = view;
+    }
+
+    auto setProjectionMatrix(const Mat4& projection) -> void {
+        _projection = projection;
+    }
+
+    auto setModelMatrix(const Mat4& model) -> void {
+        _model = model;
+    }
+
+    auto setViewPos(const Vec3& pos) -> void {
+        _viewPos = pos;
+    }
 
     template<Drawable T>
         requires Drawable<T>
@@ -108,8 +108,8 @@ private:
     Shader                                              _shader{};
     std::optional<std::reference_wrapper<const Camera>> _camera{};
     int32_t                                             _frameCount = 0;
-    // Mat4 _projection;
-    // Mat4 _view;
-    // Mat4 _model;
-    // Vec3 _viewPos;
+    Mat4                                                _projection;
+    Mat4                                                _view;
+    Mat4                                                _model;
+    Vec3                                                _viewPos;
 };
