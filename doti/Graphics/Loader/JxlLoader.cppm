@@ -37,8 +37,8 @@ public:
      * @param filenames A span containing the filenames of images to load
      * @return A vector of indices corresponding to the loaded images
      */
-    auto loadImages(std::span<const std::string> filenames) -> std::vector<size_t> {
-        std::vector<size_t> indices;
+    auto loadImages(std::span<const std::string> filenames) -> std::vector<int32_t> {
+        std::vector<int32_t> indices;
         indices.reserve(filenames.size());
 
         for (const auto& filename: filenames) {
@@ -48,7 +48,7 @@ public:
 
         // Parallel decoding
         #pragma omp parallel for
-        for (size_t i = 0; i < indices.size(); i++) {
+        for (int32_t i = 0; i < indices.size(); i++) {
             loadSingleImage(indices[i]);
         }
 
@@ -96,20 +96,26 @@ private:
             std::ifstream file(image.filename, std::ios::binary);
             file.read(reinterpret_cast<char *>(file_data.data()), file_size);
         } catch (...) {
+            Logger::error(std::format("Failed to load {}.", image.filename));
             return;
         }
 
         const auto dec = JxlDecoderMake(nullptr);
-        if (!dec) return;
+        if (!dec) {
+            Logger::error(std::format("Failed to create JxlDecoder"));
+            return;
+        }
 
         if (JxlDecoderStatus::JXL_DEC_SUCCESS != JxlDecoderSubscribeEvents(dec.get(),
                                                                            JxlDecoderStatus::JXL_DEC_BASIC_INFO |
                                                                            JxlDecoderStatus::JXL_DEC_FULL_IMAGE)) {
+            Logger::error(std::format("Failed to subscribe to JxlDecoder"));
             return;
         }
 
         if (JxlDecoderStatus::JXL_DEC_SUCCESS != JxlDecoderSetParallelRunner(dec.get(),
                                                                              JxlThreadParallelRunner, _runner.get())) {
+            Logger::error(std::format("Failed to set parallel runner! "));
             return;
         }
 
@@ -122,11 +128,14 @@ private:
             const JxlDecoderStatus status = JxlDecoderProcessInput(dec.get());
 
             if (status == JxlDecoderStatus::JXL_DEC_ERROR) {
+                Logger::error("JxlDecoder Error: JXL_DEC_ERROR");
                 return;
             } else if (status == JxlDecoderStatus::JXL_DEC_NEED_MORE_INPUT) {
+                Logger::error("JxlDecoder Error: JXL_DEC_NEED_MORE_INPUT");
                 return;
             } else if (status == JxlDecoderStatus::JXL_DEC_BASIC_INFO) {
                 if (JxlDecoderStatus::JXL_DEC_SUCCESS != JxlDecoderGetBasicInfo(dec.get(), &info)) {
+                    Logger::error("JxlDecoder Error: JXL_DEC_SUCCESS");
                     return;
                 }
                 image.width      = info.xsize;
@@ -137,13 +146,16 @@ private:
                 size_t buffer_size;
                 if (JxlDecoderStatus::JXL_DEC_SUCCESS !=
                     JxlDecoderImageOutBufferSize(dec.get(), &format, &buffer_size)) {
+                    Logger::error("JxlDecoder Error: JXL_DEC_NEED_IMAGE_OUT_BUFFER");
                     return;
                 }
                 if (buffer_size != image.pixels.size()) {
+                    Logger::error("JxlDecoder Error: JXL_DEC_NEED_IMAGE_OUT_BUFFER");
                     return;
                 }
                 if (JxlDecoderStatus::JXL_DEC_SUCCESS != JxlDecoderSetImageOutBuffer(dec.get(), &format,
                         image.pixels.data(), image.pixels.size())) {
+                    Logger::error("JxlDecoder Error: JXL_DEC_NEED_IMAGE_OUT_BUFFER");
                     return;
                 }
             } else if (status == JxlDecoderStatus::JXL_DEC_FULL_IMAGE) {

@@ -71,7 +71,7 @@ protected:
         if (scroll != 0.0f && ImGui::IsWindowFocused()) {
             EventManager::emit("Input::MouseScroll", scroll);
         }
-        if (ImGui::IsWindowFocused() && !ImGui::IsItemHovered()) {
+        if (ImGui::IsWindowFocused() && ImGui::IsItemActive() && !ImGui::IsItemHovered()) {
             ImVec2 mouseDelta = ImGui::GetMouseDragDelta();
             if (mouseDelta.x != 0 || mouseDelta.y != 0) {
                 float width  = _canvas->getWidth();

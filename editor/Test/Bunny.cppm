@@ -52,7 +52,7 @@ public:
         _rasterizationShader.setMat4("view", view);
         _rasterizationShader.setMat4("projection", projection);
 
-        // _bunnyModel.draw(_renderContext);
+        // _nanosuitModel.draw(_renderContext);
     }
 
     void exit() override {

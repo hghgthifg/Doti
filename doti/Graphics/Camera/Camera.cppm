@@ -18,9 +18,6 @@ public:
             _cameraPos + _cameraFront, // Look at position
             _cameraUp                  // Up vector
         );
-        Logger::info(
-            "Camera pos:" + std::to_string(_cameraPos.x) + ", " + std::to_string(_cameraPos.y) + ", " + std::to_string(
-                _cameraPos.z));
         return view;
     }
 
@@ -58,7 +55,7 @@ public:
         _pitch             = 0.0f;
         _fov               = 60.0f;
         _isFirstMouseInput = true;
-        _cameraPos         = Vec3(0.0f, 0.0f, 3.0f);
+        _cameraPos         = Vec3(0.0f, 0.0f, 0.0f);
         _worldUp           = Vec3(0.0f, 1.0f, 0.0f);
 
         _screenRatio = static_cast<float>(screen_width) / static_cast<float>(screen_height);

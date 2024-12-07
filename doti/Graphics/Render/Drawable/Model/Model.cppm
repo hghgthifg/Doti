@@ -62,16 +62,16 @@ private:
     }
 
     auto processMesh(Assimp::aiMesh* mesh, const Assimp::aiScene* scene) -> Mesh {
-        // data to fill
+        // Data to fill
         std::vector<MeshVertex>  vertices;
         std::vector<uint32_t>    indices;
         std::vector<MeshTexture> textures;
 
-        // walk through each of the mesh's vertices
+        // Walk through each of the mesh's vertices
         for (uint32_t i = 0; i < mesh->mNumVertices; i++) {
             MeshVertex vertex;
             /*
-             * we declare a placeholder vector since assimp uses its own vector class that
+             * We declare a placeholder vector since assimp uses its own vector class that
              * doesn't directly convert to glm's vec3 class so we transfer the data to this
              * placeholder glm::vec3 first positions
              */
@@ -105,7 +105,7 @@ private:
             }
             vertices.push_back(vertex);
         }
-        // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+        // now walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
         for (uint32_t i = 0; i < mesh->mNumFaces; i++) {
             Assimp::aiFace face = mesh->mFaces[i];
             // retrieve all indices of the face and store them in the indices vector
@@ -115,12 +115,13 @@ private:
         }
         // process materials
         Assimp::aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-        // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
+        // We assume a convention for sampler names in the shaders. Each diffuse texture should be named
         // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER.
         // Same applies to other texture as the following list summarizes:
         // diffuse: texture_diffuseN
         // specular: texture_specularN
         // normal: texture_normalN
+        // TODO: Bulk loading
         // 1. diffuse maps
         std::vector<MeshTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE,
                                                                     "texture_diffuse");
@@ -162,7 +163,7 @@ private:
             }
 
             MeshTexture texture;
-            texture.id   = loadTextureFromFile(str.C_Str(), _directory);
+            texture.id   = loadTextureFromFile(str.C_Str(), _directory.parent_path());
             texture.type = typeName;
             texture.path = str.C_Str();
             textures.push_back(texture);
@@ -178,8 +179,8 @@ private:
         glGenTextures(1, &textureID);
 
         // TODO: Now the image data is not released when an error occurs or after use.
-        auto index = ImageLoader.loadImages(std::vector{texture_filename.string()});
-        if (auto opt = ImageLoader.getImage(index[0]); opt.has_value()) {
+        const auto index = ImageLoader.loadImages(std::vector{texture_filename.string()});
+        if (const auto opt = ImageLoader.getImage(index[0]); opt.has_value()) {
             const auto& [data, width, height, components, filename, loaded] = opt->get();
             if (!loaded) {
                 Logger::error("Failed to load image: " + filename + " : incomplete image");
@@ -209,6 +210,8 @@ private:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        } else {
+            Logger::warning(std::format("{} is empty!", texture_filename.string()));
         }
 
         return textureID;

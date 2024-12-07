@@ -138,6 +138,10 @@ public:
         loadShader();
     }
 
+    auto getID() const -> GLuint {
+        return _ID;
+    }
+
     // ------------------------------------------------------------------------
     auto setBool(const std::string& name, const bool value) const -> void {
         glUniform1i(glGetUniformLocation(_ID, name.c_str()), (int) value);

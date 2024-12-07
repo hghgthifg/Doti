@@ -93,6 +93,7 @@ target_sources(Doti
         doti/Debug/Logger.cppm
         doti/Graphics/Color.cppm
         doti/Graphics/Texture.cppm
+        doti/Graphics/Material.cppm
         doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Camera/Camera.cppm
         doti/Graphics/Render/RenderContext.cppm

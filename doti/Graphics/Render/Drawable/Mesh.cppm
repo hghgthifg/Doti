@@ -20,13 +20,11 @@ export struct MeshTexture {
  * @brief Structure representing a vertex with multiple attributes
  */
 export struct MeshVertex {
-    Point3  position;   /*!< Position of the vertex in 3D space */
-    Vec3    normal;     /*!< Normal vector of the vertex */
-    Vec2    texCoords;  /*!< MeshTexture coordinates */
-    Vec3    tangent;    /*!< Tangent vector for normal mapping */
-    Vec3    bitangent;  /*!< Bitangent vector for normal mapping */
-    GLint   boneIds[4]; /*!< Bone IDs for skeletal animation */
-    GLfloat weights[4]; /*!< Weights for skeletal animation */
+    Point3 position;  /*!< Position of the vertex in 3D space */
+    Vec3   normal;    /*!< Normal vector of the vertex */
+    Vec2   texCoords; /*!< MeshTexture coordinates */
+    Vec3   tangent;   /*!< Tangent vector for normal mapping */
+    Vec3   bitangent; /*!< Bitangent vector for normal mapping */
 };
 
 template<typename V>
@@ -117,14 +115,14 @@ public:
         uint32_t diffuseNr  = 1;
         uint32_t specularNr = 1;
         for (uint32_t i = 0; i < _textures.size(); i++) {
-            glActiveTexture(static_cast<GLenum>(static_cast<uint32_t>(GL_TEXTURE0) + i));
+            glActiveTexture(static_cast<GLenum>(static_cast<uint32_t>(GL_TEXTURE1) + i));
             /* Get texture id (N in diffuse_textureN)*/
             std::string number;
             std::string name = _textures[i].type;
             if (name == "texture_diffuse") number = std::to_string(diffuseNr++);
             else if (name == "texture_specular") number = std::to_string(specularNr++);
 
-            rawShader.setInt(("material." + name + number).c_str(), i);
+            rawShader.setInt((name + number).c_str(), i + 1);
             glBindTexture(GL_TEXTURE_2D, _textures[i].id);
         }
         glActiveTexture(GL_TEXTURE0);
