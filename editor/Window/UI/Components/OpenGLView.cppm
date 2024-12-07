@@ -12,8 +12,8 @@ import Math;
 export class OpenGLView : public UIComponent {
 public:
     OpenGLView(const std::string& name) : UIComponent(name) {
-        EventManager::registerEvent<Vec2>("MouseDrag");
-        EventManager::registerEvent<float>("MouseScroll");
+        EventManager::registerEvent<Vec2>("Input::MouseDrag");
+        EventManager::registerEvent<float>("Input::MouseScroll");
     }
 
     auto setTexture(const std::shared_ptr<FrameCanvas>& canvas) -> void { _canvas = canvas; }
@@ -69,7 +69,7 @@ protected:
         ImGuiIO& io     = ImGui::GetIO();
         float    scroll = io.MouseWheel;
         if (scroll != 0.0f && ImGui::IsWindowFocused()) {
-            EventManager::emit("MouseScroll", scroll);
+            EventManager::emit("Input::MouseScroll", scroll);
         }
         if (ImGui::IsWindowFocused() && !ImGui::IsItemHovered()) {
             ImVec2 mouseDelta = ImGui::GetMouseDragDelta();
@@ -77,10 +77,21 @@ protected:
                 float width  = _canvas->getWidth();
                 float height = _canvas->getHeight();
                 Vec2  delta  = {mouseDelta.x / width, mouseDelta.y / height};
-                EventManager::emit("MouseDrag", delta);
+                EventManager::emit("Input::MouseDrag", delta);
             }
         }
-
+        if (ImGui::IsKeyPressed(ImGuiInputs::ImGuiKey_W)) {
+            EventManager::emit("Camera::MoveForward");
+        }
+        if (ImGui::IsKeyPressed(ImGuiInputs::ImGuiKey_S)) {
+            EventManager::emit("Camera::MoveBackward");
+        }
+        if (ImGui::IsKeyPressed(ImGuiInputs::ImGuiKey_A)) {
+            EventManager::emit("Camera::MoveLeft");
+        }
+        if (ImGui::IsKeyPressed(ImGuiInputs::ImGuiKey_D)) {
+            EventManager::emit("Camera::MoveRight");
+        }
         ImGui::End();
     }
 

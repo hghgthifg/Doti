@@ -20,7 +20,7 @@ public:
     }
 
     auto draw(RenderContext& render_context) -> void {
-        const Shader& rawShader = render_context.directlyAccessShader(*this);
+        const Shader& rawShader = render_context.getShader();
         rawShader.activate();
 
         render_context.apply();

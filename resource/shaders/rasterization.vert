@@ -19,6 +19,10 @@ struct Camera {
 
 uniform Camera camera;
 
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
 void main()
 {
     FragPos = vec3(model * vec4(aPos, 1.0));

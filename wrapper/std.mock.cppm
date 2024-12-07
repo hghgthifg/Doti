@@ -32,6 +32,7 @@ module;
 #include <queue>
 #include <ranges>
 #include <ratio>
+#include <random>
 #include <semaphore>
 #include <source_location>
 #include <span>
@@ -136,6 +137,11 @@ export namespace std
         using std::ranges::distance;
         using std::ranges::next;
         using std::ranges::prev;
+
+        namespace views
+        {
+            using std::ranges::views::zip;
+        }
     } // namespace ranges
     using std::reverse_iterator;
     using std::operator==;
@@ -147,6 +153,7 @@ export namespace std
     using std::operator<=>;
     using std::operator-;
     using std::operator+;
+    using std::operator|;
     using std::back_insert_iterator;
     using std::back_inserter;
     using std::begin;
@@ -2231,6 +2238,18 @@ export namespace std
     using std::any;
     using std::make_any;
     using std::any_cast;
+}
+
+export namespace std
+{
+    using std::mt19937;
+    using std::uniform_int_distribution;
+    using std::uniform_real_distribution;
+    using std::random_device;
+    using std::discrete_distribution;
+    using std::exponential_distribution;
+    using std::normal_distribution;
+    using std::bernoulli_distribution;
 }
 
 #if defined(__GLIBCXX__) || defined(__GLIBCPP__)

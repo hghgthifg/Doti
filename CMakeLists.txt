@@ -88,12 +88,13 @@ target_sources(Doti
         PUBLIC
         FILE_SET CXX_MODULES FILES
         doti/Math/Math.cppm
-        doti/Utils/Event/Event.cppm
-        doti/Utils/Camera/Camera.cppm
+        doti/Utils/Event.cppm
+        doti/Utils/Random.cppm
         doti/Debug/Logger.cppm
-        doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Color.cppm
         doti/Graphics/Texture.cppm
+        doti/Graphics/Shader/Shader.cppm
+        doti/Graphics/Camera/Camera.cppm
         doti/Graphics/Render/RenderContext.cppm
         doti/Graphics/Render/Illumination/ray.cppm
         doti/Graphics/Render/Drawable/Drawable.cppm

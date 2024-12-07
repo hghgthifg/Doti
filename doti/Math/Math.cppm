@@ -1,5 +1,5 @@
 /*!
- * @brief Fundamental math utilities.
+* @brief Fundamental math utilities.
  */
 
 export module Math;
@@ -32,6 +32,9 @@ export namespace Math
     using glm::scale;
     using glm::cos;
     using glm::sin;
+    using glm::tan;
+    using glm::dot;
+    using glm::cross;
     using glm::clamp;
 }
 #elifdef USING_EIGEN

@@ -20,11 +20,13 @@ public:
     };
 
     ~Shader() {
-        Logger::debug("Destroying shader: " + _name + ", ID: " + std::to_string(_ID));
-        glDeleteProgram(_ID);
+        if (_ID != 0) {
+            Logger::debug("Destroying shader: " + _name + ", ID: " + std::to_string(_ID));
+            glDeleteProgram(_ID);
+        }
     }
 
-    auto operator =(const Shader&) -> Shader& = delete;
+    // auto operator =(const Shader&) -> Shader& = delete;
 
     auto operator=(Shader&& other) noexcept -> Shader& {
         if (this != &other) {

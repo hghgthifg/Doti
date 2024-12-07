@@ -1,7 +1,7 @@
 export module Scene.SceneBase;
 
 import std;
-import Utils.Camera;
+import Graphics.Camera;
 import Graphics.Render.RenderContext;
 
 export class SceneBase {
@@ -17,10 +17,11 @@ public:
     inline auto setSize(const float width, const float height) -> void {
         _width  = width;
         _height = height;
+        _camera.updateScreenRatio(_width, _height);
     }
 
 protected:
-    Camera        _camera{};
-    RenderContext _renderContext{};
     float         _width = 800, _height = 600;
+    Camera        _camera{_width, _height};
+    RenderContext _renderContext{};
 };
