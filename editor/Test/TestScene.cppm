@@ -28,13 +28,14 @@ public:
             "resource/shaders/rasterization.frag"
         );
         _bunnyModel = Model(
-            "resource/models/bunny.obj"
+            "resource/models/nanosuit/nanosuit.obj"
         );
         _camera.updateScreenRatio(_width, _height);
         _renderContext.setCamera(_camera);
     }
 
     void render() override {
+        /* 1. Rasterization */
         auto model      = Mat4(1.0f);
         auto view       = _camera.getViewMatrix();
         auto projection = Math::perspective(Math::radians(_camera.getFov()), _width / _height, 0.1f, 100.0f);
@@ -57,7 +58,6 @@ public:
     }
 
 private:
-    // Triangle _triangle;
     Shader _rasterizationShader;
     Model  _bunnyModel;
 };

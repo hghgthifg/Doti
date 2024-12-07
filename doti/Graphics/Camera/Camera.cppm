@@ -18,9 +18,6 @@ public:
             _cameraPos + _cameraFront, // Look at position
             _cameraUp                  // Up vector
         );
-        Logger::info(
-            "Camera pos:" + std::to_string(_cameraPos.x) + ", " + std::to_string(_cameraPos.y) + ", " + std::to_string(
-                _cameraPos.z));
         return view;
     }
 
