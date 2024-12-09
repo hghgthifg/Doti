@@ -20,6 +20,7 @@ module;
 #include <format>
 #include <fstream>
 #include <functional>
+#include <future>
 #include <iostream>
 #include <iterator>
 #include <limits>
@@ -2220,6 +2221,7 @@ export namespace std
     {
         using std::filesystem::path;
         using std::filesystem::file_size;
+        using std::filesystem::exists;
     }
 }
 
@@ -2250,6 +2252,14 @@ export namespace std
     using std::exponential_distribution;
     using std::normal_distribution;
     using std::bernoulli_distribution;
+}
+
+export namespace std
+{
+    using std::future;
+    using std::async;
+    using std::launch;
+    using std::future_status;
 }
 
 #if defined(__GLIBCXX__) || defined(__GLIBCPP__)

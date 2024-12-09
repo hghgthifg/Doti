@@ -25,6 +25,7 @@ export namespace Math
 {
     using glm::perspective;
     using glm::normalize;
+    using glm::transpose;
     using glm::lookAt;
     using glm::rotate;
     using glm::radians;

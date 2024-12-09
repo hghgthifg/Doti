@@ -27,9 +27,9 @@ public:
             "resource/shaders/rasterization.vert",
             "resource/shaders/rasterization.frag"
         );
-        _bunnyModel = Model(
-            "resource/models/bunny.obj"
-        );
+        // _bunnyModel = Model(
+        //     "resource/models/bunny.obj"
+        // );
         _camera.updateScreenRatio(_width, _height);
         // _renderContext.setCamera(_camera);
         // _renderContext.setShader(std::move(shader));

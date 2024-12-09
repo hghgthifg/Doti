@@ -2,6 +2,7 @@ export module Test.TestScene;
 
 import std;
 import Math;
+import ImGui;
 import Debug.Logger;
 import Scene.SceneBase;
 import Graphics.Camera;
@@ -10,6 +11,7 @@ import Graphics.Shader;
 import Graphics.Render.RenderContext;
 import Graphics.Render.Drawable.Triangle;
 import Graphics.Render.Drawable.Model;
+import Graphics.Loader.Model;
 
 export class TestScene : public SceneBase {
 public:
@@ -34,11 +36,24 @@ public:
         // _bunnyModel = Model(
         //     "resource/models/bunny.obj"
         // );
-        _cornellBoxModel = Model(
-            "resource/models/cornell-box/cornell-box.obj"
-        );
+        // _cornellBoxModel = Model(
+        //     "resource/models/cornell-box/cornell-box.obj"
+        // );
         _camera.updateScreenRatio(_width, _height);
         _renderContext.setCamera(_camera);
+
+        auto                    onLoadProgress = [](ModelLoadStatus& loadStatus) {};
+        ModelLoader::LoadConfig config;
+        config.options = static_cast<uint32_t>(ModelLoader::LoadOptions::FlipUVs) |
+                         static_cast<uint32_t>(ModelLoader::LoadOptions::GenerateTangents) |
+                         static_cast<uint32_t>(ModelLoader::LoadOptions::OptimizeMeshes);
+        config.progressCallback = onLoadProgress;
+        auto modelFuture        = ModelLoader::loadAsync("resource/models/cornell-box/cornell-box.obj", config);
+        if (modelFuture.get().has_value()) {
+            _cornellBoxModel = *modelFuture.get();
+        } else {
+            Logger::error("Failed to load model");
+        }
     }
 
     void render() override {
@@ -57,6 +72,7 @@ public:
         _rasterizationShader.deactivate();
 
         _cornellBoxModel.draw(_renderContext);
+
         // _rasterizationShader.activate();
         // _rasterizationShader.setMat4("model", model);
         // _rasterizationShader.setMat4("view", view);

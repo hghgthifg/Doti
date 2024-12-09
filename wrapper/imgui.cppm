@@ -31,6 +31,7 @@ export namespace ImGui
 {
     using ImGui::Begin;
     using ImGui::Button;
+    using ImGui::ProgressBar;
     using ImGui::CreateContext;
     using ImGui::DestroyContext;
     using ImGui::DestroyPlatformWindows;
@@ -77,6 +78,9 @@ export namespace ImGui
     using ImGui::ShowUserGuide;
     using ImGui::StyleColorsDark;
     using ImGui::Text;
+
+    using ImGui::BeginPopupModal;
+    using ImGui::EndPopup;
 
     using ImGui::PushStyleVar;
     using ImGui::PopStyleVar;

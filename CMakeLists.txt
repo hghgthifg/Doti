@@ -105,6 +105,7 @@ target_sources(Doti
         doti/Graphics/Render/Drawable/Model/Model.cppm
         doti/Graphics/Loader/JxlLoader.cppm
         doti/Graphics/Loader/ImageLoader.cppm
+        doti/Graphics/Loader/ModelLoader.cppm;
         doti/Scene/SceneBase.cppm
         doti/Scene/SceneManager.cppm
         wrapper/test.cppm

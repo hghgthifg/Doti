@@ -52,7 +52,16 @@ public:
         return _shader->get();
     }
 
+    auto getTransform() const -> const Mat4& {
+        return _transform;
+    }
+
+    auto setTransform(const Mat4& transform) -> void {
+        _transform = transform;
+    }
+
 private:
     std::optional<std::reference_wrapper<const Shader>> _shader;
     std::optional<std::reference_wrapper<const Camera>> _camera;
+    Mat4                                                _transform;
 };
