@@ -27,30 +27,7 @@ public:
      */
     Camera(const float screen_width, const float screen_height) {
         this->reset(screen_width, screen_height);
-        EventManager::registerEvent<>("Camera::MoveLeft");
-        EventManager::registerEvent<>("Camera::MoveRight");
-        EventManager::registerEvent<>("Camera::MoveForward");
-        EventManager::registerEvent<>("Camera::MoveBackward");
-        EventManager::registerEvent<MoveDirection>("Camera::Move");
-        EventManager::connect<>("Camera::MoveLeft", [this]() {
-            _cameraPos -= _cameraRight * _cameraSpeed;
-            EventManager::emit("Camera::Move", MoveDirection::Left);
-        });
-        EventManager::connect<>("Camera::MoveRight", [this]() {
-            _cameraPos += _cameraRight * _cameraSpeed;
-            EventManager::emit("Camera::Move", MoveDirection::Right);
-        });
-        EventManager::connect<>("Camera::MoveForward", [this]() {
-            _cameraPos += _cameraFront * _cameraSpeed;
-            EventManager::emit("Camera::Move", MoveDirection::Forward);
-        });
-        EventManager::connect<>("Camera::MoveBackward", [this]() {
-            _cameraPos -= _cameraFront * _cameraSpeed;
-            EventManager::emit("Camera::Move", MoveDirection::Backward);
-        });
-        EventManager::connect<MoveDirection>("Camera::Move", [this](MoveDirection) {
-            EventManager::emit("Render::RefreshHistoryFramedata");
-        });
+        registerEvents(this);
     }
 
     /*!
@@ -148,11 +125,11 @@ public:
      * @param screen_height The height of the screen.
      */
     auto reset(uint32_t screen_width, uint32_t screen_height) -> void {
-        _yaw               = -100.0f;                /*!< Initial yaw angle */
-        _pitch             = -20.0f;                 /*!< Initial pitch angle */
+        _yaw               = -90.0f;                 /*!< Initial yaw angle */
+        _pitch             = -50.0f;                 /*!< Initial pitch angle */
         _fov               = 60.0f;                  /*!< Initial field of view */
         _isFirstMouseInput = true;                   /*!< Flag for first mouse input */
-        _cameraPos         = Vec3(0.1f, 0.3f, 0.5f); /*!< Initial camera position */
+        _cameraPos         = Vec3(0.0f, 1.4f, 1.0f); /*!< Initial camera position */
         _worldUp           = Vec3(0.0f, 1.0f, 0.0f); /*!< World up vector */
 
         _screenRatio = static_cast<float>(screen_width) / static_cast<float>(screen_height);
@@ -174,6 +151,22 @@ public:
         _leftBottomCorner = _cameraFront - _halfWidth * _cameraRight - _halfHeight * _cameraUp;
     }
 
+    auto moveLeft() -> void {
+        this->_cameraPos -= this->_cameraRight * this->_cameraSpeed;
+    }
+
+    auto moveRight() -> void {
+        this->_cameraPos += this->_cameraRight * this->_cameraSpeed;
+    }
+
+    auto moveForward() -> void {
+        this->_cameraPos += this->_cameraFront * this->_cameraSpeed;
+    }
+
+    auto moveBackward() -> void {
+        this->_cameraPos -= this->_cameraFront * this->_cameraSpeed;
+    }
+
 private:
     /*!
      * @brief Updates the camera's direction vectors based on the updated Euler angles.
@@ -189,6 +182,21 @@ private:
         _cameraUp    = Math::normalize(Math::cross(_cameraRight, _cameraFront));
 
         _leftBottomCorner = _cameraFront - _halfWidth * _cameraRight - _halfHeight * _cameraUp;
+    }
+
+    static auto registerEvents(Camera* camera) -> void {
+        static bool registered = false;
+        if (!registered) {
+            EventManager::registerEvent<>("Camera::MoveLeft");
+            EventManager::registerEvent<>("Camera::MoveRight");
+            EventManager::registerEvent<>("Camera::MoveForward");
+            EventManager::registerEvent<>("Camera::MoveBackward");
+            EventManager::registerEvent<MoveDirection>("Camera::Move");
+            EventManager::connect<MoveDirection>("Camera::Move", [](MoveDirection) {
+                EventManager::emit("Render::RefreshHistoryFramedata");
+            });
+            registered = true;
+        }
     }
 
     Vec3  _cameraPos;   /*!< The camera's position in world space */

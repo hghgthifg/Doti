@@ -6,9 +6,7 @@ import Window.UI.ComponentBase;
 
 export class DockSpace : public UIComponent {
 public:
-    DockSpace(const std::string& name) : UIComponent(name) {
-        _open = new bool(true);
-    }
+    DockSpace(const std::string& name) : UIComponent(name) {}
 
 protected:
     void beginRender() override {
@@ -49,7 +47,7 @@ protected:
         // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
         // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
         if (!opt_padding) ImGui::PushStyleVar(ImGuiFlags::ImGuiStyleVar::WindowPadding, ImVec2(0.0f, 0.0f));
-        ImGui::Begin("DockSpace", _open, window_flags);
+        ImGui::Begin("DockSpace", &_visible, window_flags);
         if (!opt_padding) ImGui::PopStyleVar();
 
         if (opt_fullscreen) ImGui::PopStyleVar(2);
@@ -67,7 +65,4 @@ protected:
     void endRender() override {
         ImGui::End();
     }
-
-private:
-    bool* _open;
 };

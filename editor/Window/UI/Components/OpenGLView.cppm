@@ -12,6 +12,7 @@ import Math;
 export class OpenGLView : public UIComponent {
 public:
     OpenGLView(const std::string& name) : UIComponent(name) {
+        _open = new bool(true);
         EventManager::registerEvent<Vec2>("Input::MouseDrag");
         EventManager::registerEvent<float>("Input::MouseScroll");
     }
@@ -24,7 +25,7 @@ protected:
             ImVec2(320, 240),
             ImVec2(10000, 10000)
         );
-        ImGui::Begin(getName().c_str());
+        ImGui::Begin(getName().c_str(), &_visible);
     }
 
     void renderContent() override {
@@ -97,5 +98,6 @@ protected:
 
 private:
     std::shared_ptr<FrameCanvas> _canvas;
+    bool*                        _open;
     // ImVec2                         _lastSize;
 };

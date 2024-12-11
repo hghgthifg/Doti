@@ -31,8 +31,6 @@ public:
         glBindVertexArray(0);
 
         rawShader.deactivate();
-
-        glFlush();
     }
 
 private:

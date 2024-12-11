@@ -60,13 +60,14 @@ public:
             _shader.setInt("sphere[3].materialIndex", 0);
             _shader.setVec3("sphere[3].albedo", Vec3(0.9, 0.9, 0.9));
 
-            // _shader.setVec3("tri[0].v0", Vec3(2.0, -0.5, 2.0));
-            // _shader.setVec3("tri[0].v1", Vec3(-2.0, -0.5, -2.0));
-            // _shader.setVec3("tri[0].v2", Vec3(-2.0, -0.5, 2.0));
-            //
-            // _shader.setVec3("tri[1].v0", Vec3(2.0, -0.5, 2.0));
-            // _shader.setVec3("tri[1].v1", Vec3(-2.0, -0.5, -2.0));
-            // _shader.setVec3("tri[1].v2", Vec3(2.0, -0.5, -2.0));
+            _shader.setVec3("tri[0].v0", Vec3(2.0, -0.5, 2.0));
+            _shader.setVec3("tri[0].v1", Vec3(-2.0, -0.5, -2.0));
+            _shader.setVec3("tri[0].v2", Vec3(-2.0, -0.5, 2.0));
+
+
+            _shader.setVec3("tri[1].v0", Vec3(2.0, -0.5, 2.0));
+            _shader.setVec3("tri[1].v1", Vec3(-2.0, -0.5, -2.0));
+            _shader.setVec3("tri[1].v2", Vec3(2.0, -0.5, -2.0));
         }
     }
 

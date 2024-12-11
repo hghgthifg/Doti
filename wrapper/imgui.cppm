@@ -1,5 +1,6 @@
 module;
 #include <imgui.h>
+#include <imconfig.h>
 #include <imgui_freetype.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -46,6 +47,10 @@ export namespace ImGui
     using ImGui::BeginMenu;
     using ImGui::MenuItem;
     using ImGui::EndMenu;
+    using ImGui::BeginTabBar;
+    using ImGui::EndTabBar;
+    using ImGui::BeginTabItem;
+    using ImGui::EndTabItem;
     using ImGui::IsItemActive;
     using ImGui::IsItemClicked;
     using ImGui::IsItemHovered;
@@ -77,9 +82,14 @@ export namespace ImGui
     using ImGui::ShowUserGuide;
     using ImGui::StyleColorsDark;
     using ImGui::Text;
+    using ImGui::TextUnformatted;
 
     using ImGui::PushStyleVar;
     using ImGui::PopStyleVar;
+    using ImGui::PushStyleColor;
+    using ImGui::PopStyleColor;
+
+    using ImGui::BeginDisabled;
 
     using ImGui::SetNextWindowSizeConstraints;
 
@@ -220,8 +230,90 @@ export namespace ImGuiFlags
         NoDockingInCentralNode       = NoDockingOverCentralNode, // Renamed in 1.90
     #endif
     };
+    enum class ImGuiFocusedFlags
+    {
+        None                          = 0,
+        ChildWindows                  = 1 << 0,   // Return true if any children of the window is focused
+        RootWindow                    = 1 << 1,   // Test from root window (top most parent of the current hierarchy)
+        AnyWindow                     = 1 << 2,   // Return true if any window is focused. Important: If you are trying to tell how to dispatch your low-level inputs, do NOT use this. Use 'io.WantCaptureMouse' instead! Please read the FAQ!
+        NoPopupHierarchy              = 1 << 3,   // Do not consider popup hierarchy (do not treat popup emitter as parent of popup) (when used with _ChildWindows or _RootWindow)
+        DockHierarchy                 = 1 << 4,   // Consider docking hierarchy (treat dockspace host as parent of docked window) (when used with _ChildWindows or _RootWindow)
+        RootAndChildWindows           = RootWindow | ChildWindows,
+    };
     // clang-format on
 } // namespace ImGuiFlags
+
+export namespace ImGuiStyles
+{
+    enum ImGuiCol : int {
+        ImGuiCol_Text,
+        ImGuiCol_TextDisabled,
+        ImGuiCol_WindowBg, // Background of normal windows
+        ImGuiCol_ChildBg,  // Background of child windows
+        ImGuiCol_PopupBg,  // Background of popups, menus, tooltips windows
+        ImGuiCol_Border,
+        ImGuiCol_BorderShadow,
+        ImGuiCol_FrameBg, // Background of checkbox, radio button, plot, slider, text input
+        ImGuiCol_FrameBgHovered,
+        ImGuiCol_FrameBgActive,
+        ImGuiCol_TitleBg,          // Title bar
+        ImGuiCol_TitleBgActive,    // Title bar when focused
+        ImGuiCol_TitleBgCollapsed, // Title bar when collapsed
+        ImGuiCol_MenuBarBg,
+        ImGuiCol_ScrollbarBg,
+        ImGuiCol_ScrollbarGrab,
+        ImGuiCol_ScrollbarGrabHovered,
+        ImGuiCol_ScrollbarGrabActive,
+        ImGuiCol_CheckMark, // Checkbox tick and RadioButton circle
+        ImGuiCol_SliderGrab,
+        ImGuiCol_SliderGrabActive,
+        ImGuiCol_Button,
+        ImGuiCol_ButtonHovered,
+        ImGuiCol_ButtonActive,
+        ImGuiCol_Header, // Header* colors are used for CollapsingHeader, TreeNode, Selectable, MenuItem
+        ImGuiCol_HeaderHovered,
+        ImGuiCol_HeaderActive,
+        ImGuiCol_Separator,
+        ImGuiCol_SeparatorHovered,
+        ImGuiCol_SeparatorActive,
+        ImGuiCol_ResizeGrip, // Resize grip in lower-right and lower-left corners of windows.
+        ImGuiCol_ResizeGripHovered,
+        ImGuiCol_ResizeGripActive,
+        ImGuiCol_TabHovered, // Tab background, when hovered
+        ImGuiCol_Tab, // Tab background, when tab-bar is focused & tab is unselected
+        ImGuiCol_TabSelected, // Tab background, when tab-bar is focused & tab is selected
+        ImGuiCol_TabSelectedOverline, // Tab horizontal overline, when tab-bar is focused & tab is selected
+        ImGuiCol_TabDimmed, // Tab background, when tab-bar is unfocused & tab is unselected
+        ImGuiCol_TabDimmedSelected, // Tab background, when tab-bar is unfocused & tab is selected
+        ImGuiCol_TabDimmedSelectedOverline, //..horizontal overline, when tab-bar is unfocused & tab is selected
+        ImGuiCol_DockingPreview, // Preview overlay color when about to docking something
+        ImGuiCol_DockingEmptyBg, // Background color for empty node (e.g. CentralNode with no window docked into it)
+        ImGuiCol_PlotLines,
+        ImGuiCol_PlotLinesHovered,
+        ImGuiCol_PlotHistogram,
+        ImGuiCol_PlotHistogramHovered,
+        ImGuiCol_TableHeaderBg,     // Table header background
+        ImGuiCol_TableBorderStrong, // Table outer and header borders (prefer using Alpha=1.0 here)
+        ImGuiCol_TableBorderLight,  // Table inner borders (prefer using Alpha=1.0 here)
+        ImGuiCol_TableRowBg,        // Table row background (even rows)
+        ImGuiCol_TableRowBgAlt,     // Table row background (odd rows)
+        ImGuiCol_TextLink,          // Hyperlink color
+        ImGuiCol_TextSelectedBg,
+        ImGuiCol_DragDropTarget,        // Rectangle highlighting a drop target
+        ImGuiCol_NavCursor,             // Color of keyboard/gamepad navigation cursor/rectangle, when visible
+        ImGuiCol_NavWindowingHighlight, // Highlight window when using CTRL+TAB
+        ImGuiCol_NavWindowingDimBg,     // Darken/colorize entire screen behind the CTRL+TAB window list, when active
+        ImGuiCol_ModalWindowDimBg,      // Darken/colorize entire screen behind a modal window, when one is active
+        ImGuiCol_COUNT,
+
+        #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
+        ImGuiCol_TabActive          = ImGuiCol_TabSelected,       // [renamed in 1.90.9]
+        ImGuiCol_TabUnfocused       = ImGuiCol_TabDimmed,         // [renamed in 1.90.9]
+        ImGuiCol_TabUnfocusedActive = ImGuiCol_TabDimmedSelected, // [renamed in 1.90.9]
+        ImGuiCol_NavHighlight       = ImGuiCol_NavCursor,         // [renamed in 1.91.4]
+        #endif
+    };
+}
 
 export namespace ImGuiInputs
 {
@@ -369,6 +461,20 @@ export namespace ImGui
     inline bool IsKeyPressed(ImGuiInputs::ImGuiKey key) {
         return ImGui::IsKeyPressed(static_cast<ImGuiKey>(key));
     }
+
+    inline void PushStyleColor(ImGuiStyles::ImGuiCol col, ImVec4 val) {
+        ImGui::PushStyleColor(static_cast<ImGuiCol>(col), val);
+    }
+
+    inline bool IsWindowFocused(ImGuiFlags::ImGuiFocusedFlags flags) {
+        return ImGui::IsWindowFocused(static_cast<ImGuiFocusedFlags>(flags));
+    }
+
+    inline bool BeginChild(const char*                  str_id, const ImVec2& size = ImVec2(0, 0),
+                           ImGuiChildFlags              child_flags = 0,
+                           ImGuiFlags::ImGuiWindowFlags window_flags = ImGuiFlags::ImGuiWindowFlags::None) {
+        return BeginChild(str_id, size, child_flags, static_cast<ImGuiWindowFlags>(window_flags));
+    }
 }
 
 // export using namespace ImGuiFlags;
@@ -390,6 +496,8 @@ ENABLE_BITMASK_OPERATORS(ImGuiFlags::ImGuiStyleVar);
 ENABLE_BITMASK_OPERATORS(ImGuiFlags::ImGuiWindowFlags);
 
 ENABLE_BITMASK_OPERATORS(ImGuiFlags::ImGuiDockNodeFlags);
+
+ENABLE_BITMASK_OPERATORS(ImGuiFlags::ImGuiFocusedFlags);
 
 template<typename Enum>
 concept ImGuiFlagType = EnableBitMaskOperators<Enum>::value && std::is_enum_v<Enum>;

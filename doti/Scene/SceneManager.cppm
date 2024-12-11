@@ -8,7 +8,7 @@ import Scene.SceneBase;
 export class SceneManager {
 public:
     static auto initialize() -> void {
-        EventManager::connect<std::string>("ChangeScene", [](const std::string& sceneName) {
+        EventManager::connect<std::string>("Scene::ChangeScene", [](const std::string& sceneName) {
             setCurrentScene(sceneName);
         });
     }
@@ -34,6 +34,8 @@ public:
         if (it != getScenes().end()) {
             currentScene() = it->second;
             currentScene()->load();
+            Logger::info("Loaded scene: " + name);
+            EventManager::emit("Render::RefreshHistoryFramedata");
         } else {
             Logger::error("Scene " + name + " not found.");
         }

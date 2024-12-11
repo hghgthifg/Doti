@@ -30,9 +30,10 @@ module;
 #include <optional>
 #include <print>
 #include <queue>
+#include <random>
 #include <ranges>
 #include <ratio>
-#include <random>
+#include <regex>
 #include <semaphore>
 #include <source_location>
 #include <span>
@@ -512,6 +513,8 @@ export namespace std
 export namespace std
 {
     using std::ifstream;
+    using std::ofstream;
+    using std::ostream;
     using std::ios;
     using std::stringstream;
 }
@@ -2244,6 +2247,13 @@ export namespace std
     using std::exponential_distribution;
     using std::normal_distribution;
     using std::bernoulli_distribution;
+}
+
+export namespace std
+{
+    using std::regex;
+    using std::smatch;
+    using std::regex_search;
 }
 
 #if defined(__GLIBCXX__) || defined(__GLIBCPP__)

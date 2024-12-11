@@ -142,9 +142,10 @@ protected:
      */
     virtual void endRender() {}
 
+    bool _visible{true}; /*!< Visibility flag */
+
 private:
-    std::string                               _name;          /*!< Component name */
-    std::vector<std::shared_ptr<UIComponent>> _children;      /*!< Collection of child components */
-    std::weak_ptr<UIComponent>                _parent;        /*!< Weak reference to parent component */
-    bool                                      _visible{true}; /*!< Visibility flag */
+    std::string                               _name;     /*!< Component name */
+    std::vector<std::shared_ptr<UIComponent>> _children; /*!< Collection of child components */
+    std::weak_ptr<UIComponent>                _parent;   /*!< Weak reference to parent component */
 };

@@ -1,7 +1,7 @@
 export module Graphics.Render.Drawable;
 
 export import Graphics.Render.Drawable.Mesh;
-export import Graphics.Render.Drawable.Triangle;
+// export import Graphics.Render.Drawable.Triangle;
 export import Graphics.Render.Drawable.Model;
 
 import std;

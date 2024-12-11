@@ -190,6 +190,7 @@ target_sources(Editor
         editor/Window/UI/Components/OpenGLView.cppm
         editor/Window/UI/Components/DockSpace.cppm
         editor/Window/UI/Components/MenuBar.cppm
+        editor/Window/UI/Components/Console.cppm
 )
 
 file(GLOB SCENE_MODULES "editor/Test/*.cppm")

@@ -1,4 +1,4 @@
-export module Test.TestScene;
+export module Test.BallSpace;
 
 import std;
 import Math;
@@ -11,9 +11,9 @@ import Graphics.Render.RenderContext;
 import Graphics.Render.Drawable.Canvas;
 import Graphics.Render.Drawable.Model;
 
-export class TestScene final : public SceneBase {
+export class BallSpace final : public SceneBase {
 public:
-    TestScene() = default;
+    BallSpace() = default;
 
     void load() override {
         EventManager::connect<Vec2>("Input::MouseDrag", [this](const Vec2& delta) {
@@ -27,9 +27,9 @@ public:
         });
         bindEvents();
         auto shader = Shader(
-            "Default",
-            "resource/shaders/TestScene/vertex_shader.glsl",
-            "resource/shaders/TestScene/fragment_shader.glsl"
+            "BallSpace",
+            "resource/shaders/BallSpace/vertex_shader.glsl",
+            "resource/shaders/BallSpace/fragment_shader.glsl"
         );
         _camera.updateScreenRatio(_width, _height);
         _renderContext.setShader(std::move(shader));
