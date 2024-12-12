@@ -26,7 +26,7 @@ public:
 
     void beginRender() override {
         updateLogs();
-        ImGui::Begin("Console", &_visible);
+        ImGui::Begin(getName().c_str(), &_visible);
     }
 
     void renderContent() override {

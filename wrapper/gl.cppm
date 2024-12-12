@@ -79,6 +79,11 @@ export using gl::glRenderbufferStorage;
 export using gl::glFramebufferRenderbuffer;
 export using gl::glDeleteRenderbuffers;
 
+export using gl::glCreateBuffers;
+export using gl::glNamedBufferData;
+export using gl::glNamedBufferSubData;
+export using gl::glDeleteBuffers;
+
 export using gl::glDrawElements;
 export using gl::glDrawArrays;
 

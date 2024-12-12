@@ -16,6 +16,7 @@ module;
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <execution>
 #include <filesystem>
 #include <format>
 #include <fstream>
@@ -2254,6 +2255,16 @@ export namespace std
     using std::regex;
     using std::smatch;
     using std::regex_search;
+}
+
+export namespace std
+{
+    namespace execution
+    {
+        using std::execution::par;
+        using std::execution::seq;
+        using std::execution::par_unseq;
+    }
 }
 
 #if defined(__GLIBCXX__) || defined(__GLIBCPP__)

@@ -91,11 +91,12 @@ target_sources(Doti
         doti/Utils/Event.cppm
         doti/Utils/Random.cppm
         doti/Debug/Logger.cppm
+        doti/Graphics/Buffer.cppm
         doti/Graphics/Camera/Camera.cppm
         doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Color.cppm
         doti/Graphics/Texture.cppm
-        doti/Graphics/Acceleration/BoundingBox.cppm
+        doti/Graphics/Acceleration/AABB.cppm
         doti/Graphics/Acceleration/BVHTree.cppm
         doti/Graphics/Render/RenderContext.cppm
         doti/Graphics/Render/Drawable/Drawable.cppm
