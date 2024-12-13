@@ -1,8 +1,8 @@
 export module Scene.SceneManager;
 
 import std;
-import Debug.Logger;
-import Utils.Event;
+import Core.Logger;
+import Core.Event;
 import Scene.SceneBase;
 
 export class SceneManager {

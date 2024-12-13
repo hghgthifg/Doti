@@ -1,12 +1,12 @@
 export module Graphics.Render.RenderContext;
 
 import std;
-import Math;
+import Core.Math;
 import Graphics.Shader;
 import Graphics.Camera;
-import Utils.Event;
-import Utils.Random;
-import Debug.Logger;
+import Core.Event;
+import Core.Random;
+import Core.Logger;
 
 export class RenderContext;
 

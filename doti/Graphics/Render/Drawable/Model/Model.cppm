@@ -2,11 +2,11 @@ export module Graphics.Render.Drawable.Model;
 
 import assimp;
 import std;
-import Math;
+import Core.Math;
 import OpenGL;
-import Debug.Logger;
+import Core.Logger;
 import Graphics.Render.RenderContext;
-import Graphics.Loader.Image;
+import Core.Loader.Image;
 import Graphics.Render.Drawable.Mesh;
 import Graphics.Shader;
 

@@ -3,8 +3,8 @@ export module Graphics.Shader;
 import OpenGL;
 
 import std;
-import Debug.Logger;
-import Math;
+import Core.Logger;
+import Core.Math;
 
 export class Shader {
 public:

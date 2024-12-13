@@ -1,6 +1,6 @@
-export module Utils.Event;
+export module Core.Event;
 
-import Debug.Logger;
+import Core.Logger;
 import std;
 
 // Concept to ensure that the slot function is invocable with the specified arguments and returns void

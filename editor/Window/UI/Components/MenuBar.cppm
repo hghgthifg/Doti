@@ -2,9 +2,9 @@ export module Window.UI.Components.MenuBar;
 
 import std;
 import ImGui;
-import Utils.Event;
+import Core.Event;
 import Window.UI.ComponentBase;
-import Utils.Event;
+import Core.Event;
 import Scene.SceneManager;
 
 export class MenuBar : public UIComponent {

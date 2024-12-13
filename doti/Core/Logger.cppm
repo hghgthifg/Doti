@@ -1,6 +1,4 @@
-module;
-
-export module Debug.Logger;
+export module Core.Logger;
 
 import std;
 

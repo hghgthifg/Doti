@@ -1,11 +1,11 @@
 export module Test.BallSpace;
 
 import std;
-import Math;
+import Core.Math;
 import Scene.SceneBase;
 import Graphics.Camera;
-import Utils.Event;
-import Debug.Logger;
+import Core.Event;
+import Core.Logger;
 import Graphics.Shader;
 import Graphics.Render.RenderContext;
 import Graphics.Render.Drawable.Canvas;

@@ -1,9 +1,10 @@
 export module Scene.SceneBase;
 
 import std;
-import Utils.Event;
+import Json;
+import Core.Event;
+import Core.Logger;
 import Graphics.Camera;
-import Debug.Logger;
 import Graphics.Render.RenderContext;
 
 export class SceneBase {
@@ -64,6 +65,16 @@ protected:
         EventManager::disconnectAll<>("Scene::NewRenderLoop");
         EventManager::disconnectAll<>("Render::RefreshHistoryFramedata");
     }
+
+    auto loadScene(const std::filesystem::path& path) -> void {
+        std::ifstream file(path);
+        if (!file.is_open()) {
+            Logger::info("Failed to open scene file" + path.filename().string());
+            return;
+        }
+    }
+
+    auto saveScene(const std::filesystem::path& path) -> void {}
 
     static bool   _eventsRegistered;
     int32_t       _renderLoopCount = 0;

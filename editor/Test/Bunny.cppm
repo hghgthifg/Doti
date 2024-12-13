@@ -2,10 +2,10 @@ export module Test.Bunny;
 
 /*
 import std;
-import Math;
+import Core.Math;
 import Scene.SceneBase;
 import Graphics.Camera;
-import Utils.Event;
+import Core.Event;
 import Graphics.Shader;
 import Graphics.Render.RenderContext;
 import Graphics.Render.Drawable.Triangle;
@@ -21,7 +21,7 @@ public:
         });
         EventManager::connect<float>("MouseScroll", [this](float delta) {
             auto fov = _camera.getFov();
-            _camera.setFov(Math::clamp(fov - delta, 0.1f, 45.0f));
+            _camera.setFov(Core.Math::clamp(fov - delta, 0.1f, 45.0f));
         });
         auto shader = Shader(
             "BunnyShader (Phong)",
@@ -36,7 +36,7 @@ public:
     }
 
     void render() override {
-        auto projection = Math::perspective(Math::radians(_camera.getFov()), _width / _height, 0.1f, 100.0f);
+        auto projection = Core.Math::perspective(Core.Math::radians(_camera.getFov()), _width / _height, 0.1f, 100.0f);
         _renderContext.setProjectionMatrix(projection);
 
         auto view = _camera.getViewMatrix();
@@ -46,8 +46,8 @@ public:
         _renderContext.setViewPos(viewPos);
 
         auto model = Mat4(1.0f);
-        model      = Math::translate(model, Vec3{0.0f, 0.0f, 0.0f});
-        model      = Math::scale(model, Vec3{1.0f, 1.0f, 1.0f});
+        model      = Core.Math::translate(model, Vec3{0.0f, 0.0f, 0.0f});
+        model      = Core.Math::scale(model, Vec3{1.0f, 1.0f, 1.0f});
         _renderContext.setModelMatrix(model);
 
         _bunnyModel.draw(_renderContext);

@@ -27,10 +27,15 @@ find_package(glbinding CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(Freetype CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 find_package(PkgConfig)
 pkg_check_modules(Jxl REQUIRED IMPORTED_TARGET libjxl libjxl_cms libjxl_threads)
 #find_package(Boost REQUIRED COMPONENTS signals2)
 #find_package(spdlog CONFIG REQUIRED)
+
+
+# Settings
+set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
 
 # Build Doti library
 add_library(Doti STATIC "")
@@ -87,10 +92,10 @@ endif ()
 target_sources(Doti
         PUBLIC
         FILE_SET CXX_MODULES FILES
-        doti/Math/Math.cppm
-        doti/Utils/Event.cppm
-        doti/Utils/Random.cppm
-        doti/Debug/Logger.cppm
+        doti/Core/Math/Math.cppm
+        doti/Core/Event.cppm
+        doti/Core/Random.cppm
+        doti/Core/Logger.cppm
         doti/Graphics/Buffer.cppm
         doti/Graphics/Camera/Camera.cppm
         doti/Graphics/Shader/Shader.cppm
@@ -104,11 +109,12 @@ target_sources(Doti
         #        doti/Graphics/Render/Drawable/Triangle.cppm
         doti/Graphics/Render/Drawable/Canvas.cppm
         doti/Graphics/Render/Drawable/Model/Model.cppm
-        doti/Graphics/Loader/JxlLoader.cppm
-        doti/Graphics/Loader/ImageLoader.cppm
+        doti/Core/Loader/JxlLoader.cppm
+        doti/Core/Loader/ImageLoader.cppm
         doti/Scene/SceneBase.cppm
         doti/Scene/SceneManager.cppm
-        doti/Scene/FrameCanvas.cppm
+        doti/Scene/SceneNode.cppm
+        doti/Graphics/FrameCanvas.cppm
         wrapper/test.cppm
         wrapper/eigen.cppm
         wrapper/glfw.cppm
@@ -118,6 +124,7 @@ target_sources(Doti
         wrapper/imgui.cppm
         wrapper/assimp.cppm
         wrapper/libjxl.cppm
+        wrapper/json.cppm
 )
 #if (OpenMP_CXX_FOUND)
 #    target_link_libraries(Doti PUBLIC OpenMP::OpenMP_CXX)
@@ -125,6 +132,7 @@ target_sources(Doti
 
 target_link_libraries(Doti PRIVATE
         glfw
+        nlohmann_json::nlohmann_json
         Freetype::Freetype
         PkgConfig::Jxl
         glbinding::glbinding

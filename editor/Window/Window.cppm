@@ -4,9 +4,9 @@ import std;
 import glfw;
 import ImGui;
 import OpenGL;
-import Debug.Logger;
+import Core.Logger;
 import Graphics.Shader;
-import Utils.Event;
+import Core.Event;
 
 export class Window {
 public:

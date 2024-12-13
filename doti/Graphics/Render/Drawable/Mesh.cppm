@@ -1,9 +1,9 @@
 export module Graphics.Render.Drawable.Mesh;
 
 import std;
-import Math;
+import Core.Math;
 import OpenGL;
-import Debug.Logger;
+import Core.Logger;
 import Graphics.Shader;
 import Graphics.Render.RenderContext;
 

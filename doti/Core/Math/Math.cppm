@@ -2,7 +2,7 @@
  * @brief Fundamental math utilities.
  */
 
-export module Math;
+export module Core.Math;
 #define USING_GLM
 
 #ifdef USING_GLM

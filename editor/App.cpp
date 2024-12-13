@@ -1,10 +1,10 @@
 import std;
 import ImGui;
-// import Utils.Event;
-import Debug.Logger;
+// import Core.Event;
+import Core.Logger;
 import Scene.SceneManager;
 import Scene.SceneBase;
-import Scene.FrameCanvas;
+import Graphics.FrameCanvas;
 import Window;
 import Window.UI.ComponentBase;
 import Window.UI.Components.OpenGLView;

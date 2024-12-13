@@ -1,9 +1,9 @@
 export module Graphics.Camera;
 
 import std;
-import Math;
-import Utils.Event;
-import Debug.Logger;
+import Core.Math;
+import Core.Event;
+import Core.Logger;
 
 /*!
  * @brief Class representing a camera in the scene with position and orientation.

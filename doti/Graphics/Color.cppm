@@ -4,6 +4,6 @@
 
 export module Graphics.Color;
 
-import Math;
+import Core.Math;
 
 using Color = Vec3;

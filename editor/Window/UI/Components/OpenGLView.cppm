@@ -4,10 +4,10 @@ import ImGui;
 import OpenGL;
 import std;
 import Window.UI.ComponentBase;
-import Scene.FrameCanvas;
-import Debug.Logger;
-import Utils.Event;
-import Math;
+import Graphics.FrameCanvas;
+import Core.Logger;
+import Core.Event;
+import Core.Math;
 
 export class OpenGLView : public UIComponent {
 public:

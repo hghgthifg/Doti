@@ -1,8 +1,8 @@
 export module Graphics.Render.Acceleration.BVHTree;
 
 import std;
-import Math;
-import Debug.Logger;
+import Core.Math;
+import Core.Logger;
 import Graphics.Buffer;
 import Graphics.Render.Acceleration.AABB;
 

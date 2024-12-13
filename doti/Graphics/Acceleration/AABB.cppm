@@ -1,12 +1,12 @@
 export module Graphics.Render.Acceleration.AABB;
 
 import std;
-import Math;
+import Core.Math;
 
 export class AABB {
 public:
     AABB() : _min(0, 0, 0), _max(0, 0, 0) {}
-    // AABB(const Vec3& p1, const Vec3& p2) : _min(Math::min(p1, p2)), _max(Math::max(p1, p2)) {}
+    // AABB(const Vec3& p1, const Vec3& p2) : _min(Core.Math::min(p1, p2)), _max(Core.Math::max(p1, p2)) {}
     AABB(const Vec3& v1, const Vec3& v2, const Vec3& v3) {
         _min = Math::min(v1, v2, v3);
         _max = Math::max(v1, v2, v3);

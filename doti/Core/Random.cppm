@@ -1,4 +1,4 @@
-export module Utils.Random;
+export module Core.Random;
 
 import std;
 
@@ -107,7 +107,7 @@ public:
     template<typename T>
     static T randWeightedInt(const std::vector<T>& values, const std::vector<double>& weights) {
         if (values.size() != weights.size() || values.empty()) {
-            // TODO: Use Debug.Logger instead of using throw (Currently Debug.Logger is not thread-safe).
+            // TODO: Use Core.Logger instead of using throw (Currently Core.Logger is not thread-safe).
             throw std::invalid_argument("Values and weights must have the same non-zero size.");
         }
 

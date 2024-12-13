@@ -2,7 +2,7 @@ export module Window.UI.Components.Console;
 
 import std;
 import ImGui;
-import Debug.Logger;
+import Core.Logger;
 import Window.UI.ComponentBase;
 
 struct LogEntry {

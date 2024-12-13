@@ -1,10 +1,10 @@
-export module Scene.FrameCanvas;
+export module Graphics.FrameCanvas;
 
 import std;
 import OpenGL;
 import glfw;
-import Debug.Logger;
-import Utils.Event;
+import Core.Logger;
+import Core.Event;
 
 export class FrameCanvas {
 public:
