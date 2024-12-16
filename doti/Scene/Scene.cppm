@@ -141,10 +141,9 @@ protected:
         if (!shader_node.contains("fragment_shader") || !shader_node.contains("fragment_shader")) {
             Logger::error("Shader incomplete!");
         }
-        auto   frag_path = shader_node["fragment_shader"].get<std::string>();
-        auto   vert_path = shader_node["vertex_shader"].get<std::string>();
-        Shader shader(_name, vert_path, frag_path);
-        _renderContext.setShader(std::move(shader));
+        const auto frag_path = shader_node["fragment_shader"].get<std::string>();
+        const auto vert_path = shader_node["vertex_shader"].get<std::string>();
+        _renderContext.setShader(Shader::loadFromFile(_name, vert_path, frag_path));
 
         if (!scene_node.contains("objects")) {
             Logger::warning("No objects found in scene node!");

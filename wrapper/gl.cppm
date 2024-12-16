@@ -59,6 +59,7 @@ export using gl::glGenBuffers;
 export using gl::glBindVertexArray;
 export using gl::glBindBuffer;
 export using gl::glBufferData;
+export using gl::glDeleteVertexArrays;
 
 export using gl::glGenTextures;
 export using gl::glBindTexture;
@@ -102,12 +103,14 @@ export constexpr auto GL_FLOAT          = gl::GL_FLOAT;
 export constexpr auto GL_UNSIGNED_INT   = gl::GL_UNSIGNED_INT;
 export constexpr auto GL_UNSIGNED_BYTE  = gl::GL_UNSIGNED_BYTE;
 
-export constexpr auto GL_RED  = gl::GL_RED;
-export constexpr auto GL_R32F = gl::GL_R32F;
-export constexpr auto GL_RGB  = gl::GL_RGB;
-export constexpr auto GL_RGBA = gl::GL_RGBA;
+export constexpr auto GL_RED     = gl::GL_RED;
+export constexpr auto GL_R32F    = gl::GL_R32F;
+export constexpr auto GL_RGB     = gl::GL_RGB;
+export constexpr auto GL_RGBA    = gl::GL_RGBA;
+export constexpr auto GL_RGBA32F = gl::GL_RGBA32F;
 
 export constexpr auto GL_TRIANGLES          = gl::GL_TRIANGLES;
+export constexpr auto GL_TRIANGLES_STRIP    = gl::GL_TRIANGLE_STRIP;
 export constexpr auto GL_TEXTURE_2D         = gl::GL_TEXTURE_2D;
 export constexpr auto GL_TEXTURE0           = gl::GL_TEXTURE0;
 export constexpr auto GL_TEXTURE1           = gl::GL_TEXTURE1;

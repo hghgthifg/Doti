@@ -24,12 +24,12 @@ auto main() -> int {
 
         RootComponent = std::make_shared<DockSpace>("dock_space");
 
-        auto view          = std::make_shared<OpenGLView>("opengl_view");
-        auto targetTexture = std::make_shared<FrameCanvas>(width, height);
-        auto console       = std::make_shared<Console>("log_console");
-        auto menu          = std::make_shared<MenuBar>("menu_bar");
+        auto view = std::make_shared<OpenGLView>("opengl_view");
+        // auto targetTexture = std::make_shared<FrameCanvas>(width, height);
+        auto console = std::make_shared<Console>("log_console");
+        auto menu    = std::make_shared<MenuBar>("menu_bar");
 
-        view->setTexture(targetTexture);
+        // view->setTexture(targetTexture);
         console->setLogBuffer(customLogStream);
 
         RootComponent->addChild(menu);
@@ -46,7 +46,7 @@ auto main() -> int {
             window.beginDraw();
 
             // TODO: TargetTexture should be a component of RenderContext
-            targetTexture->bind();
+            // targetTexture->bind();
 
             auto currentScene = SceneManager::getCurrentScene();
             if (currentScene.get() != nullptr) {
@@ -56,7 +56,7 @@ auto main() -> int {
                 currentScene->render();
             }
 
-            targetTexture->unbind();
+            // targetTexture->unbind();
 
             ImGui::NewFrame();
             RootComponent->render();

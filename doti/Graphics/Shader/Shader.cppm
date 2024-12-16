@@ -8,15 +8,12 @@ import Core.Math;
 
 export class Shader {
 public:
-    Shader() = default;
+    Shader() : _ID(0), _name("null") {};
 
-    explicit Shader(const std::string& name) : _ID(0), _name(name) {
-        Logger::info("Created shader: " + name);
-    }
-
-    Shader(Shader&& other) noexcept : _ID(other._ID), _name(other._name), _vertexPath(other._vertexPath),
-                                      _fragmentPath(other._fragmentPath) {
-        other._ID = 0;
+    Shader(Shader&& other) noexcept {
+        std::swap(_ID, other._ID);
+        std::swap(_name, other._name);
+        other.~Shader();
     };
 
     ~Shader() {
@@ -30,28 +27,11 @@ public:
 
     auto operator=(Shader&& other) noexcept -> Shader& {
         if (this != &other) {
-            if (_ID != 0) {
-                glDeleteProgram(_ID);
-            }
-
-            _ID           = other._ID;
-            _name         = std::move(other._name);
-            _vertexPath   = std::move(other._vertexPath);
-            _fragmentPath = std::move(other._fragmentPath);
-
-            other._ID   = 0;
-            other._name = "null";
+            std::swap(_ID, other._ID);
+            std::swap(_name, other._name);
+            other.~Shader();
         }
         return *this;
-    }
-
-    Shader(const std::string& name, const std::string& vertexPath,
-           const std::string& fragmentPath): _ID(0), _name(name) {
-        Logger::info("Created shader: " + name);
-        Logger::info("Loaded vertex shader: " + vertexPath + " and fragment shader: " + fragmentPath);
-        this->_vertexPath   = vertexPath;
-        this->_fragmentPath = fragmentPath;
-        this->loadShader();
     }
 
     auto activate() const -> void {
@@ -62,12 +42,11 @@ public:
         glUseProgram(0);
     }
 
-    // ------------------------------------------------------------------------
-    auto loadShader() -> void {
-        // 1. Load shader code from file
-        if (_vertexPath == "" || _fragmentPath == "") {
+    static Shader loadFromFile(const std::string& name, const std::string& vertexPath,
+                               const std::string& fragmentPath) {
+        if (vertexPath == "" || fragmentPath == "") {
             Logger::error("No shader paths provided.");
-            return;
+            return Shader();
         }
         std::string   vertexCode;
         std::string   fragmentCode;
@@ -79,65 +58,58 @@ public:
 
         /* Load vertex shader from file */
         try {
-            vertexFile.open(_vertexPath);
+            vertexFile.open(vertexPath);
             std::stringstream vertexStream;
             vertexStream << vertexFile.rdbuf();
             vertexFile.close();
             vertexCode = vertexStream.str();
         } catch (const std::ifstream::failure& e) {
-            Logger::error("Failed to open vertex shader file: " + _vertexPath);
-            return;
+            Logger::error("Failed to open vertex shader file: " + vertexPath);
+            return Shader();
         }
 
         /* Load fragment shader from file */
         try {
-            fragmentFile.open(_fragmentPath);
+            fragmentFile.open(fragmentPath);
             std::stringstream fragmentStream;
             fragmentStream << fragmentFile.rdbuf();
             fragmentFile.close();
             fragmentCode = fragmentStream.str();
         } catch (const std::ifstream::failure& e) {
-            Logger::error("Failed to open fragment shader file: " + _fragmentPath);
-            return;
+            Logger::error("Failed to open fragment shader file: " + fragmentPath);
+            return Shader();
         }
 
-        // 2. Compile shaders
+        return loadFromString(vertexCode, fragmentCode);
+    }
+
+    static Shader loadFromString(const std::string& vertexCode, const std::string& fragmentCode) {
+        /* Compile Shader Source */
+        Shader      result;
         const char* vertexCodeCStr   = vertexCode.c_str();
         const char* fragmentCodeCStr = fragmentCode.c_str();
-        uint32_t    vertexShader, fragmentShader;
 
-        vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        const uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader, 1, &vertexCodeCStr, nullptr);
         glCompileShader(vertexShader);
         checkCompileErrors(vertexShader, "VERTEX");
 
-        fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        const uint32_t fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fragmentShader, 1, &fragmentCodeCStr, nullptr);
         glCompileShader(fragmentShader);
         checkCompileErrors(fragmentShader, "FRAGMENT");
 
-        // 3. Link shaders
-        _ID = glCreateProgram();
-        Logger::info("Created shader: " + _name + ", ID: " + std::to_string(_ID));
-        glAttachShader(_ID, vertexShader);
-        glAttachShader(_ID, fragmentShader);
-        glLinkProgram(_ID);
-        checkCompileErrors(_ID, "PROGRAM");
+        /* Link shaders */
+        result._ID = glCreateProgram();
+        Logger::info("Created shader: " + result._name + ", ID: " + std::to_string(result._ID));
+        glAttachShader(result._ID, vertexShader);
+        glAttachShader(result._ID, fragmentShader);
+        glLinkProgram(result._ID);
+        checkCompileErrors(result._ID, "PROGRAM");
 
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
-
-        // _shaders.insert({_name, this});
-
-        Logger::info("Successfully compiled and linked shader: " + _vertexPath + " and " + _fragmentPath);
-    }
-
-    // ------------------------------------------------------------------------
-    auto loadShader(const std::string& vertexPath, const std::string& fragmentPath) -> void {
-        Logger::info("Loaded vertex shader: " + vertexPath + "and fragment shader: " + fragmentPath);
-        this->_vertexPath   = vertexPath;
-        this->_fragmentPath = fragmentPath;
-        loadShader();
+        return result;
     }
 
     // ------------------------------------------------------------------------
@@ -218,9 +190,4 @@ private:
 
     uint32_t    _ID;
     std::string _name;
-    std::string _vertexPath;
-    std::string _fragmentPath;
-    // static std::unordered_map<std::string, Shader *> _shaders;
 };
-
-// std::unordered_map<std::string, Shader *> Shader::_shaders;
