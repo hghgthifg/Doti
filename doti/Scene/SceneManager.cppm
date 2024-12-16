@@ -3,7 +3,7 @@ export module Scene.SceneManager;
 import std;
 import Core.Logger;
 import Core.Event;
-import Scene.SceneBase;
+import Scene;
 
 export class SceneManager {
 public:
@@ -13,8 +13,12 @@ public:
         });
     }
 
-    static auto registerScene(const std::string& name, std::shared_ptr<SceneBase> scene) -> void {
-        getScenes()[name] = std::move(scene);
+    static auto registerScene(const std::string& path) -> void {
+        auto scene = std::make_shared<Scene>(path);
+        if (scene->getName() == "") {
+            return;
+        }
+        getScenes()[scene->getName()] = std::move(scene);
     }
 
     static auto getSceneNames() -> const std::vector<std::string>& {
@@ -41,18 +45,18 @@ public:
         }
     }
 
-    static auto getCurrentScene() -> std::shared_ptr<SceneBase> {
+    static auto getCurrentScene() -> std::shared_ptr<Scene> {
         return currentScene();
     }
 
 private:
-    static auto getScenes() -> std::map<std::string, std::shared_ptr<SceneBase>>& {
-        static std::map<std::string, std::shared_ptr<SceneBase>> scenes;
+    static auto getScenes() -> std::map<std::string, std::shared_ptr<Scene>>& {
+        static std::map<std::string, std::shared_ptr<Scene>> scenes;
         return scenes;
     }
 
-    static auto currentScene() -> std::shared_ptr<SceneBase>& {
-        static std::shared_ptr<SceneBase> current = nullptr;
+    static auto currentScene() -> std::shared_ptr<Scene>& {
+        static std::shared_ptr<Scene> current = nullptr;
         return current;
     }
 };

@@ -1,8 +1,8 @@
-export module Graphics.Render.Drawable.Canvas;
+export module Graphics.Render.Canvas;
 
 import OpenGL;
-import Graphics.Shader;
 import Graphics.Render.RenderContext;
+import Graphics.Shader;
 
 constexpr GLfloat vertices[] = {
     -1.0f, 1.0f, 0.0f, 1.0f,
@@ -21,7 +21,7 @@ public:
 
     // TODO: Optimize Shader activation process
     auto draw(RenderContext& render_context) -> void {
-        const Shader& rawShader = render_context.directlyAccessShader(*this);
+        const Shader& rawShader = render_context.getShader();
         rawShader.activate();
 
         render_context.apply();

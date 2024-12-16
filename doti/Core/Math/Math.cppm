@@ -8,12 +8,13 @@ export module Core.Math;
 #ifdef USING_GLM
 import glm;
 
-export using Vec2 = glm::vec2;
-export using Vec3 = glm::vec3;
-export using Vec4 = glm::vec4;
-export using Mat2 = glm::mat2;
-export using Mat3 = glm::mat3;
-export using Mat4 = glm::mat4;
+export using Vec2  = glm::vec2;
+export using Vec3  = glm::vec3;
+export using Vec4  = glm::vec4;
+export using Vec4u = glm::u32vec4;
+export using Mat2  = glm::mat2;
+export using Mat3  = glm::mat3;
+export using Mat4  = glm::mat4;
 
 export using glm::operator-;
 export using glm::operator+;

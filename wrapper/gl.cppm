@@ -83,6 +83,7 @@ export using gl::glCreateBuffers;
 export using gl::glNamedBufferData;
 export using gl::glNamedBufferSubData;
 export using gl::glDeleteBuffers;
+export using gl::glBindBufferBase;
 
 export using gl::glDrawElements;
 export using gl::glDrawArrays;
@@ -91,6 +92,9 @@ export using gl::glFlush;
 
 export using gl::glVertexAttribPointer;
 export using gl::glEnableVertexAttribArray;
+
+export using gl::glGetProgramResourceIndex;
+export using gl::glShaderStorageBlockBinding;
 
 export constexpr auto GL_BYTE           = gl::GL_BYTE;
 export constexpr auto GL_UNSIGNED_SHORT = gl::GL_UNSIGNED_SHORT;
@@ -122,10 +126,13 @@ export constexpr auto GL_MIRRORED_REPEAT    = gl::GL_MIRRORED_REPEAT;
 export constexpr auto GL_FALSE = gl::GL_FALSE;
 export constexpr auto GL_TRUE  = gl::GL_TRUE;
 
-export constexpr auto GL_ARRAY_BUFFER         = gl::GL_ARRAY_BUFFER;
-export constexpr auto GL_FRAMEBUFFER          = gl::GL_FRAMEBUFFER;
-export constexpr auto GL_ELEMENT_ARRAY_BUFFER = gl::GL_ELEMENT_ARRAY_BUFFER;
-export constexpr auto GL_RENDERBUFFER         = gl::GL_RENDERBUFFER;
+export constexpr auto GL_ARRAY_BUFFER          = gl::GL_ARRAY_BUFFER;
+export constexpr auto GL_FRAMEBUFFER           = gl::GL_FRAMEBUFFER;
+export constexpr auto GL_ELEMENT_ARRAY_BUFFER  = gl::GL_ELEMENT_ARRAY_BUFFER;
+export constexpr auto GL_RENDERBUFFER          = gl::GL_RENDERBUFFER;
+export constexpr auto GL_SHADER_STORAGE_BUFFER = gl::GL_SHADER_STORAGE_BUFFER;
+
+export constexpr auto GL_SHADER_STORAGE_BLOCK = gl::GL_SHADER_STORAGE_BLOCK;
 
 export constexpr auto GL_DEPTH24_STENCIL8 = gl::GL_DEPTH24_STENCIL8;
 

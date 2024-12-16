@@ -5,99 +5,86 @@ import Core.Math;
 import Core.Logger;
 import Graphics.Buffer;
 import Graphics.Render.Acceleration.AABB;
+import Graphics.Render.Acceleration.Primitive;
 
 enum class BVHSplitMethod { SAH, Middle, EqualCounts };
 
 struct BVHNode {
     AABB    box;
-    int32_t sizeIndex;
+    int32_t index; // max size of the tree if > 0, primitive index if < 0
+    float   padding[3] = {0.0f, 0.0f, 0.0f};
 };
 
-struct BVHBuffer {
-    std::shared_ptr<Buffer> vertexBuffer;
-    std::shared_ptr<Buffer> indexBuffer;
-    std::shared_ptr<Buffer> nodeBuffer;
-};
-
-
-struct Mesh {
-    std::vector<Vec3>     vertices;
-    std::vector<Vec3>     normals;
-    std::vector<Vec3>     texCoords;
-    std::vector<uint32_t> indices;
-};
-
-constexpr int32_t paraLim = 10000;
+constexpr uint32_t paraLim = 10000;
 
 export class BVHTree {
 public:
-    BVHTree(const std::vector<Mesh>& meshes, BVHSplitMethod splitMethod) : _splitMethod(splitMethod) {
-        uint32_t indicesCount = 0;
-        for (const auto& mesh: meshes) {
-            _vertices.insert(_vertices.end(), mesh.vertices.begin(), mesh.vertices.end());
-            _normals.insert(_normals.end(), mesh.normals.begin(), mesh.normals.end());
+    BVHTree() = default;
 
-            std::vector<uint32_t> transIndices(mesh.indices.size());
-            const uint32_t        meshIndex = &mesh - &meshes[0];
+    ~BVHTree() = default;
 
-            std::ranges::transform(mesh.indices, transIndices.begin(),
-                                   [meshIndex, indicesCount](const uint32_t x) {
-                                       return (x + indicesCount) | (meshIndex << 24);
-                                   });
-            // 8bit meshIndex | 24bit vertexIndex
-
-            _indices.insert(_indices.end(), transIndices.begin(), transIndices.end());
-            indicesCount += mesh.indices.size();
-        }
-
-        std::vector<HittableInfo> hittableInfo(indicesCount / 3);
-
-        const auto clamp = [](uint32_t x) { return x & 0x00ffffff; };
-
-        AABB bound;
-        for (uint32_t i = 0; i < hittableInfo.size(); ++i) {
+    BVHTree(const std::vector<std::shared_ptr<PrimitiveBase>>& primitives,
+            BVHSplitMethod splitMethod = BVHSplitMethod::EqualCounts): _splitMethod(splitMethod) {
+        std::vector<HittableInfo> hittableInfo(primitives.size());
+        AABB                      bound;
+        uint32_t                  triangle_count = 0;
+        uint32_t                  sphere_count   = 0;
+        for (uint32_t i = 0; i < hittableInfo.size(); i++) {
             HittableInfo hInfo;
-            hInfo.bound = AABB(
-                _vertices[clamp(_indices[i * 3 + 0])],
-                _vertices[clamp(_indices[i * 3 + 1])],
-                _vertices[clamp(_indices[i * 3 + 2])]
-            );
-            hInfo.centroid = hInfo.bound.getCentroid();
-            hInfo.index    = i;
+            const auto   pri = primitives[i];
+            hInfo.bound      = pri->getAABB();
+            hInfo.centroid   = pri->getCentroid();
+
+            uint32_t masked_index;
+            switch (pri->getType()) {
+                case PrimitiveType::Triangle: {
+                    masked_index = triangle_count | 0x10000000;
+                    triangle_count++;
+                    break;
+                }
+                case PrimitiveType::Sphere: {
+                    masked_index = sphere_count | 0x20000000;
+                    sphere_count++;
+                    break;
+                }
+                default: {
+                    Logger::error("Unknown PrimitiveType!");
+                    continue;
+                }
+            }
+            /* 1bit reserved + 3bit primitive type + 28bit index */
+            /*
+             * Primitive type:
+             * 0001 - Triangle
+             * 0002 - Sphere
+             */
+            hInfo.index = masked_index;
             bound.mergeWith(hInfo.bound);
             hittableInfo[i] = hInfo;
         }
-
-        _nodes.reserve(hittableInfo.size() * 2 - 1);
-        build(0, hittableInfo, bound, 0, hittableInfo.size() - 1);
+        _nodes.resize(hittableInfo.size() * 2 - 1);
+        this->build(0, hittableInfo, bound, 0, hittableInfo.size() - 1);
     }
 
-    ~BVHTree();
+    auto genNodeBuffer() {
+        const auto nodeBuf = std::make_shared<Buffer>();
 
-    auto genBuffers() -> BVHBuffer {
-        const auto vertexBuf = std::make_shared<Buffer>();
-        const auto indexBuf  = std::make_shared<Buffer>();
-        const auto nodeBuf   = std::make_shared<Buffer>();
-
-        vertexBuf->allocate(_vertices.size() * sizeof(Vec3), _vertices.data(), 0);
-        indexBuf->allocate(_indices.size() * sizeof(uint32_t), _indices.data(), 0);
         nodeBuf->allocate(_nodes.size() * sizeof(BVHNode), _nodes.data(), 0);
-
-        return {vertexBuf, indexBuf, nodeBuf};
+        return nodeBuf;
     }
 
 private:
     struct HittableInfo {
-        AABB    bound;
-        Vec3    centroid;
-        int32_t index;
+        AABB     bound;
+        Vec3     centroid;
+        uint32_t index;
     };
 
-    void build(int32_t       offset, std::vector<HittableInfo>& hittableInfo, const AABB& nodeBound, const int32_t l,
+    void build(const int32_t offset, std::vector<HittableInfo>& hittableInfo, const AABB& nodeBound, const int32_t l,
                const int32_t r) {
         int8_t  dim    = nodeBound.maxExtent();
-        int32_t size   = (r - l) * 2 + 1;
-        _nodes[offset] = BVHNode{nodeBound, (size == 1) ? -l : size};
+        int32_t size   = (r - l + 1) * 2 - 1;
+        _nodes[offset] = BVHNode{nodeBound, (size == 1) ? -static_cast<int32_t>(hittableInfo[l].index) : size};
 
         if (l == r) return;
 
@@ -116,7 +103,7 @@ private:
         if (hittableInfo.size() > paraLim) {
             std::sort(std::execution::par, hittableInfo.begin() + l, hittableInfo.begin() + r, cmp);
         } else {
-            std::sort(hittableInfo.begin() + l, hittableInfo.end() + r, cmp);
+            std::sort(hittableInfo.begin() + l, hittableInfo.begin() + r, cmp);
         }
         int32_t hittableCount = r - l + 1;
 
@@ -142,11 +129,9 @@ private:
             case BVHSplitMethod::SAH: {
                 float cost = boundInfo[0].getSurfaceArea() + boundInfoRev[1].getSurfaceArea() * (r - l);
                 for (int32_t i = 1; i < hittableCount - 1; i++) {
-                    const float c = boundInfo[i].getSurfaceArea() * (i + 1) +
-                                    boundInfoRev[i + 1].getSurfaceArea() * (hittableCount - i - 1);
-                    if (c < cost) {
-                        cost = c, m = l + i;
-                    }
+                    const float c = boundInfo[i].getSurfaceArea() * (i + 1)
+                                    + boundInfoRev[i + 1].getSurfaceArea() * (hittableCount - i - 1);
+                    if (c < cost) { cost = c, m = l + i; }
                 }
                 break;
             }
@@ -181,9 +166,9 @@ private:
         }
     }
 
-    BVHSplitMethod        _splitMethod;
-    std::vector<Vec3>     _vertices;
-    std::vector<Vec3>     _normals;
-    std::vector<uint32_t> _indices;
-    std::vector<BVHNode>  _nodes;
+    BVHSplitMethod _splitMethod;
+    // std::vector<Vec3>     _vertices;
+    // std::vector<Vec3>     _normals;
+    // std::vector<uint32_t> _indices;
+    std::vector<BVHNode> _nodes;
 };

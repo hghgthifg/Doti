@@ -118,6 +118,7 @@ public:
 
         // 3. Link shaders
         _ID = glCreateProgram();
+        Logger::info("Created shader: " + _name + ", ID: " + std::to_string(_ID));
         glAttachShader(_ID, vertexShader);
         glAttachShader(_ID, fragmentShader);
         glLinkProgram(_ID);
@@ -131,6 +132,7 @@ public:
         Logger::info("Successfully compiled and linked shader: " + _vertexPath + " and " + _fragmentPath);
     }
 
+    // ------------------------------------------------------------------------
     auto loadShader(const std::string& vertexPath, const std::string& fragmentPath) -> void {
         Logger::info("Loaded vertex shader: " + vertexPath + "and fragment shader: " + fragmentPath);
         this->_vertexPath   = vertexPath;

@@ -6,10 +6,10 @@ import Core.Math;
 export class AABB {
 public:
     AABB() : _min(0, 0, 0), _max(0, 0, 0) {}
-    // AABB(const Vec3& p1, const Vec3& p2) : _min(Core.Math::min(p1, p2)), _max(Core.Math::max(p1, p2)) {}
-    AABB(const Vec3& v1, const Vec3& v2, const Vec3& v3) {
-        _min = Math::min(v1, v2, v3);
-        _max = Math::max(v1, v2, v3);
+
+    AABB(const Vec3& min, const Vec3& max) {
+        _min = min;
+        _max = max;
     }
 
     AABB(const AABB& a, const AABB& b) {
@@ -55,5 +55,9 @@ public:
     }
 
 private:
-    Vec3 _min, _max;
+    // Warning: Do not move this
+    Vec3  _min;
+    float padding1 = 0;
+    Vec3  _max;
+    float padding2 = 0;
 };

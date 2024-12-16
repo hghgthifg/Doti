@@ -6,6 +6,7 @@ module;
 #include <any>
 #include <array>
 #include <atomic>
+#include <bitset>
 #include <chrono>
 #include <concepts>
 #include <condition_variable>
@@ -79,6 +80,7 @@ export namespace std
     using std::unordered_map;
     using std::multimap;
     using std::unordered_multimap;
+    using std::bitset;
 } // namespace std
 
 export namespace std

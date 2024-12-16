@@ -100,21 +100,25 @@ target_sources(Doti
         doti/Graphics/Camera/Camera.cppm
         doti/Graphics/Shader/Shader.cppm
         doti/Graphics/Color.cppm
-        doti/Graphics/Texture.cppm
+        doti/Graphics/FrameCanvas.cppm
         doti/Graphics/Acceleration/AABB.cppm
         doti/Graphics/Acceleration/BVHTree.cppm
+        doti/Graphics/Acceleration/Primitive/Primitive.cppm
+        doti/Graphics/Acceleration/Primitive/PrimitiveBase.cppm
+        doti/Graphics/Acceleration/Primitive/TrianglePrimitive.cppm
+        doti/Graphics/Acceleration/Primitive/SpherePrimitive.cppm
         doti/Graphics/Render/RenderContext.cppm
-        doti/Graphics/Render/Drawable/Drawable.cppm
-        doti/Graphics/Render/Drawable/Mesh.cppm
-        #        doti/Graphics/Render/Drawable/Triangle.cppm
-        doti/Graphics/Render/Drawable/Canvas.cppm
-        doti/Graphics/Render/Drawable/Model/Model.cppm
+        doti/Graphics/Render/Object/Types.cppm
+        doti/Graphics/Render/Object/ObjectBase.cppm
+        doti/Graphics/Render/Object/Object.cppm
+        doti/Graphics/Render/Object/Mesh.cppm
+        doti/Graphics/Render/Canvas.cppm
         doti/Core/Loader/JxlLoader.cppm
         doti/Core/Loader/ImageLoader.cppm
-        doti/Scene/SceneBase.cppm
+        doti/Scene/Scene.cppm
         doti/Scene/SceneManager.cppm
         doti/Scene/SceneNode.cppm
-        doti/Graphics/FrameCanvas.cppm
+        doti/Scene/SceneNodeFactory.cppm
         wrapper/test.cppm
         wrapper/eigen.cppm
         wrapper/glfw.cppm
@@ -202,13 +206,13 @@ target_sources(Editor
         editor/Window/UI/Components/Console.cppm
 )
 
-file(GLOB SCENE_MODULES "editor/Test/*.cppm")
+#file(GLOB SCENE_MODULES "editor/Test/*.cppm")
 
-target_sources(Editor
-        PUBLIC
-        FILE_SET CXX_MODULES FILES
-        ${SCENE_MODULES}
-)
+#target_sources(Editor
+#        PUBLIC
+#        FILE_SET CXX_MODULES FILES
+#        ${SCENE_MODULES}
+#)
 
 target_sources(Editor PRIVATE
         editor/App.cpp

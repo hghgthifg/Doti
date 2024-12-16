@@ -3,7 +3,7 @@ import ImGui;
 // import Core.Event;
 import Core.Logger;
 import Scene.SceneManager;
-import Scene.SceneBase;
+import Scene;
 import Graphics.FrameCanvas;
 import Window;
 import Window.UI.ComponentBase;
@@ -11,9 +11,6 @@ import Window.UI.Components.OpenGLView;
 import Window.UI.Components.DockSpace;
 import Window.UI.Components.MenuBar;
 import Window.UI.Components.Console;
-
-import Test.TestScene;
-import Test.BallSpace;
 
 std::shared_ptr<DockSpace> RootComponent;
 
@@ -31,6 +28,7 @@ auto main() -> int {
         auto targetTexture = std::make_shared<FrameCanvas>(width, height);
         auto console       = std::make_shared<Console>("log_console");
         auto menu          = std::make_shared<MenuBar>("menu_bar");
+
         view->setTexture(targetTexture);
         console->setLogBuffer(customLogStream);
 
@@ -42,8 +40,7 @@ auto main() -> int {
 
         SceneManager::initialize();
 
-        SceneManager::registerScene("BallSpace", std::make_shared<BallSpace>());
-        SceneManager::registerScene("TestScene", std::make_shared<TestScene>());
+        SceneManager::registerScene("resource/scenes/cornell-box.json");
 
         while (!window.shouldClose()) {
             window.beginDraw();
@@ -53,7 +50,7 @@ auto main() -> int {
 
             auto currentScene = SceneManager::getCurrentScene();
             if (currentScene.get() != nullptr) {
-                currentScene->setSize(1200, 800);
+                currentScene->setSize(width, height);
             }
             if (currentScene) {
                 currentScene->render();

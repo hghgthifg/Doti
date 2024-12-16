@@ -1,99 +1,68 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Generic 3D Scene Schema",
-  "description": "A schema for defining 3D scenes with objects, meshes, materials, and lights.",
   "type": "object",
   "properties": {
     "scene": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string",
-          "description": "The name of the scene."
+          "type": "string"
         },
         "objects": {
           "type": "array",
-          "description": "List of objects in the scene.",
           "items": {
             "type": "object",
             "properties": {
               "name": {
-                "type": "string",
-                "description": "The name of the object."
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
               },
               "mesh": {
                 "type": "object",
-                "description": "Mesh data for the object.",
-                "oneOf": [
-                  {
-                    "description": "External mesh file.",
-                    "properties": {
-                      "path": {
-                        "type": "string",
-                        "description": "Path to the external mesh file."
-                      }
-                    },
-                    "required": [
-                      "path"
-                    ],
-                    "additionalProperties": false
+                "properties": {
+                  "vertices": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    }
                   },
-                  {
-                    "description": "Inline mesh data.",
-                    "properties": {
-                      "vertices": {
-                        "type": "array",
-                        "description": "List of vertex positions.",
-                        "items": {
-                          "type": "array",
-                          "description": "A vertex position as [x, y, z].",
-                          "items": {
-                            "type": "number"
-                          },
-                          "minItems": 3,
-                          "maxItems": 3
-                        },
-                        "minItems": 1
+                  "normals": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
                       },
-                      "normals": {
-                        "type": "array",
-                        "description": "List of vertex normals.",
-                        "items": {
-                          "type": "array",
-                          "description": "A normal vector as [x, y, z].",
-                          "items": {
-                            "type": "number"
-                          },
-                          "minItems": 3,
-                          "maxItems": 3
-                        },
-                        "minItems": 1
-                      },
-                      "indices": {
-                        "type": "array",
-                        "description": "List of indices for mesh triangles.",
-                        "items": {
-                          "type": "integer",
-                          "minimum": 0
-                        },
-                        "minItems": 3
-                      }
-                    },
-                    "required": [
-                      "vertices",
-                      "indices"
-                    ],
-                    "additionalProperties": false
+                      "minItems": 3,
+                      "maxItems": 3
+                    }
+                  },
+                  "indices": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
                   }
+                },
+                "required": [
+                  "vertices",
+                  "normals",
+                  "indices"
                 ]
               },
               "transform": {
                 "type": "object",
-                "description": "Transformation data for the object.",
                 "properties": {
                   "position": {
                     "type": "array",
-                    "description": "Position of the object [x, y, z].",
                     "items": {
                       "type": "number"
                     },
@@ -102,90 +71,52 @@
                   },
                   "scale": {
                     "type": "array",
-                    "description": "Scale of the object [x, y, z].",
                     "items": {
                       "type": "number"
                     },
                     "minItems": 3,
-                    "maxItems": 3,
-                    "default": [
-                      1,
-                      1,
-                      1
-                    ]
+                    "maxItems": 3
                   },
                   "rotation": {
                     "type": "array",
-                    "description": "Rotation of the object in degrees [pitch, yaw, roll].",
                     "items": {
                       "type": "number"
                     },
                     "minItems": 3,
-                    "maxItems": 3,
-                    "default": [
-                      0,
-                      0,
-                      0
-                    ]
+                    "maxItems": 3
                   }
                 },
                 "required": [
-                  "position"
-                ],
-                "additionalProperties": false
+                  "position",
+                  "scale",
+                  "rotation"
+                ]
               },
               "material": {
                 "type": "object",
-                "description": "Material properties of the object.",
                 "properties": {
                   "albedo": {
                     "type": "array",
-                    "description": "Albedo color [r, g, b].",
                     "items": {
                       "type": "number"
                     },
                     "minItems": 3,
-                    "maxItems": 3,
-                    "default": [
-                      1.0,
-                      1.0,
-                      1.0
-                    ]
+                    "maxItems": 3
                   },
                   "metallic": {
                     "type": "number",
-                    "description": "Metallic factor (0.0 - 1.0).",
-                    "minimum": 0.0,
-                    "maximum": 1.0,
-                    "default": 0.0
+                    "minimum": 0,
+                    "maximum": 1
                   },
                   "roughness": {
                     "type": "number",
-                    "description": "Roughness factor (0.0 - 1.0).",
-                    "minimum": 0.0,
-                    "maximum": 1.0,
-                    "default": 0.5
+                    "minimum": 0,
+                    "maximum": 1
                   },
                   "ao": {
                     "type": "number",
-                    "description": "Ambient occlusion factor (0.0 - 1.0).",
-                    "minimum": 0.0,
-                    "maximum": 1.0,
-                    "default": 1.0
-                  },
-                  "emissive": {
-                    "type": "array",
-                    "description": "Emissive color [r, g, b].",
-                    "items": {
-                      "type": "number"
-                    },
-                    "minItems": 3,
-                    "maxItems": 3,
-                    "default": [
-                      0.0,
-                      0.0,
-                      0.0
-                    ]
+                    "minimum": 0,
+                    "maximum": 1
                   }
                 },
                 "required": [
@@ -193,8 +124,7 @@
                   "metallic",
                   "roughness",
                   "ao"
-                ],
-                "additionalProperties": false
+                ]
               }
             },
             "required": [
@@ -202,38 +132,24 @@
               "mesh",
               "transform",
               "material"
-            ],
-            "additionalProperties": false
+            ]
           }
         },
         "lights": {
           "type": "array",
-          "description": "List of lights in the scene.",
           "items": {
             "type": "object",
             "properties": {
               "type": {
                 "type": "string",
-                "description": "Type of the light.",
                 "enum": [
                   "point",
                   "directional",
-                  "spot",
-                  "area"
+                  "spot"
                 ]
               },
               "position": {
                 "type": "array",
-                "description": "Position of the light [x, y, z].",
-                "items": {
-                  "type": "number"
-                },
-                "minItems": 3,
-                "maxItems": 3
-              },
-              "direction": {
-                "type": "array",
-                "description": "Direction of the light [x, y, z].",
                 "items": {
                   "type": "number"
                 },
@@ -242,174 +158,29 @@
               },
               "intensity": {
                 "type": "array",
-                "description": "Intensity/color of the light [r, g, b].",
                 "items": {
                   "type": "number"
                 },
                 "minItems": 3,
                 "maxItems": 3
-              },
-              "angle": {
-                "type": "number",
-                "description": "Cone angle for spotlights in degrees.",
-                "minimum": 0.0,
-                "maximum": 90.0
-              },
-              "size": {
-                "type": "number",
-                "description": "Size of area lights."
               }
             },
             "required": [
               "type",
+              "position",
               "intensity"
-            ],
-            "oneOf": [
-              {
-                "properties": {
-                  "type": {
-                    "enum": [
-                      "point"
-                    ]
-                  },
-                  "position": {
-                    "type": "array",
-                    "minItems": 3,
-                    "maxItems": 3
-                  }
-                },
-                "required": [
-                  "position"
-                ]
-              },
-              {
-                "properties": {
-                  "type": {
-                    "enum": [
-                      "directional"
-                    ]
-                  },
-                  "direction": {
-                    "type": "array",
-                    "minItems": 3,
-                    "maxItems": 3
-                  }
-                },
-                "required": [
-                  "direction"
-                ]
-              },
-              {
-                "properties": {
-                  "type": {
-                    "enum": [
-                      "spot"
-                    ]
-                  },
-                  "position": {
-                    "type": "array",
-                    "minItems": 3,
-                    "maxItems": 3
-                  },
-                  "direction": {
-                    "type": "array",
-                    "minItems": 3,
-                    "maxItems": 3
-                  },
-                  "angle": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "position",
-                  "direction",
-                  "angle"
-                ]
-              },
-              {
-                "properties": {
-                  "type": {
-                    "enum": [
-                      "area"
-                    ]
-                  },
-                  "position": {
-                    "type": "array",
-                    "minItems": 3,
-                    "maxItems": 3
-                  },
-                  "size": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "position",
-                  "size"
-                ]
-              }
-            ],
-            "additionalProperties": false
+            ]
           }
-        },
-        "camera": {
-          "type": "object",
-          "description": "Camera settings for the scene.",
-          "properties": {
-            "position": {
-              "type": "array",
-              "description": "Position of the camera [x, y, z].",
-              "items": {
-                "type": "number"
-              },
-              "minItems": 3,
-              "maxItems": 3
-            },
-            "target": {
-              "type": "array",
-              "description": "Look-at target point [x, y, z].",
-              "items": {
-                "type": "number"
-              },
-              "minItems": 3,
-              "maxItems": 3
-            },
-            "fov": {
-              "type": "number",
-              "description": "Field of view in degrees.",
-              "minimum": 1.0,
-              "maximum": 179.0,
-              "default": 60.0
-            },
-            "near_clip": {
-              "type": "number",
-              "description": "Near clipping plane distance.",
-              "minimum": 0.1,
-              "default": 0.1
-            },
-            "far_clip": {
-              "type": "number",
-              "description": "Far clipping plane distance.",
-              "minimum": 0.1,
-              "default": 1000.0
-            }
-          },
-          "required": [
-            "position",
-            "target"
-          ],
-          "additionalProperties": false
         }
       },
       "required": [
         "name",
         "objects",
         "lights"
-      ],
-      "additionalProperties": false
+      ]
     }
   },
   "required": [
     "scene"
-  ],
-  "additionalProperties": false
+  ]
 }
