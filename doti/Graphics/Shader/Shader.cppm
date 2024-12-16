@@ -42,9 +42,9 @@ public:
         glUseProgram(0);
     }
 
-    static Shader loadFromFile(const std::string& name, const std::string& vertexPath,
-                               const std::string& fragmentPath) {
-        if (vertexPath == "" || fragmentPath == "") {
+    static Shader loadFromFile(const std::string& name, const std::string& vertex_path,
+                               const std::string& fragment_path) {
+        if (vertex_path == "" || fragment_path == "") {
             Logger::error("No shader paths provided.");
             return Shader();
         }
@@ -58,36 +58,36 @@ public:
 
         /* Load vertex shader from file */
         try {
-            vertexFile.open(vertexPath);
+            vertexFile.open(vertex_path);
             std::stringstream vertexStream;
             vertexStream << vertexFile.rdbuf();
             vertexFile.close();
             vertexCode = vertexStream.str();
         } catch (const std::ifstream::failure& e) {
-            Logger::error("Failed to open vertex shader file: " + vertexPath);
+            Logger::error("Failed to open vertex shader file: " + vertex_path);
             return Shader();
         }
 
         /* Load fragment shader from file */
         try {
-            fragmentFile.open(fragmentPath);
+            fragmentFile.open(fragment_path);
             std::stringstream fragmentStream;
             fragmentStream << fragmentFile.rdbuf();
             fragmentFile.close();
             fragmentCode = fragmentStream.str();
         } catch (const std::ifstream::failure& e) {
-            Logger::error("Failed to open fragment shader file: " + fragmentPath);
+            Logger::error("Failed to open fragment shader file: " + fragment_path);
             return Shader();
         }
 
         return loadFromString(vertexCode, fragmentCode);
     }
 
-    static Shader loadFromString(const std::string& vertexCode, const std::string& fragmentCode) {
+    static Shader loadFromString(const std::string& vertex_code, const std::string& fragment_code) {
         /* Compile Shader Source */
         Shader      result;
-        const char* vertexCodeCStr   = vertexCode.c_str();
-        const char* fragmentCodeCStr = fragmentCode.c_str();
+        const char* vertexCodeCStr   = vertex_code.c_str();
+        const char* fragmentCodeCStr = fragment_code.c_str();
 
         const uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader, 1, &vertexCodeCStr, nullptr);

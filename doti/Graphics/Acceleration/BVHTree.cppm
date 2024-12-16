@@ -24,7 +24,7 @@ public:
     ~BVHTree() = default;
 
     BVHTree(const std::vector<std::shared_ptr<PrimitiveBase>>& primitives,
-            BVHSplitMethod splitMethod = BVHSplitMethod::EqualCounts): _splitMethod(splitMethod) {
+            BVHSplitMethod split_method = BVHSplitMethod::EqualCounts): _splitMethod(split_method) {
         std::vector<HittableInfo> hittableInfo(primitives.size());
         AABB                      bound;
         uint32_t                  triangle_count = 0;
@@ -166,9 +166,6 @@ private:
         }
     }
 
-    BVHSplitMethod _splitMethod;
-    // std::vector<Vec3>     _vertices;
-    // std::vector<Vec3>     _normals;
-    // std::vector<uint32_t> _indices;
+    BVHSplitMethod       _splitMethod;
     std::vector<BVHNode> _nodes;
 };

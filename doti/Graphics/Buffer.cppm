@@ -11,9 +11,9 @@ public:
         glDeleteBuffers(1, &_ID);
     }
 
-    void allocate(const uint32_t size, const void* data, const GLuint elementsCount, const bool batched = false,
+    void allocate(const uint32_t size, const void* data, const GLuint elements_count, const bool batched = false,
                   const GLenum   type = GL_STATIC_DRAW) {
-        _elementsCount = elementsCount;
+        _elementsCount = elements_count;
         _size          = size;
         _batched       = batched;
 

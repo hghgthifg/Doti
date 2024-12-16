@@ -104,18 +104,6 @@ public:
                 0
             ));
         }
-        // for (auto i: _triangleVertices) {
-        //     std::cout << std::format("({}, {}, {}, {})", i.x, i.y, i.z, i.w) << " ";
-        // }
-        // std::cout << "\n";
-        // for (auto i: _triangleNormals) {
-        //     std::cout << std::format("({}, {}, {}, {})", i.x, i.y, i.z, i.w) << " ";
-        // }
-        // std::cout << "\n";
-        // for (auto i: _triangleIndices) {
-        //     std::cout << std::format("({}, {}, {}, {})", i.x, i.y, i.z, i.w) << " ";
-        // }
-        // std::cout << "\n";
     }
 
 private:
