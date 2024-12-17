@@ -89,46 +89,15 @@
               "rotation"
             ]
           },
-          "material": {
-            "type": "object",
-            "properties": {
-              "albedo": {
-                "type": "array",
-                "items": {
-                  "type": "number"
-                },
-                "minItems": 3,
-                "maxItems": 3
-              },
-              "metallic": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              },
-              "roughness": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              },
-              "ao": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1
-              }
-            },
-            "required": [
-              "albedo",
-              "metallic",
-              "roughness",
-              "ao"
-            ]
+          "material_id": {
+            "type": "integer"
           }
         },
         "required": [
           "name",
           "mesh",
           "transform",
-          "material"
+          "material_id"
         ]
       }
     },

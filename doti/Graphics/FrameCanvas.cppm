@@ -151,6 +151,30 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rasterTexture, 0);
 
+        // Position Texture
+        glGenTextures(1, &_gPosition);
+        glBindTexture(GL_TEXTURE_2D, _gPosition);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _gPosition, 0);
+
+        // Normal Texture
+        glGenTextures(1, &_gNormal);
+        glBindTexture(GL_TEXTURE_2D, _gNormal);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _gNormal, 0);
+
+        // AlbedoSpec Texture
+        glGenTextures(1, &_gAlbedoSpec);
+        glBindTexture(GL_TEXTURE_2D, _gAlbedoSpec);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // 或 GL_NEAREST，视需求而定
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // 或 GL_NEAREST，视需求而定
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, _gAlbedoSpec, 0);
+
         /* 2.3 Attach renderbuffer to framebuffer of the rasterization pass. */
         glBindFramebuffer(GL_FRAMEBUFFER, _fboRaster);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _rboRasterization);
@@ -236,6 +260,10 @@ private:
 
         if (_rboRasterization) glDeleteRenderbuffers(1, &_rboRasterization);
 
+        if (_gPosition) glDeleteTextures(1, &_gPosition);
+        if (_gNormal) glDeleteTextures(1, &_gNormal);
+        if (_gAlbedoSpec) glDeleteTextures(1, &_gAlbedoSpec);
+
         if (_rasterTexture) glDeleteTextures(1, &_rasterTexture);
         if (_rayTracingAccumTexture1) glDeleteTextures(1, &_rayTracingAccumTexture1);
         if (_rayTracingAccumTexture2) glDeleteTextures(1, &_rayTracingAccumTexture2);
@@ -251,6 +279,10 @@ private:
     GLuint _rayTracingAccumTexture1 = 0;
     GLuint _rayTracingAccumTexture2 = 0;
     GLuint _finalTexture            = 0;
+
+    GLuint _gPosition   = 0;
+    GLuint _gNormal     = 0;
+    GLuint _gAlbedoSpec = 0;
 
     GLuint _rboRasterization = 0;
 

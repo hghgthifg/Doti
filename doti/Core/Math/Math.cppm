@@ -42,6 +42,7 @@ export namespace Math
     using glm::clamp;
     using glm::min;
     using glm::max;
+    using glm::identity;
 }
 #elifdef USING_EIGEN
 import Eigen;

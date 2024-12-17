@@ -44,6 +44,10 @@ public:
         return view;
     }
 
+    auto getProjectionMatrix() const -> Mat4 {
+        return Math::perspective(Math::radians(_fov), _screenRatio, 0.1f, 100.0f);
+    }
+
     /*!
      * @brief Updates the camera's orientation based on mouse movement.
      * @param deltaX The change in mouse position along the X-axis.

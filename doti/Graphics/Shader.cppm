@@ -115,6 +115,37 @@ public:
         return result;
     }
 
+    static Shader loadFromBin(const std::string&   name,
+                              const unsigned char* vertex_shader,
+                              const unsigned int&  vertex_shader_size,
+                              const unsigned char* fragment_shader,
+                              const unsigned int&  fragment_shader_size) {
+        Shader result;
+
+        const auto vert = glCreateShader(GL_VERTEX_SHADER);
+        const auto frag = glCreateShader(GL_FRAGMENT_SHADER);
+
+        glShaderBinary(1, &vert, GL_SHADER_BINARY_FORMAT_SPIR_V, vertex_shader,
+                       vertex_shader_size * sizeof(unsigned char));
+        checkCompileErrors(vert, "VERTEX");
+
+        glShaderBinary(1, &frag, GL_SHADER_BINARY_FORMAT_SPIR_V, fragment_shader,
+                       fragment_shader_size * sizeof(unsigned char));
+        checkCompileErrors(frag, "FRAGMENT");
+
+        result._ID = glCreateProgram();
+        Logger::info("Created shader: " + result._name + ", ID: " + std::to_string(result._ID));
+        glAttachShader(result._ID, vert);
+        glAttachShader(result._ID, frag);
+        glLinkProgram(result._ID);
+        checkCompileErrors(result._ID, "PROGRAM");
+
+        glDeleteShader(vert);
+        glDeleteShader(frag);
+        result._name = name;
+        return result;
+    }
+
     // ------------------------------------------------------------------------
     auto setBool(const std::string& name, const bool value) const -> void {
         glUniform1i(glGetUniformLocation(_ID, name.c_str()), (int) value);

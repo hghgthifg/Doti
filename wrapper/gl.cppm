@@ -28,6 +28,7 @@ export using gl::glUseProgram;
 export using gl::glDeleteProgram;
 export using gl::glCreateShader;
 export using gl::glCompileShader;
+export using gl::glShaderBinary;
 export using gl::glShaderSource;
 export using gl::glGetShaderiv;
 export using gl::glGetProgramiv;
@@ -107,7 +108,11 @@ export constexpr auto GL_RED     = gl::GL_RED;
 export constexpr auto GL_R32F    = gl::GL_R32F;
 export constexpr auto GL_RGB     = gl::GL_RGB;
 export constexpr auto GL_RGBA    = gl::GL_RGBA;
+export constexpr auto GL_RGBA8   = gl::GL_RGBA8;
 export constexpr auto GL_RGBA32F = gl::GL_RGBA32F;
+export constexpr auto GL_RGBA16F = gl::GL_RGBA16F;
+export constexpr auto GL_RGBA32I = gl::GL_RGBA32I;
+export constexpr auto GL_RGBA16I = gl::GL_RGBA16I;
 
 export constexpr auto GL_TRIANGLES          = gl::GL_TRIANGLES;
 export constexpr auto GL_TRIANGLES_STRIP    = gl::GL_TRIANGLE_STRIP;
@@ -166,3 +171,5 @@ export constexpr auto GL_COLOR_BUFFER_BIT = gl::GL_COLOR_BUFFER_BIT;
 export constexpr auto GL_DEPTH_BUFFER_BIT = gl::GL_DEPTH_BUFFER_BIT;
 
 export constexpr auto GL_LINEAR_MIPMAP_LINEAR = gl::GL_LINEAR_MIPMAP_LINEAR;
+
+export constexpr auto GL_SHADER_BINARY_FORMAT_SPIR_V = gl::GL_SHADER_BINARY_FORMAT_SPIR_V;

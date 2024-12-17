@@ -59,20 +59,24 @@ auto buildMesh(std::shared_ptr<LeafNode> node, const Json& data) -> std::shared_
     if (mesh.contains("indices") && mesh["indices"].is_array()) {
         indices.reserve(mesh.at("indices").size());
         if (mesh["indices"].size() % 3 != 0) {
-            Logger::warning("Indices array size mismatch! Index count: " + std::to_string(mesh["indices"].size()));
+            Logger::error("Indices array size mismatch! Index count: " + std::to_string(mesh["indices"].size()));
+            return nullptr;
         }
         for (const auto& i: mesh["indices"]) {
             indices.emplace_back(i.get<uint32_t>());
         }
     }
 
-    /* Process textures (optional) */
-    // TODO: Process textures
+    /* Get Material */
+    uint32_t materialIndex = 0;
+    if (data.contains("material_id")) {
+        materialIndex = data.at("material_id").get<uint32_t>();
+    }
 
-    const auto drawable = std::make_shared<Mesh>(
-        std::move(vertices), std::move(normals), std::move(indices)
+    const auto object = std::make_shared<Mesh>(
+        std::move(vertices), std::move(normals), std::move(indices), std::move(materialIndex)
     );
-    node->setDrawable(drawable);
+    node->hangObject(object);
     return node;
 }
 

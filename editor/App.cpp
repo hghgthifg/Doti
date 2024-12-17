@@ -62,5 +62,6 @@ auto main() -> int {
         std::cout << e.what() << "\n";
         return -1;
     }
+    Logger::setOutputStream(std::cout);
     return 0;
 }

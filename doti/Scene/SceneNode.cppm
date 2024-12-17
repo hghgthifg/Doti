@@ -37,13 +37,13 @@ public:
     auto     isLeaf() const -> bool override { return true; }
 
     auto collectData() -> void override {
-        _drawable->sendDataToPipeline();
+        _object->sendDataToPipeline();
     }
 
-    auto setDrawable(const std::shared_ptr<ObjectBase>& drawable) -> void { _drawable = drawable; }
+    auto hangObject(const std::shared_ptr<ObjectBase>& object) -> void { _object = object; }
 
 private:
-    std::shared_ptr<ObjectBase> _drawable;
+    std::shared_ptr<ObjectBase> _object;
 };
 
 export class CompositeNode final : public SceneNode {

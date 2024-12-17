@@ -14,6 +14,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 
 project(Doti LANGUAGES CXX)
+set(DOTI_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Make sure to add -DCMAKE_TOOLCHAIN_FILE=<path/to/vcpkg>/scripts/buildsystems/vcpkg.cmake when calling CMake.
 
@@ -28,14 +29,86 @@ find_package(imgui CONFIG REQUIRED)
 find_package(Freetype CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(unofficial-shaderc CONFIG REQUIRED)
 find_package(PkgConfig)
 pkg_check_modules(Jxl REQUIRED IMPORTED_TARGET libjxl libjxl_cms libjxl_threads)
 #find_package(Boost REQUIRED COMPONENTS signals2)
 #find_package(spdlog CONFIG REQUIRED)
 
-
 # Settings
 set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
+
+# Build Shaders
+set(SHADERS_GLSL
+        #        doti/Graphics/Shader/raster_frag.frag
+        doti/Graphics/Shader/raster_vert.vert
+        #        doti/Graphics/Shader/raytracing.comp
+)
+
+find_program(SHADERC_GLSL_EXECUTABLE
+        NAMES glslc
+        PATHS ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/tools/shaderc
+        PATH_SUFFIXES .
+)
+
+if (NOT SHADERC_GLSL_EXECUTABLE)
+    message(FATAL_ERROR "glslc not found. Please ensure shaderc is installed via vcpkg.")
+endif ()
+
+message(STATUS "Found shaderc_glsl: ${SHADERC_GLSL_EXECUTABLE}")
+
+foreach (shader ${SHADERS_GLSL})
+    get_filename_component(shader_name ${shader} NAME_WE)
+    set(spv_output ${CMAKE_BINARY_DIR}/shaders_spv/${shader_name}.spv)
+    add_custom_command(
+            OUTPUT ${spv_output}
+            COMMAND ${SHADERC_GLSL_EXECUTABLE}
+            ${DOTI_ROOT_DIR}/${shader}
+            -o ${spv_output}
+            --target-env=opengl
+            #            --platform desktop
+            -I doti/Graphics/Shader/
+            DEPENDS ${shader}
+            COMMENT "Compiling ${shader} to SPIR-V"
+    )
+    list(APPEND SPIRV_BINARY ${spv_output})
+endforeach ()
+
+add_custom_target(Shaders ALL DEPENDS ${SPIRV_BINARY})
+
+set(SHADER_MODULES_DIR ${CMAKE_SOURCE_DIR}/doti/Graphics/Shader/Modules)
+file(MAKE_DIRECTORY ${SHADER_MODULES_DIR})
+
+set(Python3_ROOT_DIR ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/tools/python3)
+
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+
+if (NOT Python3_Interpreter_FOUND)
+    message(FATAL_ERROR "Python3 not found. Please ensure Python3 is installed via vcpkg.")
+endif ()
+
+message(STATUS "Found Python3: ${Python3_EXECUTABLE}")
+
+foreach (spv ${SPIRV_BINARY})
+    get_filename_component(spv_name ${spv} NAME_WE)
+    set(module_file ${SHADER_MODULES_DIR}/${spv_name}.cppm)
+
+    add_custom_command(
+            OUTPUT ${module_file}
+            COMMAND ${Python3_EXECUTABLE}
+            ${DOTI_ROOT_DIR}/scripts/SpirvToModule.py
+            ${spv}
+            ${module_file}
+            ${spv_name}
+            DEPENDS ${spv}
+            COMMENT "Generating module for ${spv_name}.spv, output: ${module_file}"
+    )
+
+    list(APPEND SPIRV_MODULES ${module_file})
+endforeach ()
+
+add_custom_target(ShaderModules ALL DEPENDS ${SPIRV_MODULES})
+add_dependencies(ShaderModules Shaders)
 
 # Build Doti library
 add_library(Doti STATIC "")
@@ -89,9 +162,13 @@ else ()
     )
 endif ()
 
+add_dependencies(Doti ShaderModules)
+
 target_sources(Doti
         PUBLIC
         FILE_SET CXX_MODULES FILES
+        ${SPIRV_MODULES}
+        doti/Graphics/Shader/Modules/Shaders.cppm
         doti/Core/Math/Math.cppm
         doti/Core/Event.cppm
         doti/Core/Random.cppm
@@ -99,7 +176,7 @@ target_sources(Doti
         doti/Core/Input/InputManager.cppm
         doti/Graphics/Buffer.cppm
         doti/Graphics/Camera/Camera.cppm
-        doti/Graphics/Shader/Shader.cppm
+        doti/Graphics/Shader.cppm
         doti/Graphics/Color.cppm
         doti/Graphics/FrameCanvas.cppm
         doti/Graphics/Acceleration/AABB.cppm
@@ -113,6 +190,8 @@ target_sources(Doti
         doti/Graphics/Render/Object/ObjectBase.cppm
         doti/Graphics/Render/Object/Object.cppm
         doti/Graphics/Render/Object/Mesh.cppm
+        doti/Graphics/Render/Type/Light.cppm
+        doti/Graphics/Render/Type/Material.cppm
         doti/Core/Loader/JxlLoader.cppm
         doti/Core/Loader/ImageLoader.cppm
         doti/Scene/Scene.cppm
@@ -130,9 +209,6 @@ target_sources(Doti
         wrapper/libjxl.cppm
         wrapper/json.cppm
 )
-#if (OpenMP_CXX_FOUND)
-#    target_link_libraries(Doti PUBLIC OpenMP::OpenMP_CXX)
-#endif ()
 
 target_link_libraries(Doti PRIVATE
         glfw
@@ -144,10 +220,6 @@ target_link_libraries(Doti PRIVATE
         imgui::imgui
         glm::glm
         assimp::assimp
-        #        opengl32
-        #        user32
-        #        shell32
-        #        gdi32
 )
 
 # Build Editor

@@ -4,6 +4,7 @@ import std;
 import OpenGL;
 import Core.Math;
 import Graphics.Buffer;
+import Graphics.Shader;
 import Graphics.Camera;
 import Core.Event;
 import Core.Random;
@@ -26,6 +27,9 @@ public:
     auto deactivate() -> void {
         disconnectSlots();
     }
+
+    auto getFrameCount() const -> uint32_t { return _frameCount; }
+    auto getCamera() const -> Camera { return _camera; }
 
 private:
     auto connectSlots() -> void;

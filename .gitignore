@@ -13,3 +13,6 @@ compile_commands.json
 # Clion generated files
 cmake-build-debug/
 cmake-build-release/
+
+doti/Graphics/Shader/Modules/*
+!doti/Graphics/Shader/Modules/Shaders.cppm

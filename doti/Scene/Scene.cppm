@@ -10,6 +10,8 @@ import Graphics.Camera;
 import Graphics.Shader;
 import Graphics.Render.RenderContext;
 import Graphics.Render.Pipeline;
+import Graphics.Type.Material;
+import Graphics.Type.Light;
 
 static auto getNameFromJson(const Json& json) -> std::string {
     if (json.is_null()) {
@@ -127,6 +129,21 @@ private:
                 continue;
             }
             _rootNode->addChild(SceneNodeFactory::createNode(object));
+        }
+        if (_sceneJson.contains("materials") && _sceneJson["materials"].is_array()) {
+            for (Json material_json: _sceneJson["materials"]) {
+                Material material{
+                    .albedo = Vec3{
+                        material_json["albedo"][0].get<float>(),
+                        material_json["albedo"][1].get<float>(),
+                        material_json["albedo"][2].get<float>()
+                    },
+                    .metallic = material_json["metallic"][0].get<float>(),
+                    .roughness = material_json["roughness"][1].get<float>(),
+                    .ao = material_json["ao"][0].get<float>()
+                };
+                Pipeline::getInstance().addMaterial(material);
+            }
         }
     }
 

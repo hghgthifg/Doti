@@ -7,6 +7,10 @@ import Graphics.Shader;
 import Graphics.Render.Acceleration.BVHTree;
 import Graphics.Render.Acceleration.Primitive;
 import Graphics.Render.RenderContext;
+import Graphics.Type.Material;
+import Graphics.Type.Light;
+
+import Graphics.ShaderCollection;
 
 export class Pipeline {
 public:
@@ -15,39 +19,53 @@ public:
         return instance;
     }
 
-    void sendVertices(const std::vector<Vec3>& vertices) {
+    // void sendVertices(const std::vector<Point3>& vertices) {
+    //     _vertices.insert(_vertices.end(), vertices.begin(), vertices.end());
+    // }
+    //
+    // void sendVertex(const Point3& vertex) { _vertices.emplace_back(vertex); }
+    //
+    // void sendIndices(const std::vector<uint32_t>& indices) {
+    //     _indices.insert(_indices.end(), indices.begin(), indices.end());
+    // }
+    //
+    // void sendIndex(uint32_t index) { _indices.emplace_back(index); }
+    //
+    // void sendNormals(const std::vector<Vec3>& normals) {
+    //     _normals.insert(_normals.end(), normals.begin(), normals.end());
+    // }
+    //
+    // void sendNormal(const Vec3& normal) { _normals.emplace_back(normal); }
+
+    void sendTriangleData(const std::vector<Point3>&   vertices,
+                          const std::vector<Vec3>&     normals,
+                          const std::vector<uint32_t>& indices,
+                          uint32_t                     materialID) {
+        size_t triangleCount = indices.size() / 3;
         _vertices.insert(_vertices.end(), vertices.begin(), vertices.end());
-    }
-
-    void sendVertex(const Vec3& vertex) {
-        _vertices.emplace_back(vertex);
-    }
-
-    void sendIndices(const std::vector<uint32_t>& indices) {
-        _indices.insert(_indices.end(), indices.begin(), indices.end());
-    }
-
-    void sendIndex(uint32_t index) {
-        _indices.emplace_back(index);
-    }
-
-    void sendNormals(const std::vector<Vec3>& normals) {
         _normals.insert(_normals.end(), normals.begin(), normals.end());
+        _indices.insert(_indices.end(), indices.begin(), indices.end());
+        _triangleMaterialIDs.insert(_triangleMaterialIDs.end(), triangleCount, materialID);
     }
 
-    void sendNormal(const Vec3& normal) {
-        _normals.emplace_back(normal);
+    void sendSingleSphereData(const Vec3& center, float radius, uint32_t materialID) {
+        _sphereCenters.emplace_back(center);
+        _sphereRadius.emplace_back(radius);
+        _sphereMaterialIDs.emplace_back(materialID);
     }
 
-    void initialize() {
+    void addMaterial(const Material& material) {
+        _materials.emplace_back(material);
+    }
+
+    auto initialize() -> void {
         buildBVH();
+        _rasterShader = Shaders::GetRasterizationShader();
     }
 
-    void setContext(const std::shared_ptr<RenderContext>& context) {
-        _renderContext = context;
-    }
+    auto setContext(const std::shared_ptr<RenderContext>& context) -> void { _renderContext = context; }
 
-    void clearData() {
+    auto clearData() -> void {
         _vertices.clear();
         _indices.clear();
         _normals.clear();
@@ -55,11 +73,35 @@ public:
         _sphereCenters.clear();
         _sphereRadius.clear();
 
+        _triangleMaterialIDs.clear();
+        _sphereMaterialIDs.clear();
+
         _bvh = BVHTree();
     }
 
-    void render() {
+    auto render() -> void {
+        auto context = _renderContext.lock();
+
+        if (context->getFrameCount() == 0) { rasterizationPass(); }
+
         _frameCanvas.renderToScreen();
+    }
+
+    auto rasterizationPass() -> void {
+        _rasterShader.activate();
+
+        const auto& context = _renderContext.lock();
+        const auto& camera  = context->getCamera();
+
+        const auto modelMatrix = Math::identity<Mat4>();
+        const auto viewMatrix  = camera.getViewMatrix();
+        const auto perpMatrix  = camera.getProjectionMatrix();
+
+        _rasterShader.setMat4("model", modelMatrix);
+        _rasterShader.setMat4("view", viewMatrix);
+        _rasterShader.setMat4("projection", perpMatrix);
+
+        _rasterShader.deactivate();
     }
 
 private:
@@ -93,8 +135,7 @@ private:
             }
         }
 
-        primitives.insert(primitives.end(),
-                          std::make_move_iterator(spherePrimitives.begin()),
+        primitives.insert(primitives.end(), std::make_move_iterator(spherePrimitives.begin()),
                           std::make_move_iterator(spherePrimitives.end()));
 
         _bvh = BVHTree(primitives);
@@ -112,6 +153,11 @@ private:
 
     std::vector<Vec3>  _sphereCenters{};
     std::vector<float> _sphereRadius{};
+
+    std::vector<Material> _materials{};
+
+    std::vector<uint32_t> _triangleMaterialIDs{};
+    std::vector<uint32_t> _sphereMaterialIDs{};
 
     BVHTree _bvh{};
 
