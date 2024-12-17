@@ -20,6 +20,8 @@ public:
         Right,    /*!< Move the camera to the right */
     };
 
+    Camera() = default;
+
     /*!
      * @brief Constructor for the Camera class.
      * @param screen_width Width of the screen.
@@ -27,7 +29,6 @@ public:
      */
     Camera(const float screen_width, const float screen_height) {
         this->reset(screen_width, screen_height);
-        registerEvents(this);
     }
 
     /*!
@@ -182,21 +183,6 @@ private:
         _cameraUp    = Math::normalize(Math::cross(_cameraRight, _cameraFront));
 
         _leftBottomCorner = _cameraFront - _halfWidth * _cameraRight - _halfHeight * _cameraUp;
-    }
-
-    static auto registerEvents(Camera* camera) -> void {
-        static bool registered = false;
-        if (!registered) {
-            EventManager::registerEvent<>("Camera::MoveLeft");
-            EventManager::registerEvent<>("Camera::MoveRight");
-            EventManager::registerEvent<>("Camera::MoveForward");
-            EventManager::registerEvent<>("Camera::MoveBackward");
-            EventManager::registerEvent<MoveDirection>("Camera::Move");
-            EventManager::connect<MoveDirection>("Camera::Move", [](MoveDirection) {
-                EventManager::emit("Render::RefreshHistoryFramedata");
-            });
-            registered = true;
-        }
     }
 
     Vec3  _cameraPos;   /*!< The camera's position in world space */

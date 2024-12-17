@@ -123,9 +123,37 @@ public:
         }
     }
 
+    static auto registerInherentEvents() -> void;
+
 private:
     static std::unordered_map<std::string, std::shared_ptr<void>> _signals;
 };
 
 /* Initialize the static member */
 std::unordered_map<std::string, std::shared_ptr<void>> EventManager::_signals;
+
+auto EventManager::registerInherentEvents() -> void {
+    static bool _registered = false;
+    if (_registered) {
+        Logger::warning("Inherent events registered.");
+        return;
+    }
+
+    registerEvent<>("Render::RefreshHistoryFramedata");
+    registerEvent<>("Render::NewFrame");
+
+    registerEvent<>("Camera::MoveLeft");
+    registerEvent<>("Camera::MoveRight");
+    registerEvent<>("Camera::MoveForward");
+    registerEvent<>("Camera::MoveBackward");
+    registerEvent<float, float>("Camera::UpdateOrientation");
+    registerEvent<float>("Camera::UpdateFov");
+
+    registerEvent<std::string>("Scene::ChangeScene");
+    registerEvent<float, float>("Scene::Resize");
+
+    registerEvent<float, float>("Input::MouseDrag");
+    registerEvent<float>("Input::MouseScroll");
+
+    _registered = true;
+}

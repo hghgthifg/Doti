@@ -7,7 +7,7 @@ import Graphics.Render.RenderContext;
 
 export class SceneNode : public std::enable_shared_from_this<SceneNode> {
 public:
-    explicit SceneNode(const std::string& name, const std::string& type) : _name(name), _type(type), _isDirty(true) {}
+    explicit SceneNode(const std::string& name, const std::string& type) : _name(name), _type(type) {}
 
     virtual ~SceneNode() = default;
 
@@ -19,14 +19,12 @@ public:
 
     virtual bool isLeaf() const = 0;
 
-    virtual void load(RenderContext& render_context) = 0;
+    virtual void collectData() = 0;
 
 protected:
     std::string              _name;
     std::string              _type;
     std::weak_ptr<SceneNode> _parent;
-
-    bool _isDirty;
 
     Vec3 _position{0, 0, 0};
     Vec3 _scale{0, 0, 0};
@@ -38,10 +36,8 @@ public:
     explicit LeafNode(const std::string& name, const std::string& type = "LeafNode") : SceneNode(name, type) {}
     auto     isLeaf() const -> bool override { return true; }
 
-    auto load(RenderContext& render_context) -> void override {
-        if (!_isDirty) { return; }
-        _drawable->load(render_context);
-        _isDirty = true;
+    auto collectData() -> void override {
+        _drawable->sendDataToPipeline();
     }
 
     auto setDrawable(const std::shared_ptr<ObjectBase>& drawable) -> void { _drawable = drawable; }
@@ -55,12 +51,10 @@ public:
     explicit CompositeNode(const std::string& name, const std::string& type = "SceneNode") : SceneNode(name, type) {}
     auto     isLeaf() const -> bool override { return false; }
 
-    auto load(RenderContext& render_context) -> void override {
-        if (!_isDirty) { return; }
+    auto collectData() -> void override {
         for (const auto& child: _children) {
-            child->load(render_context);
+            child->collectData();
         }
-        _isDirty = false;
     }
 
     auto addChild(const std::shared_ptr<SceneNode>& child) -> void {

@@ -7,7 +7,7 @@ import Core.Logger;
 import Core.Event;
 import Graphics.Shader;
 
-constexpr std::string MIX_FRAGMENT_SHADER = R"(
+const std::string MIX_FRAGMENT_SHADER = R"(
 #version 460 core
 out vec4 FragColor;
 
@@ -24,7 +24,7 @@ void main() {
 }
 )";
 
-constexpr std::string MIX_VERTEX_SHADER = R"(
+const std::string MIX_VERTEX_SHADER = R"(
 #version 460 core
 layout(location = 0) in vec2 aPos;
 layout(location = 1) in vec2 aTexCoords;
@@ -41,8 +41,10 @@ export class FrameCanvas {
 public:
     FrameCanvas() {
         EventManager::connect<>("Render::RefreshHistoryFramedata", [this] {
-            Logger::event("Render::RefreshHistoryFramedata");
-            rescaleFramebuffers(_width, _height);
+            clearRenderResults();
+        });
+        EventManager::connect<float, float>("Scene::Resize", [this](float width, float height) {
+            rescaleFramebuffers(static_cast<int>(width), static_cast<int>(height));
         });
     };
 
@@ -99,6 +101,7 @@ public:
         glBindVertexArray(0);
 
         _mixShader.deactivate();
+        unbind();
     }
 
     auto getRasterizationTexture() const -> GLuint { return _rasterTexture; }
@@ -120,17 +123,11 @@ public:
         initializeFrameBuffers();
     }
 
-    auto unbind() -> void {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
+    auto unbind() -> void { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-    auto getWidth() const -> int32_t {
-        return _width;
-    }
+    auto getWidth() const -> int32_t { return _width; }
 
-    auto getHeight() const -> int32_t {
-        return _height;
-    }
+    auto getHeight() const -> int32_t { return _height; }
 
 private:
     auto initializeFrameBuffers() -> void {
@@ -203,14 +200,16 @@ private:
 
         /* 5. Initialize the mixture pass (if not initialized). */
         if (!_mixPassReady) {
-            _mixShader                     = Shader::loadFromString(MIX_VERTEX_SHADER, MIX_FRAGMENT_SHADER);
+            _mixShader = Shader::loadFromString("MixShader", MIX_VERTEX_SHADER, MIX_FRAGMENT_SHADER);
+            // clang-format off
             constexpr float quadVertices[] = {
                 // positions   // texCoords
-                -1.0f, 1.0f, 0.0f, 1.0f,
-                -1.0f, -1.0f, 0.0f, 0.0f,
-                1.0f, 1.0f, 1.0f, 1.0f,
-                1.0f, -1.0f, 1.0f, 0.0f,
+                -1.0f,  1.0f,  0.0f, 1.0f,
+                -1.0f, -1.0f,  0.0f, 0.0f,
+                1.0f ,  1.0f,  1.0f, 1.0f,
+                1.0f , -1.0f,  1.0f, 0.0f,
             };
+            // clang-format on
             glGenVertexArrays(1, &_quadVAO);
             glGenBuffers(1, &_quadVBO);
             glBindVertexArray(_quadVAO);
@@ -253,10 +252,10 @@ private:
     GLuint _rayTracingAccumTexture2 = 0;
     GLuint _finalTexture            = 0;
 
-
     GLuint _rboRasterization = 0;
 
-    int32_t _width                     = 0, _height = 0;
+    int32_t _width                     = 0;
+    int32_t _height                    = 0;
     int8_t  _currentActiveAccumTexture = 0;
 
     GLuint _quadVAO = 0;

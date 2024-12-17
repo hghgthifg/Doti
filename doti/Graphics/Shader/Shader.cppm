@@ -63,7 +63,7 @@ public:
             vertexStream << vertexFile.rdbuf();
             vertexFile.close();
             vertexCode = vertexStream.str();
-        } catch (const std::ifstream::failure& e) {
+        } catch (...) {
             Logger::error("Failed to open vertex shader file: " + vertex_path);
             return Shader();
         }
@@ -75,15 +75,16 @@ public:
             fragmentStream << fragmentFile.rdbuf();
             fragmentFile.close();
             fragmentCode = fragmentStream.str();
-        } catch (const std::ifstream::failure& e) {
+        } catch (...) {
             Logger::error("Failed to open fragment shader file: " + fragment_path);
             return Shader();
         }
 
-        return loadFromString(vertexCode, fragmentCode);
+        return loadFromString(name, vertexCode, fragmentCode);
     }
 
-    static Shader loadFromString(const std::string& vertex_code, const std::string& fragment_code) {
+    static Shader loadFromString(const std::string& name, const std::string& vertex_code,
+                                 const std::string& fragment_code) {
         /* Compile Shader Source */
         Shader      result;
         const char* vertexCodeCStr   = vertex_code.c_str();
@@ -109,6 +110,8 @@ public:
 
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
+
+        result._name = name;
         return result;
     }
 

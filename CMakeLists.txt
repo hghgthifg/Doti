@@ -96,6 +96,7 @@ target_sources(Doti
         doti/Core/Event.cppm
         doti/Core/Random.cppm
         doti/Core/Logger.cppm
+        doti/Core/Input/InputManager.cppm
         doti/Graphics/Buffer.cppm
         doti/Graphics/Camera/Camera.cppm
         doti/Graphics/Shader/Shader.cppm
@@ -107,12 +108,11 @@ target_sources(Doti
         doti/Graphics/Acceleration/Primitive/PrimitiveBase.cppm
         doti/Graphics/Acceleration/Primitive/TrianglePrimitive.cppm
         doti/Graphics/Acceleration/Primitive/SpherePrimitive.cppm
+        doti/Graphics/Render/Pipeline.cppm
         doti/Graphics/Render/RenderContext.cppm
-        doti/Graphics/Render/Object/Types.cppm
         doti/Graphics/Render/Object/ObjectBase.cppm
         doti/Graphics/Render/Object/Object.cppm
         doti/Graphics/Render/Object/Mesh.cppm
-        doti/Graphics/Render/Canvas.cppm
         doti/Core/Loader/JxlLoader.cppm
         doti/Core/Loader/ImageLoader.cppm
         doti/Scene/Scene.cppm

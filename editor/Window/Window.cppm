@@ -13,6 +13,8 @@ public:
     Window() = delete;
 
     Window(const int32_t width, const int32_t height, const char* title) {
+        EventManager::registerInherentEvents();
+
         /* Initialize the library */
         if (!glfwInit()) throw std::runtime_error("Failed to initialize GLFW! ");
 

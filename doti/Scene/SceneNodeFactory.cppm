@@ -12,45 +12,44 @@ auto buildMesh(std::shared_ptr<LeafNode> node, const Json& data) -> std::shared_
         Logger::error("Invalid mesh data : mesh not found!");
         return nullptr;
     }
-    std::vector<Vertex>  vertices;
-    std::vector<Index>   indices;
-    std::vector<Texture> textures;
+    std::vector<Vec3>     normals;
+    std::vector<Vec3>     vertices;
+    std::vector<uint32_t> indices;
+    // std::vector<uint32_t> textures;
 
     auto mesh = data.at("mesh");
 
-    // TODO: Change the format to avoid unnecessary reformat
     /* 1. Process vertices */
     if (mesh.contains("vertices") && mesh["vertices"].is_array()) {
         vertices.reserve(mesh.at("vertices").size());
         for (auto& v: mesh.at("vertices")) {
             vertices.emplace_back(
-                Vec3{v[0].get<float>(), v[1].get<float>(), v[2].get<float>()},
-                Vec3{0, 0, 0},
-                Vec2{0, 0}
+                Vec3{v[0].get<float>(), v[1].get<float>(), v[2].get<float>()}
             );
         }
         /* Process normals (optional) */
         if (mesh.contains("normals") && mesh["normals"].is_array()) {
+            normals.resize(mesh.at("normals").size());
             if (mesh["normals"].size() != vertices.size()) {
                 Logger::warning("Normals array size mismatch");
             }
-            auto normals = mesh["normals"];
-            for (uint64_t i = 0; i < normals.size(); i++) {
-                auto n             = normals.at(i);
-                vertices[i].normal = Vec3{n[0].get<float>(), n[1].get<float>(), n[2].get<float>()};
+            auto json_normals = mesh["normals"];
+            for (uint64_t i = 0; i < json_normals.size(); i++) {
+                auto n     = json_normals.at(i);
+                normals[i] = Vec3{n[0].get<float>(), n[1].get<float>(), n[2].get<float>()};
             }
         }
-        /* Process texCoords (optional) */
-        if (mesh.contains("texCoords") && mesh["texCoords"].is_array()) {
-            if (mesh["texCoords"].size() != vertices.size()) {
-                Logger::warning("texCoords array size mismatch");
-            }
-            auto texCoords = mesh["texCoords"];
-            for (uint64_t i = 0; i < texCoords.size(); i++) {
-                auto t                = texCoords.at(i);
-                vertices[i].texCoords = Vec2{t[0].get<float>(), t[1].get<float>()};
-            }
-        }
+        // /* Process texCoords (optional) */
+        // if (mesh.contains("texCoords") && mesh["texCoords"].is_array()) {
+        //     if (mesh["texCoords"].size() != vertices.size()) {
+        //         Logger::warning("texCoords array size mismatch");
+        //     }
+        //     auto texCoords = mesh["texCoords"];
+        //     for (uint64_t i = 0; i < texCoords.size(); i++) {
+        //         auto t                = texCoords.at(i);
+        //         vertices[i].texCoords = Vec2{t[0].get<float>(), t[1].get<float>()};
+        //     }
+        // }
     } else {
         Logger::error("Invalid mesh data : _vertices not found!");
         return nullptr;
@@ -58,8 +57,9 @@ auto buildMesh(std::shared_ptr<LeafNode> node, const Json& data) -> std::shared_
 
     /* Process indices */
     if (mesh.contains("indices") && mesh["indices"].is_array()) {
+        indices.reserve(mesh.at("indices").size());
         if (mesh["indices"].size() % 3 != 0) {
-            Logger::warning("Indices array size mismatch");
+            Logger::warning("Indices array size mismatch! Index count: " + std::to_string(mesh["indices"].size()));
         }
         for (const auto& i: mesh["indices"]) {
             indices.emplace_back(i.get<uint32_t>());
@@ -70,7 +70,7 @@ auto buildMesh(std::shared_ptr<LeafNode> node, const Json& data) -> std::shared_
     // TODO: Process textures
 
     const auto drawable = std::make_shared<Mesh>(
-        std::move(vertices), std::move(indices), std::move(textures)
+        std::move(vertices), std::move(normals), std::move(indices)
     );
     node->setDrawable(drawable);
     return node;

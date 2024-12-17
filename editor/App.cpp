@@ -1,6 +1,5 @@
 import std;
 import ImGui;
-// import Core.Event;
 import Core.Logger;
 import Scene.SceneManager;
 import Scene;
@@ -24,7 +23,7 @@ auto main() -> int {
 
         RootComponent = std::make_shared<DockSpace>("dock_space");
 
-        auto view = std::make_shared<OpenGLView>("opengl_view");
+        auto view = std::make_shared<OpenGLView>("opengl_view", width, height);
         // auto targetTexture = std::make_shared<FrameCanvas>(width, height);
         auto console = std::make_shared<Console>("log_console");
         auto menu    = std::make_shared<MenuBar>("menu_bar");
@@ -45,18 +44,13 @@ auto main() -> int {
         while (!window.shouldClose()) {
             window.beginDraw();
 
-            // TODO: TargetTexture should be a component of RenderContext
-            // targetTexture->bind();
-
             auto currentScene = SceneManager::getCurrentScene();
             if (currentScene.get() != nullptr) {
                 currentScene->setSize(width, height);
             }
             if (currentScene) {
-                currentScene->render();
+                currentScene->update();
             }
-
-            // targetTexture->unbind();
 
             ImGui::NewFrame();
             RootComponent->render();
@@ -65,7 +59,7 @@ auto main() -> int {
             window.endDraw();
         }
     } catch (const std::exception& e) {
-        Logger::error(e.what());
+        std::cout << e.what() << "\n";
         return -1;
     }
     return 0;

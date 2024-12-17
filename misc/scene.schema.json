@@ -2,152 +2,62 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
-    "scene": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "objects": {
-          "type": "array",
-          "items": {
+    "name": {
+      "type": "string"
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "mesh": {
             "type": "object",
             "properties": {
-              "name": {
-                "type": "string"
+              "vertices": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                }
               },
-              "type": {
-                "type": "string"
+              "normals": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                }
               },
-              "mesh": {
-                "type": "object",
-                "properties": {
-                  "vertices": {
-                    "type": "array",
-                    "items": {
-                      "type": "array",
-                      "items": {
-                        "type": "number"
-                      },
-                      "minItems": 3,
-                      "maxItems": 3
-                    }
-                  },
-                  "normals": {
-                    "type": "array",
-                    "items": {
-                      "type": "array",
-                      "items": {
-                        "type": "number"
-                      },
-                      "minItems": 3,
-                      "maxItems": 3
-                    }
-                  },
-                  "indices": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer",
-                      "minimum": 0
-                    }
-                  }
-                },
-                "required": [
-                  "vertices",
-                  "normals",
-                  "indices"
-                ]
-              },
-              "transform": {
-                "type": "object",
-                "properties": {
-                  "position": {
-                    "type": "array",
-                    "items": {
-                      "type": "number"
-                    },
-                    "minItems": 3,
-                    "maxItems": 3
-                  },
-                  "scale": {
-                    "type": "array",
-                    "items": {
-                      "type": "number"
-                    },
-                    "minItems": 3,
-                    "maxItems": 3
-                  },
-                  "rotation": {
-                    "type": "array",
-                    "items": {
-                      "type": "number"
-                    },
-                    "minItems": 3,
-                    "maxItems": 3
-                  }
-                },
-                "required": [
-                  "position",
-                  "scale",
-                  "rotation"
-                ]
-              },
-              "material": {
-                "type": "object",
-                "properties": {
-                  "albedo": {
-                    "type": "array",
-                    "items": {
-                      "type": "number"
-                    },
-                    "minItems": 3,
-                    "maxItems": 3
-                  },
-                  "metallic": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 1
-                  },
-                  "roughness": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 1
-                  },
-                  "ao": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 1
-                  }
-                },
-                "required": [
-                  "albedo",
-                  "metallic",
-                  "roughness",
-                  "ao"
-                ]
+              "indices": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0
+                }
               }
             },
             "required": [
-              "name",
-              "mesh",
-              "transform",
-              "material"
+              "vertices",
+              "normals",
+              "indices"
             ]
-          }
-        },
-        "lights": {
-          "type": "array",
-          "items": {
+          },
+          "transform": {
             "type": "object",
             "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "point",
-                  "directional",
-                  "spot"
-                ]
-              },
               "position": {
                 "type": "array",
                 "items": {
@@ -156,7 +66,15 @@
                 "minItems": 3,
                 "maxItems": 3
               },
-              "intensity": {
+              "scale": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "rotation": {
                 "type": "array",
                 "items": {
                   "type": "number"
@@ -166,21 +84,95 @@
               }
             },
             "required": [
-              "type",
               "position",
-              "intensity"
+              "scale",
+              "rotation"
+            ]
+          },
+          "material": {
+            "type": "object",
+            "properties": {
+              "albedo": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "metallic": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "roughness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "ao": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [
+              "albedo",
+              "metallic",
+              "roughness",
+              "ao"
             ]
           }
-        }
-      },
-      "required": [
-        "name",
-        "objects",
-        "lights"
-      ]
+        },
+        "required": [
+          "name",
+          "mesh",
+          "transform",
+          "material"
+        ]
+      }
+    },
+    "lights": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "point",
+              "directional",
+              "spot"
+            ]
+          },
+          "position": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "intensity": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "type",
+          "position",
+          "intensity"
+        ]
+      }
     }
   },
   "required": [
-    "scene"
+    "name",
+    "objects",
+    "lights"
   ]
 }

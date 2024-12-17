@@ -3,154 +3,116 @@ export module Scene;
 import std;
 import Json;
 import Core.Event;
-import Core.Math;
 import Core.Logger;
 import Scene.SceneNode;
 import Scene.SceneNodeFactory;
 import Graphics.Camera;
 import Graphics.Shader;
 import Graphics.Render.RenderContext;
-import Graphics.Render.Canvas;
-import Graphics.Render.Acceleration.BVHTree;
+import Graphics.Render.Pipeline;
+
+static auto getNameFromJson(const Json& json) -> std::string {
+    if (json.is_null()) {
+        Logger::error("Empty json object!");
+        return "";
+    }
+    if (json.contains("name")) {
+        return json["name"].get<std::string>();
+    }
+    Logger::error("Cannot find name item!");
+    return "";
+}
+
+static auto getShaderFileFromJson(const Json& json) -> std::string {
+    if (json.is_null()) {
+        Logger::error("Empty json object!");
+    }
+    if (json.contains("shader")) {
+        if (json["shader"].is_string()) {
+            return json["shader"].get<std::string>();
+        }
+        Logger::error("Cannot find shader item!");
+        return "";
+    }
+    Logger::error("Cannot find shader item!");
+    return "";
+}
 
 export class Scene {
 public:
     explicit Scene(const std::string& path) {
         if (!_eventsRegistered) {
-            EventManager::registerEvent<>("Render::RefreshHistoryFramedata");
-            EventManager::registerEvent<>("Scene::NewRenderLoop");
             _eventsRegistered = true;
         }
         _sceneFilePath = path;
-        loadScene(_sceneFilePath);
+        loadSceneJsonFile(_sceneFilePath);
     }
 
-    auto getName() -> std::string {
-        return _name;
+    auto getName() const -> std::string {
+        return getNameFromJson(_sceneJson);
     }
 
     ~Scene() = default;
 
     auto load() -> void {
         // TODO: Multiple scenes support
-        bindEvents();
-        _rootNode->load(_renderContext);
-        _renderContext.setCamera(_camera);
-        std::cout << _renderLoopCount << "\n";
-        _renderContext.setFrameCount(_renderLoopCount);
-        _renderContext.setup();
+        /* 1. Build the scene from json file. */
+        buildSceneTree();
+
+        /* 2. Collect data from drawables and send data to Pipeline. */
+        _rootNode->collectData();
+
+        /* 3. Activate current RenderContext. */
+        _renderContext = std::make_shared<RenderContext>();
+        Pipeline::getInstance().setContext(_renderContext);
+
+        /* 4. Initialize Pipeline */
+        Pipeline::getInstance().initialize();
     };
 
-    auto render() -> void {
-        EventManager::emit("Scene::NewRenderLoop");
-        _canvas.draw(_renderContext);
+    auto update() -> void {
+        EventManager::emit("Render::NewFrame");
+        Pipeline::getInstance().render();
     };
 
     auto exit() -> void {
-        unbindEvents();
-        _renderContext = RenderContext();
+        _renderContext = nullptr;
+        Pipeline::getInstance().clearData();
         saveScene(_sceneFilePath);
         _rootNode = nullptr;
     };
 
     inline auto setSize(const float width, const float height) -> void {
-        _width  = width;
-        _height = height;
-        _camera.updateScreenRatio(_width, _height);
+        if (_width != width || _height != height) {
+            _width  = width;
+            _height = height;
+            EventManager::emit("Scene::Resize", width, height);
+        }
     }
 
-protected:
-    auto bindEvents() -> void {
-        EventManager::connect<Vec2>("Input::MouseDrag", [this](const Vec2& delta) {
-            _camera.updateOrientation(delta.x, delta.y);
-            EventManager::emit("Render::RefreshHistoryFramedata");
-        });
-        EventManager::connect<float>("Input::MouseScroll", [this](float delta) {
-            const auto fov = _camera.getFov();
-            _camera.setFov(Math::clamp(fov - delta, 0.1f, 80.0f));
-            EventManager::emit("Render::RefreshHistoryFramedata");
-        });
-        EventManager::connect<>("Camera::MoveLeft", [this]() {
-            this->_camera.moveLeft();
-            EventManager::emit("Camera::Move");
-        });
-        EventManager::connect<>("Camera::MoveRight", [this]() {
-            this->_camera.moveRight();
-            EventManager::emit("Camera::Move");
-        });
-        EventManager::connect<>("Camera::MoveForward", [this]() {
-            this->_camera.moveForward();
-            EventManager::emit("Camera::Move");
-        });
-        EventManager::connect<>("Camera::MoveBackward", [this]() {
-            this->_camera.moveBackward();
-            EventManager::emit("Camera::Move");
-        });
-        EventManager::connect<>("Scene::NewRenderLoop", [this] {
-            this->_renderLoopCount = this->_renderLoopCount + 1;
-        });
-        EventManager::connect<>("Render::RefreshHistoryFramedata", [this] {
-            this->_renderLoopCount = 0;
-        });
-    }
-
-    auto unbindEvents() -> void {
-        EventManager::disconnectAll<Vec2>("Input::MouseDrag");
-        EventManager::disconnectAll<float>("Input::MouseScroll");
-        EventManager::disconnectAll<>("Camera::MoveLeft");
-        EventManager::disconnectAll<>("Camera::MoveRight");
-        EventManager::disconnectAll<>("Camera::MoveForward");
-        EventManager::disconnectAll<>("Camera::MoveBackward");
-        EventManager::disconnectAll<>("Scene::NewRenderLoop");
-        EventManager::disconnectAll<>("Render::RefreshHistoryFramedata");
-    }
-
-    auto loadScene(const std::filesystem::path& path) -> void {
+private:
+    auto loadSceneJsonFile(const std::filesystem::path& path) -> void {
         std::ifstream file(path);
         if (!file.is_open()) {
-            Logger::info("Failed to open scene file" + path.filename().string());
+            Logger::error("Failed to open scene file" + path.filename().string());
             return;
         }
         Json scene_json;
         file >> scene_json;
-        this->parseSceneJson(scene_json);
+        this->_sceneJson = std::move(scene_json);
     }
 
-    auto parseSceneJson(const Json& scene_json) -> void {
-        if (scene_json.is_null()) {
-            Logger::error("Failed to parse scene file!");
+    auto buildSceneTree() -> void {
+        if (_sceneJson.is_null()) {
+            Logger::error("Empty json object!");
             return;
         }
-        if (!scene_json.contains("scene")) {
-            Logger::error("Cannot find scene node!");
+        if (!_sceneJson.contains("objects")) {
+            Logger::error("No objects found in scene node!");
             return;
         }
-        Json scene_node = scene_json["scene"];
-        if (scene_node.contains("name")) {
-            _name = scene_node["name"].get<std::string>();
-        } else {
-            Logger::error("Cannot find scene name!");
-            return;
-        }
-
-        if (!scene_node.contains("shader")) {
-            Logger::error("Cannot find scene shader!");
-            return;
-        }
-        Json shader_node = scene_node["shader"];
-        if (!shader_node.contains("fragment_shader") || !shader_node.contains("fragment_shader")) {
-            Logger::error("Shader incomplete!");
-        }
-        const auto frag_path = shader_node["fragment_shader"].get<std::string>();
-        const auto vert_path = shader_node["vertex_shader"].get<std::string>();
-        _renderContext.setShader(Shader::loadFromFile(_name, vert_path, frag_path));
-
-        if (!scene_node.contains("objects")) {
-            Logger::warning("No objects found in scene node!");
-        }
-        _rootNode = std::static_pointer_cast<CompositeNode>(SceneNodeFactory::createNode(scene_node));
-
-        Json scene_objects = scene_node["objects"];
+        _rootNode          = std::static_pointer_cast<CompositeNode>(SceneNodeFactory::createNode(_sceneJson));
+        Json scene_objects = _sceneJson["objects"];
         if (!scene_objects.is_array()) {
             Logger::error("scene_objects is not an array!");
             return;
@@ -171,14 +133,11 @@ protected:
     auto saveScene(const std::filesystem::path& path) -> void {}
 
     static bool                    _eventsRegistered;
-    std::string                    _name;
     std::string                    _sceneFilePath;
-    int32_t                        _renderLoopCount = 0;
-    float                          _width           = 800, _height = 600;
-    Camera                         _camera{_width, _height};
-    Canvas                         _canvas;
-    RenderContext                  _renderContext{};
+    float                          _width = 800, _height = 600;
+    Json                           _sceneJson;
     std::shared_ptr<CompositeNode> _rootNode;
+    std::shared_ptr<RenderContext> _renderContext;
 };
 
 bool Scene::_eventsRegistered = false;

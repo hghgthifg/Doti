@@ -11,13 +11,15 @@ import Core.Math;
 
 export class OpenGLView : public UIComponent {
 public:
-    OpenGLView(const std::string& name) : UIComponent(name) {
-        _open = new bool(true);
-        EventManager::registerEvent<Vec2>("Input::MouseDrag");
-        EventManager::registerEvent<float>("Input::MouseScroll");
+    OpenGLView(const std::string& name, float width, float height) : UIComponent(name) {
+        EventManager::connect<float, float>("Scene::Resize", [this](float width, float height) {
+            _canvasWidth  = width;
+            _canvasHeight = height;
+        });
+        _canvasWidth  = width;
+        _canvasHeight = height;
+        _open         = new bool(true);
     }
-
-    auto setTexture(const std::shared_ptr<FrameCanvas>& canvas) -> void { _canvas = canvas; }
 
 protected:
     void beginRender() override {
@@ -33,19 +35,15 @@ protected:
         const ImVec2 pos           = ImGui::GetCursorScreenPos();
         const ImVec2 availableSize = ImGui::GetContentRegionAvail();
 
-        /* Get the original texture dimensions */
-        const float canvasWidth  = static_cast<float>(_canvas->getWidth());
-        const float canvasHeight = static_cast<float>(_canvas->getHeight());
-
         /* Calculate scaling factor while maintaining aspect ratio
          * Choose the smaller scale to ensure texture fits in the window */
-        const float scaleX = availableSize.x / canvasWidth;
-        const float scaleY = availableSize.y / canvasHeight;
+        const float scaleX = availableSize.x / _canvasWidth;
+        const float scaleY = availableSize.y / _canvasHeight;
         const float scale  = std::min(scaleX, scaleY);
 
         /* Calculate the actual display dimensions after scaling */
-        const float displayWidth  = canvasWidth * scale;
-        const float displayHeight = canvasHeight * scale;
+        const float displayWidth  = _canvasWidth * scale;
+        const float displayHeight = _canvasHeight * scale;
 
         /* Calculate offsets to center the texture in available space */
         const float offsetX = (availableSize.x - displayWidth) * 0.5f;
@@ -58,7 +56,8 @@ protected:
         /* Draw the texture maintaining original aspect ratio and centered position
          * UV coordinates are flipped vertically (0,1 to 1,0) to correct OpenGL texture orientation */
         ImGui::GetWindowDrawList()->AddImage(
-            (ImTextureID) (intptr_t) (_canvas->getTexture()),
+            0,
+            // (ImTextureID) (intptr_t) (_canvas->getTexture()),
             displayPos,
             displayEndPos,
             ImVec2(0, 1), // UV start (bottom-left)
@@ -75,8 +74,8 @@ protected:
         if (ImGui::IsWindowFocused() && !ImGui::IsItemHovered()) {
             ImVec2 mouseDelta = ImGui::GetMouseDragDelta();
             if (mouseDelta.x != 0 || mouseDelta.y != 0) {
-                float width  = _canvas->getWidth();
-                float height = _canvas->getHeight();
+                float width  = _canvasWidth;
+                float height = _canvasHeight;
                 Vec2  delta  = {mouseDelta.x / width, mouseDelta.y / height};
                 EventManager::emit("Input::MouseDrag", delta);
             }
@@ -97,7 +96,8 @@ protected:
     }
 
 private:
-    std::shared_ptr<FrameCanvas> _canvas;
-    bool*                        _open;
+    // std::shared_ptr<FrameCanvas> _canvas;
+    bool* _open;
+    float _canvasWidth, _canvasHeight;
     // ImVec2                         _lastSize;
 };

@@ -9,9 +9,7 @@ import Scene.SceneManager;
 
 export class MenuBar : public UIComponent {
 public:
-    MenuBar(const std::string& name) : UIComponent(name) {
-        EventManager::registerEvent<std::string>("Scene::ChangeScene");
-    }
+    MenuBar(const std::string& name) : UIComponent(name) {}
 
 protected:
     void beginRender() override {
