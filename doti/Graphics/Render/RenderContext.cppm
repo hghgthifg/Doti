@@ -28,8 +28,19 @@ public:
         disconnectSlots();
     }
 
-    auto getFrameCount() const -> uint32_t { return _frameCount; }
-    auto getCamera() const -> Camera { return _camera; }
+    auto getFrameCount() const -> uint32_t {
+        return _frameCount;
+    }
+
+    auto getCamera() const -> Camera {
+        return _camera;
+    }
+
+    auto setScreenSize(const float width, const float height) -> void {
+        _screenWidth  = width;
+        _screenHeight = height;
+        _camera.reset(width, height);
+    }
 
 private:
     auto connectSlots() -> void;
@@ -38,6 +49,7 @@ private:
 
     Camera   _camera{};
     uint32_t _frameCount = 0;
+    float    _screenWidth, _screenHeight;
 };
 
 auto RenderContext::connectSlots() -> void {
@@ -72,6 +84,12 @@ auto RenderContext::connectSlots() -> void {
     EventManager::connect<>("Render::RefreshHistoryFramedata", [this] {
         this->_frameCount = 0;
     });
+    EventManager::connect<float, float>("Scene::Resize", [this](float width, float height) {
+        Logger::debug("Scene::Resize emitted");
+        this->_screenWidth  = width;
+        this->_screenHeight = height;
+        this->_camera.reset(width, height);
+    });
 }
 
 auto RenderContext::disconnectSlots() -> void {
@@ -83,4 +101,5 @@ auto RenderContext::disconnectSlots() -> void {
     EventManager::disconnectAll<>("Camera::UpdateFov");
     EventManager::disconnectAll<>("Render::NewFrame");
     EventManager::disconnectAll<>("Render::RefreshHistoryFramedata");
+    EventManager::disconnectAll<>("Scene::Resize");
 }

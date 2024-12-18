@@ -8,11 +8,13 @@ public:
     Buffer(): _ID(0), _elementsCount(0), _size(0), _batched(false) {}
 
     ~Buffer() {
-        glDeleteBuffers(1, &_ID);
+        if (_ID != 0) {
+            glDeleteBuffers(1, &_ID);
+        }
     }
 
-    void allocate(const uint32_t size, const void* data, const GLuint elements_count, const bool batched = false,
-                  const GLenum   type = GL_STATIC_DRAW) {
+    void allocate(const uint32_t size, const void* data, const GLuint elements_count = 0, const bool batched = false,
+                  const GLenum   type                                                = GL_STATIC_DRAW) {
         _elementsCount = elements_count;
         _size          = size;
         _batched       = batched;

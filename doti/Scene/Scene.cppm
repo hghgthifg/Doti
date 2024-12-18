@@ -2,6 +2,7 @@ export module Scene;
 
 import std;
 import Json;
+import Core.Math;
 import Core.Event;
 import Core.Logger;
 import Scene.SceneNode;
@@ -66,6 +67,7 @@ public:
 
         /* 3. Activate current RenderContext. */
         _renderContext = std::make_shared<RenderContext>();
+        _renderContext->setScreenSize(_width, _height);
         Pipeline::getInstance().setContext(_renderContext);
 
         /* 4. Initialize Pipeline */
@@ -132,18 +134,63 @@ private:
         }
         if (_sceneJson.contains("materials") && _sceneJson["materials"].is_array()) {
             for (Json material_json: _sceneJson["materials"]) {
+                // std::cout << material_json.dump() << "\n";
                 Material material{
                     .albedo = Vec3{
                         material_json["albedo"][0].get<float>(),
                         material_json["albedo"][1].get<float>(),
                         material_json["albedo"][2].get<float>()
                     },
-                    .metallic = material_json["metallic"][0].get<float>(),
-                    .roughness = material_json["roughness"][1].get<float>(),
-                    .ao = material_json["ao"][0].get<float>()
+                    .metallic = material_json["metallic"].get<float>(),
+                    .roughness = material_json["roughness"].get<float>(),
+                    .ao = material_json["ao"].get<float>()
                 };
                 Pipeline::getInstance().addMaterial(material);
             }
+        }
+
+        if (_sceneJson.contains("lights") && _sceneJson["lights"].is_array()) {
+            auto& pipeline = Pipeline::getInstance();
+            for (Json light_json: _sceneJson["lights"]) {
+                if (light_json["type"].get<std::string>() == "point") {
+                    PointLight pointLight{
+                        .position = Vec3{
+                            light_json["position"][0].get<float>(),
+                            light_json["position"][1].get<float>(),
+                            light_json["position"][2].get<float>()
+                        },
+                        .emission = Vec3{
+                            light_json["emission"][0].get<float>(),
+                            light_json["emission"][1].get<float>(),
+                            light_json["emission"][2].get<float>()
+                        }
+                    };
+                    pipeline.addPointLight(pointLight);
+                } else if (light_json["type"].get<std::string>() == "area") {
+                    AreaLight areaLight{
+                        .position = Vec3{
+                            light_json["position"][0].get<float>(),
+                            light_json["position"][1].get<float>(),
+                            light_json["position"][2].get<float>()
+                        },
+                        .normal = Vec3{
+                            light_json["normal"][0].get<float>(),
+                            light_json["normal"][1].get<float>(),
+                            light_json["normal"][2].get<float>()
+                        },
+                        .emission = Vec3{
+                            light_json["emission"][0].get<float>(),
+                            light_json["emission"][1].get<float>(),
+                            light_json["emission"][2].get<float>()
+                        },
+                        .size = Vec2{
+                            light_json["size"][0].get<float>(),
+                            light_json["size"][1].get<float>()
+                        }
+                    };
+                    pipeline.addAreaLight(areaLight);
+                }
+            };
         }
     }
 
@@ -151,7 +198,7 @@ private:
 
     static bool                    _eventsRegistered;
     std::string                    _sceneFilePath;
-    float                          _width = 800, _height = 600;
+    float                          _width = 0, _height = 0;
     Json                           _sceneJson;
     std::shared_ptr<CompositeNode> _rootNode;
     std::shared_ptr<RenderContext> _renderContext;

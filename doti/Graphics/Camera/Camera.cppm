@@ -129,7 +129,7 @@ public:
      * @param screen_width The width of the screen.
      * @param screen_height The height of the screen.
      */
-    auto reset(uint32_t screen_width, uint32_t screen_height) -> void {
+    auto reset(const float screen_width, const float screen_height) -> void {
         _yaw               = -90.0f;                 /*!< Initial yaw angle */
         _pitch             = -50.0f;                 /*!< Initial pitch angle */
         _fov               = 60.0f;                  /*!< Initial field of view */
@@ -137,7 +137,7 @@ public:
         _cameraPos         = Vec3(0.0f, 1.4f, 1.0f); /*!< Initial camera position */
         _worldUp           = Vec3(0.0f, 1.0f, 0.0f); /*!< World up vector */
 
-        _screenRatio = static_cast<float>(screen_width) / static_cast<float>(screen_height);
+        _screenRatio = screen_width / screen_height;
         _halfHeight  = Math::tan(Math::radians(_fov / 2.0f));
         _halfWidth   = _halfHeight * _screenRatio;
         _cameraSpeed = 1.0f; /*!< Movement speed */

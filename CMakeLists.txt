@@ -40,8 +40,10 @@ set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
 
 # Build Shaders
 set(SHADERS_GLSL
-        #        doti/Graphics/Shader/raster_frag.frag
-        doti/Graphics/Shader/raster_vert.vert
+        doti/Graphics/Shader/geometry_pass.frag
+        doti/Graphics/Shader/geometry_pass.vert
+        #        doti/Graphics/Shader/color_pass.vert
+        #        doti/Graphics/Shader/color_pass.frag
         #        doti/Graphics/Shader/raytracing.comp
 )
 
@@ -58,15 +60,19 @@ endif ()
 message(STATUS "Found shaderc_glsl: ${SHADERC_GLSL_EXECUTABLE}")
 
 foreach (shader ${SHADERS_GLSL})
-    get_filename_component(shader_name ${shader} NAME_WE)
-    set(spv_output ${CMAKE_BINARY_DIR}/shaders_spv/${shader_name}.spv)
+    get_filename_component(shader_name ${shader} NAME)
+    string(REPLACE "." "_" shader_name_unique ${shader_name})
+    set(spv_output ${CMAKE_BINARY_DIR}/shaders_spv/${shader_name_unique}.spv)
     add_custom_command(
             OUTPUT ${spv_output}
             COMMAND ${SHADERC_GLSL_EXECUTABLE}
             ${DOTI_ROOT_DIR}/${shader}
             -o ${spv_output}
             --target-env=opengl
-            #            --platform desktop
+            -std=460core
+            -O0
+            -Werror
+            -g
             -I doti/Graphics/Shader/
             DEPENDS ${shader}
             COMMENT "Compiling ${shader} to SPIR-V"

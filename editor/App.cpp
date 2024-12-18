@@ -40,6 +40,7 @@ auto main() -> int {
         SceneManager::initialize();
 
         SceneManager::registerScene("resource/scenes/cornell-box.json");
+        SceneManager::setCurrentScene("Cornell Box");
 
         while (!window.shouldClose()) {
             window.beginDraw();
@@ -47,8 +48,6 @@ auto main() -> int {
             auto currentScene = SceneManager::getCurrentScene();
             if (currentScene.get() != nullptr) {
                 currentScene->setSize(width, height);
-            }
-            if (currentScene) {
                 currentScene->update();
             }
 

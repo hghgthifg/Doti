@@ -7,4 +7,6 @@ export struct Material {
     float metallic;
     float roughness;
     float ao;
+    float padding1 = 0;
+    float padding2 = 0;
 };

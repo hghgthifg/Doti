@@ -111,7 +111,7 @@
             "enum": [
               "point",
               "directional",
-              "spot"
+              "area"
             ]
           },
           "position": {
@@ -134,7 +134,7 @@
         "required": [
           "type",
           "position",
-          "intensity"
+          "emission"
         ]
       }
     }

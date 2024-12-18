@@ -61,7 +61,7 @@
         "scale": [1.0, 1.0, 1.0],
         "rotation": [0.0, 0.0, 0.0]
       },
-      "material_id": 1
+      "material_id": 0
     },
     {
       "name": "ceiling",
@@ -89,7 +89,7 @@
         "scale": [1.0, 1.0, 1.0],
         "rotation": [0.0, 0.0, 0.0]
       },
-      "material_id": 1
+      "material_id": 0
     },
     {
       "name": "left_wall",
@@ -117,7 +117,7 @@
         "scale": [1.0, 1.0, 1.0],
         "rotation": [0.0, 0.0, 0.0]
       },
-      "material_id": 2
+      "material_id": 1
     },
     {
       "name": "right_wall",
@@ -145,7 +145,7 @@
         "scale": [1.0, 1.0, 1.0],
         "rotation": [0.0, 0.0, 0.0]
       },
-      "material_id": 3
+      "material_id": 2
     },
     {
       "name": "back_wall",
@@ -173,7 +173,7 @@
         "scale": [1.0, 1.0, 1.0],
         "rotation": [0.0, 0.0, 0.0]
       },
-      "material_id": 1
+      "material_id": 0
     },
     {
       "name": "short_block",
@@ -211,21 +211,16 @@
         "scale": [1.0, 1.0, 1.0],
         "rotation": [0.0, 45.0, 0.0]
       },
-      "material_id": 1
+      "material_id": 0
     }
   ],
   "lights": [
     {
-      "type": "point",
-      "position": [343.0, 548.8, 227.0],
-      "intensity": [5.0, 5.0, 5.0],
-      "emission_spectrum": {
-        "400.0": 0.0,
-        "500.0": 8.0,
-        "600.0": 15.6,
-        "700.0": 18.4
-      },
-      "reflectance": 0.78
+      "type": "area",
+      "position": [278.0, 548.8, 279.5],
+      "normal": [0.0, -1.0, 0.0],
+      "size": [60.0, 60.0],
+      "emission": [20.0, 20.0, 20.0]
     }
   ]
 }

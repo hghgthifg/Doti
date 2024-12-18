@@ -101,7 +101,8 @@ public:
         checkCompileErrors(fragmentShader, "FRAGMENT");
 
         /* Link shaders */
-        result._ID = glCreateProgram();
+        result._ID   = glCreateProgram();
+        result._name = name;
         Logger::info("Created shader: " + result._name + ", ID: " + std::to_string(result._ID));
         glAttachShader(result._ID, vertexShader);
         glAttachShader(result._ID, fragmentShader);
@@ -111,7 +112,6 @@ public:
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
-        result._name = name;
         return result;
     }
 
@@ -127,13 +127,16 @@ public:
 
         glShaderBinary(1, &vert, GL_SHADER_BINARY_FORMAT_SPIR_V, vertex_shader,
                        vertex_shader_size * sizeof(unsigned char));
+        glSpecializeShader(vert, "main", 0, nullptr, nullptr);
         checkCompileErrors(vert, "VERTEX");
 
         glShaderBinary(1, &frag, GL_SHADER_BINARY_FORMAT_SPIR_V, fragment_shader,
                        fragment_shader_size * sizeof(unsigned char));
+        glSpecializeShader(frag, "main", 0, nullptr, nullptr);
         checkCompileErrors(frag, "FRAGMENT");
 
-        result._ID = glCreateProgram();
+        result._ID   = glCreateProgram();
+        result._name = name;
         Logger::info("Created shader: " + result._name + ", ID: " + std::to_string(result._ID));
         glAttachShader(result._ID, vert);
         glAttachShader(result._ID, frag);
@@ -142,8 +145,11 @@ public:
 
         glDeleteShader(vert);
         glDeleteShader(frag);
-        result._name = name;
         return result;
+    }
+
+    auto getID() const -> GLuint {
+        return _ID;
     }
 
     // ------------------------------------------------------------------------
@@ -204,20 +210,20 @@ public:
     }
 
 private:
-    static auto checkCompileErrors(const uint32_t shader, const std::string_view type) -> void {
+    static auto checkCompileErrors(const uint32_t shader, const std::string& type) -> void {
         int  success;
         char infoLog[1024];
         if (type != "PROGRAM") {
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
             if (!success) {
                 glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-                Logger::error(infoLog);
+                Logger::error("[" + type + "]" + std::string(infoLog));
             }
         } else {
             glGetProgramiv(shader, GL_LINK_STATUS, &success);
             if (!success) {
                 glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-                Logger::error(infoLog);
+                Logger::error(std::string(infoLog));
             }
         }
     }

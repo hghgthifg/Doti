@@ -1,15 +1,16 @@
 export module Graphics.ShaderCollection;
 
-import Shaders.raster_vert;
+import Shaders.geometry_pass_vert;
+import Shaders.geometry_pass_frag;
 import Graphics.Shader;
 
 export namespace Shaders
 {
-    auto GetRasterizationShader() {
-        return Shader::loadFromBin("Rasterizalization",
-                                   raster_vert_spv,
-                                   raster_vert_spv_size,
-                                   raster_frag_spv,
-                                   raster_frag_spv_size);
+    auto GetRasterizationGeometryPassShader() {
+        return Shader::loadFromBin("Raster_Geopass",
+                                   geometry_pass_vert_spv,
+                                   geometry_pass_vert_spv_size,
+                                   geometry_pass_frag_spv,
+                                   geometry_pass_frag_spv_size);
     }
 };

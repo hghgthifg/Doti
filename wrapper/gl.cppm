@@ -39,8 +39,12 @@ export using gl::glCreateProgram;
 export using gl::glAttachShader;
 export using gl::glLinkProgram;
 export using gl::glDeleteShader;
+export using gl::glSpecializeShader;
 export using gl::glClear;
 export using gl::glEnable;
+
+export using gl::glGetUniformBlockIndex;
+export using gl::glUniformBlockBinding;
 
 export using gl::glUniform1i;
 export using gl::glUniform1f;
@@ -87,10 +91,20 @@ export using gl::glNamedBufferSubData;
 export using gl::glDeleteBuffers;
 export using gl::glBindBufferBase;
 
+export using gl::glCreateVertexArrays;
+export using gl::glEnableVertexArrayAttrib;
+export using gl::glVertexArrayVertexBuffer;
+export using gl::glVertexArrayAttribFormat;
+export using gl::glVertexArrayAttribIFormat;
+export using gl::glVertexArrayAttribBinding;
+export using gl::glVertexArrayElementBuffer;
+
 export using gl::glDrawElements;
 export using gl::glDrawArrays;
 
 export using gl::glFlush;
+
+export using gl::glDrawBuffers;
 
 export using gl::glVertexAttribPointer;
 export using gl::glEnableVertexAttribArray;
@@ -104,6 +118,9 @@ export constexpr auto GL_FLOAT          = gl::GL_FLOAT;
 export constexpr auto GL_UNSIGNED_INT   = gl::GL_UNSIGNED_INT;
 export constexpr auto GL_UNSIGNED_BYTE  = gl::GL_UNSIGNED_BYTE;
 
+export constexpr auto GL_RG      = gl::GL_RG;
+export constexpr auto GL_RG16    = gl::GL_RG16;
+export constexpr auto GL_RG16F   = gl::GL_RG16F;
 export constexpr auto GL_RED     = gl::GL_RED;
 export constexpr auto GL_R32F    = gl::GL_R32F;
 export constexpr auto GL_RGB     = gl::GL_RGB;
@@ -139,6 +156,7 @@ export constexpr auto GL_FRAMEBUFFER           = gl::GL_FRAMEBUFFER;
 export constexpr auto GL_ELEMENT_ARRAY_BUFFER  = gl::GL_ELEMENT_ARRAY_BUFFER;
 export constexpr auto GL_RENDERBUFFER          = gl::GL_RENDERBUFFER;
 export constexpr auto GL_SHADER_STORAGE_BUFFER = gl::GL_SHADER_STORAGE_BUFFER;
+export constexpr auto GL_UNIFORM_BUFFER        = gl::GL_UNIFORM_BUFFER;
 
 export constexpr auto GL_SHADER_STORAGE_BLOCK = gl::GL_SHADER_STORAGE_BLOCK;
 
@@ -146,8 +164,11 @@ export constexpr auto GL_DEPTH24_STENCIL8 = gl::GL_DEPTH24_STENCIL8;
 
 export constexpr auto GL_DEPTH_STENCIL_ATTACHMENT = gl::GL_DEPTH_STENCIL_ATTACHMENT;
 
-export constexpr auto GL_DEPTH_TEST  = gl::GL_DEPTH_TEST;
-export constexpr auto GL_STATIC_DRAW = gl::GL_STATIC_DRAW;
+export constexpr auto GL_INVALID_INDEX = gl::GL_INVALID_INDEX;
+
+export constexpr auto GL_DEPTH_TEST   = gl::GL_DEPTH_TEST;
+export constexpr auto GL_STATIC_DRAW  = gl::GL_STATIC_DRAW;
+export constexpr auto GL_DYNAMIC_DRAW = gl::GL_DYNAMIC_DRAW;
 
 export constexpr auto GL_COLOR_ATTACHMENT0 = gl::GL_COLOR_ATTACHMENT0;
 export constexpr auto GL_COLOR_ATTACHMENT1 = gl::GL_COLOR_ATTACHMENT1;

@@ -58,11 +58,24 @@ public:
         if (_quadVBO) glDeleteBuffers(1, &_quadVBO);
     }
 
+    auto bindRasterizationGBuffer() -> void {
+        glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
+        glViewport(0, 0, _width, _height);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
     auto bindRasterizationFBO() -> void {
         glBindFramebuffer(GL_FRAMEBUFFER, _fboRaster);
         glViewport(0, 0, _width, _height);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    auto drawQuad() {
+        glBindVertexArray(_quadVAO);
+        glDrawArrays(GL_TRIANGLES_STRIP, 0, 4);
+        glBindVertexArray(0);
     }
 
     auto bindRayTracingFBO() -> void {
@@ -96,12 +109,10 @@ public:
         }
         _mixShader.setInt("rayTracingTexture", 1);
 
-        glBindVertexArray(_quadVAO);
-        glDrawArrays(GL_TRIANGLES_STRIP, 0, 4);
-        glBindVertexArray(0);
+        this->drawQuad();
 
         _mixShader.deactivate();
-        unbind();
+        this->unbind();
     }
 
     auto getRasterizationTexture() const -> GLuint { return _rasterTexture; }
@@ -151,7 +162,11 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _rasterTexture, 0);
 
-        // Position Texture
+        /* 2.3 Generate gBuffer */
+        glGenFramebuffers(1, &_gBuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer);
+
+        // Position Texture (layout location = 0)
         glGenTextures(1, &_gPosition);
         glBindTexture(GL_TEXTURE_2D, _gPosition);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);
@@ -159,7 +174,7 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _gPosition, 0);
 
-        // Normal Texture
+        // Normal Texture (layout location = 1)
         glGenTextures(1, &_gNormal);
         glBindTexture(GL_TEXTURE_2D, _gNormal);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);
@@ -167,13 +182,26 @@ private:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _gNormal, 0);
 
-        // AlbedoSpec Texture
-        glGenTextures(1, &_gAlbedoSpec);
-        glBindTexture(GL_TEXTURE_2D, _gAlbedoSpec);
+        // Albedo + Metallic Texture (layout location = 2)
+        glGenTextures(1, &_gAlbedoMetallic);
+        glBindTexture(GL_TEXTURE_2D, _gAlbedoMetallic);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // 或 GL_NEAREST，视需求而定
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // 或 GL_NEAREST，视需求而定
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, _gAlbedoSpec, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, _gAlbedoMetallic, 0);
+
+        // Roughness + AO Texture (layout location = 3)
+        glGenTextures(1, &_gRoughnessAO);
+        glBindTexture(GL_TEXTURE_2D, _gRoughnessAO);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, _width, _height, 0, GL_RG, GL_FLOAT, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, _gRoughnessAO, 0);
+
+        constexpr GLenum attachments[4] = {
+            GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
+        };
+        glDrawBuffers(4, attachments);
 
         /* 2.3 Attach renderbuffer to framebuffer of the rasterization pass. */
         glBindFramebuffer(GL_FRAMEBUFFER, _fboRaster);
@@ -257,12 +285,13 @@ private:
         if (_fboRayTracing1) glDeleteFramebuffers(1, &_fboRayTracing1);
         if (_fboRayTracing2) glDeleteFramebuffers(1, &_fboRayTracing2);
         if (_fboFinal) glDeleteFramebuffers(1, &_fboFinal);
+        if (_gBuffer) glDeleteFramebuffers(1, &_gBuffer);
 
         if (_rboRasterization) glDeleteRenderbuffers(1, &_rboRasterization);
 
         if (_gPosition) glDeleteTextures(1, &_gPosition);
         if (_gNormal) glDeleteTextures(1, &_gNormal);
-        if (_gAlbedoSpec) glDeleteTextures(1, &_gAlbedoSpec);
+        if (_gAlbedoMetallic) glDeleteTextures(1, &_gAlbedoMetallic);
 
         if (_rasterTexture) glDeleteTextures(1, &_rasterTexture);
         if (_rayTracingAccumTexture1) glDeleteTextures(1, &_rayTracingAccumTexture1);
@@ -280,9 +309,11 @@ private:
     GLuint _rayTracingAccumTexture2 = 0;
     GLuint _finalTexture            = 0;
 
-    GLuint _gPosition   = 0;
-    GLuint _gNormal     = 0;
-    GLuint _gAlbedoSpec = 0;
+    GLuint _gPosition       = 0;
+    GLuint _gNormal         = 0;
+    GLuint _gAlbedoMetallic = 0;
+    GLuint _gRoughnessAO    = 0;
+    GLuint _gBuffer         = 0;
 
     GLuint _rboRasterization = 0;
 
