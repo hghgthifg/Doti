@@ -41,7 +41,6 @@ auto main() -> int {
         SceneManager::initialize();
 
         SceneManager::registerScene("resource/scenes/cornell-box.json");
-
         while (!window.shouldClose()) {
             window.beginDraw();
 

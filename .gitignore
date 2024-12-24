@@ -13,3 +13,5 @@ compile_commands.json
 # Clion generated files
 cmake-build-debug/
 cmake-build-release/
+
+.cache

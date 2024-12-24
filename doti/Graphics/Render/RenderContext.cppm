@@ -39,6 +39,7 @@ public:
         _triangleIndicesBuffer  = std::make_shared<Buffer>();
         _triangleNormalsBuffer  = std::make_shared<Buffer>();
         _triangleVerticesBuffer = std::make_shared<Buffer>();
+        _triangleAlbedosBuffer  = std::make_shared<Buffer>();
 
         _triangleIndicesBuffer->allocate(
             _triangleIndices.size() * sizeof(decltype(_triangleIndices[0])),
@@ -55,13 +56,19 @@ public:
             _triangleNormals.data(),
             0
         );
+        _triangleAlbedosBuffer->allocate(
+            _triangleAlbedos.size() * sizeof(decltype(_triangleAlbedos[0])),
+            _triangleAlbedos.data(),
+            0
+        );
 
         _shader.activate();
 
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, _triangleIndicesBuffer->getID());
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _triangleVerticesBuffer->getID());
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _triangleNormalsBuffer->getID());
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _bvhBuffer->getID());
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, _triangleAlbedosBuffer->getID());
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, _bvhBuffer->getID());
 
         _shader.deactivate();
     }
@@ -86,7 +93,8 @@ public:
         _primitives.emplace_back(primitive);
     }
 
-    auto addMeshData(std::vector<Vec3>&& vertices, std::vector<Vec3>&& normals, std::vector<uint32_t>&& indices) {
+    auto addMeshData(std::vector<Vec3>&& vertices, std::vector<Vec3>&& normals, std::vector<uint32_t>&& indices,
+                     std::vector<Vec3>&& albedos) {
         for (auto& i: indices) {
             i += _triangleVertices.size();
         }
@@ -103,6 +111,9 @@ public:
                 indices[3 * i + 2],
                 0
             ));
+        }
+        for (uint32_t i = 0; i < albedos.size(); i++) {
+            _triangleAlbedos.emplace_back(Vec4(albedos[i], 0.0f));
         }
         // for (auto i: _triangleVertices) {
         //     std::cout << std::format("({}, {}, {}, {})", i.x, i.y, i.z, i.w) << " ";
@@ -127,11 +138,13 @@ private:
 
     std::vector<Vec4>  _triangleVertices{};
     std::vector<Vec4>  _triangleNormals{};
+    std::vector<Vec4>  _triangleAlbedos{};
     std::vector<Vec4u> _triangleIndices{};
 
     std::shared_ptr<Buffer> _triangleVerticesBuffer{};
     std::shared_ptr<Buffer> _triangleNormalsBuffer{};
     std::shared_ptr<Buffer> _triangleIndicesBuffer{};
+    std::shared_ptr<Buffer> _triangleAlbedosBuffer{};
     std::shared_ptr<Buffer> _bvhBuffer{};
 
     std::vector<std::shared_ptr<PrimitiveBase>> _primitives{};

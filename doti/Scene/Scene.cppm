@@ -36,7 +36,7 @@ public:
         bindEvents();
         _rootNode->load(_renderContext);
         _renderContext.setCamera(_camera);
-        std::cout << _renderLoopCount << "\n";
+        // std::cout << _renderLoopCount << "\n";
         _renderContext.setFrameCount(_renderLoopCount);
         _renderContext.setup();
     };

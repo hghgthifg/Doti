@@ -18,6 +18,11 @@ layout (std430, binding = 2) buffer NormalBuffer {
     float _normal_padding;
 };
 
+layout (std430, binding = 3) buffer AlbedosBuffer {
+    vec3 albedos[];
+    float _albedo_padding;
+};
+
 struct AABB {
     vec4 pMin;
     vec4 pMax;
@@ -29,7 +34,7 @@ struct BVHNode {
     float _bvh_padding[3];
 };
 
-layout (std430, binding = 3) buffer BVHTree {
+layout (std430, binding = 4) buffer BVHTree {
     BVHNode nodes[];
 };
 
@@ -57,6 +62,14 @@ struct hitRecord {
     vec3 position;
     vec3 albedo;
 };
+
+struct Light {
+    vec3 position;
+    vec3 color;
+    float intensity;
+};
+
+int materialType[1000];
 
 uniform sampler2D historyTexture;
 uniform int screenWidth;
@@ -183,8 +196,13 @@ bool hitWorld(Ray r, out hitRecord rec) {
                         if (dis < minDis) {
                             minDis = dis;
                             rec.normal = normals[priIndex];
-                            rec.albedo = vec3(0.17, 0.17, 0.87);
-                            rec.position = r.origin + dis * r.direction;
+                            rec.albedo = albedos[priIndex];
+
+                            if (materialType[priIndex] == 1) {
+                                rec.position = diffuseReflection(rec.normal);
+                            } else {
+                                rec.position = metalReflection(rec.normal, r.direction);
+                            }
                         }
                     }
                 } else if (priType == 2) {
@@ -212,15 +230,11 @@ bool hitWorld(Ray r, out hitRecord rec) {
 vec3 shading(Ray r) {
     vec3 color = vec3(1.0, 1.0, 1.0);
     bool hitAnything = false;
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 10; i++) {
         hitRecord rec;
         if (hitWorld(r, rec)) {
             r.origin = rec.position;
             r.direction = diffuseReflection(rec.normal);
-            // if (rec.materialIndex == 0)
-            // r.direction = diffuseReflection(rec.normal);
-            // else if (rec.materialIndex == 1)
-            // r.direction = metalReflection(rec.normal, r.direction);
             color *= rec.albedo;
             hitAnything = true;
         } else {
@@ -232,8 +246,14 @@ vec3 shading(Ray r) {
 }
 
 void main() {
+
     wseed = uint(randOrigin * float(6.95857) * (TexCoords.x * TexCoords.y));
     vec3 hist = texture(historyTexture, TexCoords).rgb;
+
+    for (int i = 0; i < indices.length() / 3; i++) {
+        materialType[i] = int(rand()) % 2;
+    }
+
     Ray cameraRay;
     cameraRay.origin = camera.position;
     cameraRay.direction = normalize(camera.leftBottom + (TexCoords.x * 2.0 * camera.halfWidth) * camera.right + (TexCoords.y * 2.0 * camera.halfHeight) * camera.up);

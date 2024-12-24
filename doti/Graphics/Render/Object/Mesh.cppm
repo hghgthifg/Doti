@@ -11,10 +11,12 @@ export class Mesh final : public ObjectBase {
 public:
     Mesh(std::vector<Vertex>&&  vertices,
          std::vector<Index>&&   indices,
-         std::vector<Texture>&& textures) : ObjectBase(),
-                                            _vertices(std::move(vertices)),
-                                            _indices(std::move(indices)),
-                                            _textures(std::move(textures)) {};
+         std::vector<Texture>&& textures,
+         std::vector<Vec3>&&    albedos) : ObjectBase(),
+                                        _vertices(std::move(vertices)),
+                                        _indices(std::move(indices)),
+                                        _textures(std::move(textures)),
+                                        _albedos(std::move(albedos)) {};
 
     auto getVertices() const -> std::vector<Vertex> { return _vertices; };
     auto getIndices() const -> std::vector<Index> { return _indices; };
@@ -43,11 +45,12 @@ public:
             positions.emplace_back(vertex.position);
         }
         indices.assign(_indices.begin(), _indices.end());
-        render_context.addMeshData(std::move(positions), std::move(normals), std::move(indices));
+        render_context.addMeshData(std::move(positions), std::move(normals), std::move(indices), std::move(_albedos));
     }
 
 private:
     std::vector<Vertex>  _vertices;
     std::vector<Index>   _indices;
     std::vector<Texture> _textures;
+    std::vector<Vec3>    _albedos;
 };

@@ -13,12 +13,11 @@ import std;
  */
 export class Logger {
 public:
-    static auto setOutputStream(std::ostream& os = std::cout) {
-        Logger::logOutput = &os;
-    }
+    static auto setOutputStream(std::ostream& os = std::cout) { Logger::logOutput = &os; }
 
     static auto info(const std::string_view&     str,
                      const std::source_location& location = std::source_location::current()) -> void {
+        std::scoped_lock            lock(mutex);
         const std::filesystem::path filePath = location.file_name();
         std::println(*logOutput, "{}{} {:<10} ({}:{}) {}", "\033[1;32m", getCurrentTime(), "[info]",
                      filePath.filename().string(), location.line(), str);
@@ -26,6 +25,7 @@ public:
 
     static auto debug(const std::string_view&     str,
                       const std::source_location& location = std::source_location::current()) -> void {
+        std::scoped_lock            lock(mutex);
         const std::filesystem::path filePath = location.file_name();
         std::println(*logOutput, "{}{} {:<10} ({}:{}) {}", "\033[1;35m", getCurrentTime(), "[debug]",
                      filePath.filename().string(), location.line(), str);
@@ -33,6 +33,7 @@ public:
 
     static auto warning(const std::string_view&     str,
                         const std::source_location& location = std::source_location::current()) -> void {
+        std::scoped_lock            lock(mutex);
         const std::filesystem::path filePath = location.file_name();
         std::println(*logOutput, "{}{} {:<10} ({}:{}) {}", "\033[1;93m", getCurrentTime(), "[warning]",
                      filePath.filename().string(), location.line(), str);
@@ -40,6 +41,7 @@ public:
 
     static auto error(const std::string_view&     str,
                       const std::source_location& location = std::source_location::current()) -> void {
+        std::scoped_lock            lock(mutex);
         const std::filesystem::path filePath = location.file_name();
         std::println(*logOutput, "{}{} {:<10} ({}:{}) {}", "\033[1;91m", getCurrentTime(), "[error]",
                      filePath.filename().string(), location.line(), str);
@@ -47,6 +49,7 @@ public:
 
     static auto event(const std::string_view&     str,
                       const std::source_location& location = std::source_location::current()) -> void {
+        std::scoped_lock            lock(mutex);
         const std::filesystem::path filePath = location.file_name();
         std::println(*logOutput, "{}{} {:<10} ({}:{}) {}", "\033[1;36m", getCurrentTime(), "[event]",
                      filePath.filename().string(), location.line(), str);
@@ -54,13 +57,14 @@ public:
 
 private:
     inline static auto getCurrentTime() -> std::string {
-        std::chrono::zoned_time now{
-            std::chrono::current_zone(), std::chrono::system_clock::now()
-        };
+        std::scoped_lock        lock(mutex);
+        std::chrono::zoned_time now{std::chrono::current_zone(), std::chrono::system_clock::now()};
         return std::format("{:%Y-%m-%d %H:%M:%S}", now);;
     }
 
     static std::ostream* logOutput;
+    static std::mutex    mutex;
 };
 
 std::ostream* Logger::logOutput = &std::cout;
+std::mutex    Logger::mutex;

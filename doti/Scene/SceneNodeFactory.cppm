@@ -15,6 +15,7 @@ auto buildMesh(std::shared_ptr<LeafNode> node, const Json& data) -> std::shared_
     std::vector<Vertex>  vertices;
     std::vector<Index>   indices;
     std::vector<Texture> textures;
+    std::vector<Vec3>    albedos;
 
     auto mesh = data.at("mesh");
 
@@ -66,11 +67,15 @@ auto buildMesh(std::shared_ptr<LeafNode> node, const Json& data) -> std::shared_
         }
     }
 
-    /* Process textures (optional) */
-    // TODO: Process textures
+    auto m = data["material"]["albedo"];
+    for (int i = 0; i < indices.size() / 3; i++) {
+        albedos.emplace_back(Vec3{
+            m[0].get<float>(), m[1].get<float>(), m[2].get<float>()
+        });
+    }
 
     const auto drawable = std::make_shared<Mesh>(
-        std::move(vertices), std::move(indices), std::move(textures)
+        std::move(vertices), std::move(indices), std::move(textures), std::move(albedos)
     );
     node->setDrawable(drawable);
     return node;

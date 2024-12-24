@@ -22,6 +22,9 @@ Besides, you need to install the following packages via vcpkg:
 - imgui
 - Freetype
 - libjxl
+- nlohmann_json
+- glm
+- assimp
 
 Then you can build the project using CMake:
 
